@@ -1,0 +1,16 @@
+# Build context: repo root
+FROM rust:1-slim AS build
+RUN apt-get update && apt-get install -y pkg-config && rm -rf /var/lib/apt/lists/*
+WORKDIR /src/server
+COPY server/ .
+RUN cargo build --release --bins
+
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+COPY --from=build /src/server/target/release/cakna /usr/local/bin/cakna
+COPY --from=build /src/server/target/release/seed /usr/local/bin/seed
+COPY data/extracted /app/data/extracted
+ENV CAKNA_DATA_DIR=/app/data/extracted
+WORKDIR /app
+EXPOSE 8080
+CMD ["cakna"]

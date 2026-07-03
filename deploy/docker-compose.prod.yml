@@ -1,0 +1,52 @@
+# Run from the repo root on the server:
+#   docker compose -f deploy/docker-compose.prod.yml --env-file deploy/.env up -d --build
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cakna
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: cakna
+    volumes:
+      - cakna_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cakna -d cakna"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://cakna:${DB_PASSWORD}@db:5432/cakna
+      PORT: "8080"
+      COOKIE_SECURE: "true"
+      STATIC_DIR: /app/static
+      RUST_LOG: cakna=info,tower_http=info
+    volumes:
+      - ../web/build:/app/static:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+
+volumes:
+  cakna_pgdata:
+  caddy_data:
+  caddy_config:

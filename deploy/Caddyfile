@@ -1,0 +1,6 @@
+# Single proxy target: the Rust API serves both /api and the SPA static build.
+# (Never split routes across handle blocks here — one reverse_proxy, no footguns.)
+cakna.qcxis.com {
+	encode gzip
+	reverse_proxy api:8080
+}
