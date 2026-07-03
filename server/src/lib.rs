@@ -4,6 +4,7 @@ pub mod content;
 pub mod error;
 pub mod normalize;
 pub mod seed;
+pub mod solat;
 pub mod state;
 pub mod sync;
 
@@ -40,6 +41,7 @@ pub fn router(st: AppState) -> Router {
     let api = Router::new()
         .route("/health", get(health))
         .merge(content)
+        .route("/solat/:zone", get(solat::zone_times))
         .route("/auth/register", post(auth::routes::register))
         .route("/auth/login", post(auth::routes::login))
         .route("/auth/logout", post(auth::routes::logout))

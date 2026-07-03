@@ -16,6 +16,8 @@ pub enum AppError {
     #[error(transparent)]
     Db(#[from] sqlx::Error),
     #[error("{0}")]
+    Upstream(String),
+    #[error("{0}")]
     Internal(String),
 }
 
@@ -29,6 +31,10 @@ impl IntoResponse for AppError {
             AppError::Db(e) => {
                 tracing::error!("db error: {e}");
                 (StatusCode::INTERNAL_SERVER_ERROR, "internal error".into())
+            }
+            AppError::Upstream(m) => {
+                tracing::warn!("upstream error: {m}");
+                (StatusCode::BAD_GATEWAY, "upstream unavailable".into())
             }
             AppError::Internal(m) => {
                 tracing::error!("internal error: {m}");

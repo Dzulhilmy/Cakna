@@ -21,6 +21,12 @@
 		return () => clearInterval(iv);
 	});
 
+	// refetch official JAKIM times whenever the location changes
+	$effect(() => {
+		void city.value;
+		solat.loadOfficial();
+	});
+
 	/* ---------- City select ---------- */
 	let citySel = $state('0');
 	$effect(() => {
@@ -81,7 +87,8 @@
 		const l = solat.loc;
 		if (!l) return;
 		try {
-			const np = nextPrayer(l.lat, l.lng, l.tz);
+			// official JAKIM times when available, astronomical otherwise
+			const np = solat.next ?? nextPrayer(l.lat, l.lng, l.tz);
 			let ms = np.diff * 3600000;
 			// sample fallback: high-latitude tomorrow-Subuh NaN -> assume 05:00
 			if (!isFinite(ms)) ms = (24 - nowInTz(l.tz) + 5) * 3600000;
@@ -164,6 +171,17 @@
 						<b class="tabular-nums">{fmtT(np.times[k])}</b>
 					</div>
 				{/each}
+			</div>
+			<div class="pt-2 text-center text-[11px] tracking-wide text-muted-foreground">
+				{#if solat.official}
+					✓ {settings.value.uiLang === 'en'
+						? `Official JAKIM e-Solat times · Zone ${solat.official.zone}`
+						: `Waktu rasmi JAKIM e-Solat · Zon ${solat.official.zone}`}
+				{:else}
+					{settings.value.uiLang === 'en'
+						? 'Astronomical estimate (Subuh 20°, Isyak 18°)'
+						: 'Anggaran astronomi (Subuh 20°, Isyak 18°)'}
+				{/if}
 			</div>
 		</div>
 	{/if}

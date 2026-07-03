@@ -28,7 +28,9 @@ Extraction drift check: `cd tools/extract && node verify.mjs`
 ## Deploy (cakna.qcxis.com)
 
     cd web && npm run build
-    rsync -az --delete --exclude target --exclude node_modules --exclude .git . ubuntu@56.68.66.106:~/cakna-app/
+    # NOTE: keep the deploy/.env exclude — the file exists only on the server
+    rsync -az --delete --exclude target --exclude node_modules --exclude .git \
+      --exclude deploy/.env . ubuntu@56.68.66.106:~/cakna-app/
     ssh ubuntu@56.68.66.106 'cd ~/cakna-app && docker compose -f deploy/docker-compose.prod.yml --env-file deploy/.env up -d --build'
     ssh ubuntu@56.68.66.106 'cd ~/cakna-app && docker compose -f deploy/docker-compose.prod.yml exec api seed'
 

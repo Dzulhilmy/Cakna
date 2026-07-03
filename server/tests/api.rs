@@ -6,7 +6,6 @@ use cakna::config::Config;
 use cakna::state::AppState;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::PgPool;
-use std::sync::Arc;
 
 async fn spawn() -> Option<(String, PgPool)> {
     let Ok(url) = std::env::var("CAKNA_TEST_DATABASE_URL") else {
@@ -36,11 +35,8 @@ async fn spawn() -> Option<(String, PgPool)> {
         cookie_secure: false,
         static_dir: None,
     };
-    let st = AppState {
-        pool: pool.clone(),
-        cfg: Arc::new(cfg),
-        content_version: AppState::load_content_version(&pool).await,
-    };
+    let content_version = AppState::load_content_version(&pool).await;
+    let st = AppState::new(pool.clone(), cfg, content_version);
     let app = cakna::router(st);
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
     let addr = listener.local_addr().unwrap();

@@ -43,11 +43,7 @@ async fn main() {
         .expect("migrations failed");
 
     let content_version = AppState::load_content_version(&pool).await;
-    let st = AppState {
-        pool,
-        cfg: Arc::new(cfg.clone()),
-        content_version,
-    };
+    let st = AppState::new(pool, cfg.clone(), content_version);
 
     let app = cakna::router(st);
     let addr = format!("0.0.0.0:{}", cfg.port);
