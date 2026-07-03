@@ -113,7 +113,7 @@
 		{#if item.kind === 'band'}
 			<div class="surah-band" dir="rtl">
 				سُورَةُ {item.surah.name_ar}
-				<small>{item.surah.number}. {item.surah.name_translit} — {surahMeaning(item.surah)}</small>
+				<small dir="ltr">{item.surah.number}. {item.surah.name_translit} — {surahMeaning(item.surah)}</small>
 			</div>
 		{:else if item.kind === 'basmalah'}
 			<div class="basmalah font-arabic" dir="rtl">{BASMALAH}</div>
