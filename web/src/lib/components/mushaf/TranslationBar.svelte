@@ -29,12 +29,14 @@
 					<X size={14} />
 				</button>
 			</div>
-			{#if settings.value.translit}
-				<p class="mb-1 text-[12.5px] italic leading-snug text-muted-foreground">{ayah.translit}</p>
-			{/if}
-			<p class="max-h-28 overflow-y-auto text-[13.5px] leading-relaxed">
-				{ayah.tr[settings.value.transLang]}
-			</p>
+			<div class="max-h-[42dvh] overflow-y-auto overscroll-contain">
+				{#if settings.value.translit}
+					<p class="mb-1 text-[12.5px] italic leading-snug text-muted-foreground">{ayah.translit}</p>
+				{/if}
+				<p class="text-[14px] leading-relaxed">
+					{ayah.tr[settings.value.transLang]}
+				</p>
+			</div>
 		</div>
 	</div>
 {/if}
