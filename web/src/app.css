@@ -1,0 +1,208 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@import '@fontsource/marcellus';
+@import '@fontsource/figtree/400.css';
+@import '@fontsource/figtree/500.css';
+@import '@fontsource/figtree/600.css';
+@import '@fontsource/figtree/700.css';
+@import '@fontsource/amiri-quran';
+@import '@fontsource/scheherazade-new/400.css';
+@import '@fontsource/scheherazade-new/500.css';
+
+@custom-variant dark (&:is(.dark *));
+
+/* ---------- Cakna palette (from the Nur Al-Quran sample) ---------- */
+:root {
+	--background: #f7f3e8;
+	--foreground: #22312b;
+	--card: #fffdf7;
+	--card-foreground: #22312b;
+	--popover: #fffdf7;
+	--popover-foreground: #22312b;
+	--primary: #155b44;
+	--primary-foreground: #ffffff;
+	--secondary: #ede7d5;
+	--secondary-foreground: #22312b;
+	--muted: #efe9da;
+	--muted-foreground: #5c6b63;
+	--accent: #eaf4ec;
+	--accent-foreground: #155b44;
+	--destructive: #c0392b;
+	--destructive-foreground: #ffffff;
+	--border: #e4dcc8;
+	--input: #e4dcc8;
+	--ring: #155b44;
+	--radius: 0.75rem;
+
+	/* brand extras */
+	--emerald-deep: #0b3d2e;
+	--emerald: #155b44;
+	--gold: #c7a24b;
+	--gold-soft: #e3cd96;
+	--playing: #eaf4ec;
+	--arabic-size: 26px;
+	--safe-b: env(safe-area-inset-bottom, 0px);
+
+	/* tajweed rules t0..t10 */
+	--tj-0: #1e8e5a;
+	--tj-1: #8e44ad;
+	--tj-2: #0e9aa7;
+	--tj-3: #6c7a45;
+	--tj-4: #2e75d1;
+	--tj-5: #a93a8c;
+	--tj-6: #0b7a69;
+	--tj-7: #d35400;
+	--tj-8: #c0392b;
+	--tj-9: #c2185b;
+	--tj-10: #8e1600;
+
+	/* highlight colors */
+	--hl-1: rgba(240, 200, 60, 0.3);
+	--hl-2: rgba(60, 180, 110, 0.25);
+	--hl-3: rgba(80, 150, 230, 0.25);
+
+	/* reading heatmap buckets */
+	--heat-1: #b7dcc5;
+	--heat-2: #5fb98a;
+	--heat-3: #1e8e5a;
+}
+
+.dark {
+	--background: #0a1f1a;
+	--foreground: #ede9db;
+	--card: #102b23;
+	--card-foreground: #ede9db;
+	--popover: #102b23;
+	--popover-foreground: #ede9db;
+	--primary: #2e9970;
+	--primary-foreground: #06231b;
+	--secondary: #16352b;
+	--secondary-foreground: #ede9db;
+	--muted: #14312a;
+	--muted-foreground: #9fb2a7;
+	--accent: #17392c;
+	--accent-foreground: #ede9db;
+	--destructive: #f1948a;
+	--destructive-foreground: #2b0f0b;
+	--border: #1e3b31;
+	--input: #1e3b31;
+	--ring: #2e9970;
+
+	--gold: #d6b36a;
+	--gold-soft: #8a7440;
+	--playing: #17392c;
+
+	--tj-0: #4cc38a;
+	--tj-1: #c39bdd;
+	--tj-2: #5bc8d4;
+	--tj-3: #adbe85;
+	--tj-4: #82b3f2;
+	--tj-5: #e091c8;
+	--tj-6: #54bfa6;
+	--tj-7: #f0a05a;
+	--tj-8: #f1948a;
+	--tj-9: #f48fb1;
+	--tj-10: #e57373;
+
+	--hl-1: rgba(240, 200, 60, 0.2);
+	--hl-2: rgba(60, 180, 110, 0.18);
+	--hl-3: rgba(80, 150, 230, 0.2);
+
+	--heat-1: #1e4a38;
+	--heat-2: #2a6e50;
+	--heat-3: #3fa576;
+}
+
+[data-theme='sepia'] {
+	--background: #ede0c4;
+	--foreground: #463823;
+	--card: #f8efda;
+	--card-foreground: #463823;
+	--popover: #f8efda;
+	--popover-foreground: #463823;
+	--primary: #7a6023;
+	--primary-foreground: #fff9e8;
+	--secondary: #e7daba;
+	--secondary-foreground: #463823;
+	--muted: #e9dcbd;
+	--muted-foreground: #87724f;
+	--accent: #e7daba;
+	--accent-foreground: #7a6023;
+	--border: #d9c79e;
+	--input: #d9c79e;
+	--ring: #7a6023;
+
+	--gold: #a9852f;
+	--gold-soft: #cbb57c;
+	--playing: #e7daba;
+}
+
+@theme inline {
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-destructive-foreground: var(--destructive-foreground);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--color-gold: var(--gold);
+	--color-gold-soft: var(--gold-soft);
+	--color-emerald-deep: var(--emerald-deep);
+	--color-playing: var(--playing);
+
+	--radius-sm: calc(var(--radius) - 4px);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) + 4px);
+
+	--font-sans: 'Figtree', system-ui, sans-serif;
+	--font-display: 'Marcellus', serif;
+	--font-arabic: 'Amiri Quran', 'Scheherazade New', serif;
+}
+
+@layer base {
+	* {
+		border-color: var(--border);
+	}
+	html {
+		-webkit-tap-highlight-color: transparent;
+	}
+	body {
+		background: var(--background);
+		color: var(--foreground);
+		font-family: var(--font-sans);
+		-webkit-font-smoothing: antialiased;
+	}
+}
+
+/* ---------- Arabic / mushaf shared styles ---------- */
+.font-arabic {
+	font-family: var(--font-arabic);
+}
+.tj {
+	font-style: normal;
+}
+.t0 { color: var(--tj-0); }
+.t1 { color: var(--tj-1); }
+.t2 { color: var(--tj-2); }
+.t3 { color: var(--tj-3); }
+.t4 { color: var(--tj-4); }
+.t5 { color: var(--tj-5); }
+.t6 { color: var(--tj-6); }
+.t7 { color: var(--tj-7); }
+.t8 { color: var(--tj-8); }
+.t9 { color: var(--tj-9); }
+.t10 { color: var(--tj-10); }
