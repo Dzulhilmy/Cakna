@@ -1,0 +1,69 @@
+{
+  "source_sha256": "9438ff40f806562af83dcd3451535102029ca00702b6e657f2ba3b8fc8cf92e6",
+  "counts": {
+    "surahs": 114,
+    "ayahs": 6236,
+    "pages": 604,
+    "juz": 30,
+    "asma": 99,
+    "sajdah": 15,
+    "cities": 54,
+    "dhikr": 14,
+    "duas": 42,
+    "mathurat": 28
+  },
+  "artifacts": {
+    "surahs.json": {
+      "sha256": "13a0c1264e1079901c39fb0e078bb0803b9eb37fa16d3df2ea46a2180d119e66",
+      "bytes": 18473
+    },
+    "ayahs.json": {
+      "sha256": "5e0b44f06aa12d8b5aa33ce53728a8ac1d14c1a6950a9673dfd2b3be03636ddc",
+      "bytes": 2082104
+    },
+    "translations.json": {
+      "sha256": "128ca66b6d565bfde5161d9a1d3f4490593ead6c37cefb47fca615cf7ba4883e",
+      "bytes": 3485095
+    },
+    "transliterations.json": {
+      "sha256": "0c3d127796a2eab4fa70dbf5453c7656e85debf1f9f731641becf72234857da7",
+      "bytes": 632688
+    },
+    "asma.json": {
+      "sha256": "b808ae88bcb52c5452df79ddd403cf46273ff43ff195de9b85730a5ac9c6e8a9",
+      "bytes": 12143
+    },
+    "cities.json": {
+      "sha256": "f4c88011fce0d302d5cee8f5cfa4593625236404dc58774709fb51d13e9fa7f5",
+      "bytes": 5297
+    },
+    "hijri_events.json": {
+      "sha256": "28139964c970d6aa80480e54e6a07997230d6108ac1594a76aeaa488e8be7d21",
+      "bytes": 222
+    },
+    "dhikr.json": {
+      "sha256": "9c1af361de5e937d595a23c05a16672293491c90e74ff09108ea9569705801d4",
+      "bytes": 3661
+    },
+    "duas.json": {
+      "sha256": "9c7ac15d29d750506bbfcd11e12b980930b5d3c92f3021784f98cffe70597af4",
+      "bytes": 12037
+    },
+    "mathurat.json": {
+      "sha256": "d437dad465982c3150bfde89f65b1ce01087e6daa575066cda6c11d5b8cd038e",
+      "bytes": 18668
+    },
+    "ibadah.json": {
+      "sha256": "6116f9915bc9f93582fa07c991a2f0e1146d5cc15567c98bbbc0efa190e1a6c7",
+      "bytes": 23887
+    },
+    "mengaji.json": {
+      "sha256": "949d193083250bfdb4f154e85ffc13ba7905aa1f3b28d59d9162b11be2eda6d9",
+      "bytes": 1124
+    },
+    "yasin.json": {
+      "sha256": "0b976ae4defc6d958e841b179b7ad90e89d15bf0dc4d97d810febe0879f503dc",
+      "bytes": 507
+    }
+  }
+}
