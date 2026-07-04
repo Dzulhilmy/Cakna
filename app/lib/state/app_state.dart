@@ -26,5 +26,12 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// audio reciter edition id (islamic.network), e.g. 'ar.alafasy'
+  String get reciter => prefs.getString('reciter') ?? 'ar.alafasy';
+  set reciter(String v) {
+    prefs.setString('reciter', v);
+    notifyListeners();
+  }
+
   static Future<AppState> load() async => AppState(await SharedPreferences.getInstance());
 }

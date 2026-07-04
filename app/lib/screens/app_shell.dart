@@ -3,7 +3,7 @@ import '../theme.dart';
 import 'collection_screen.dart';
 import 'home_screen.dart';
 import 'notes_screen.dart';
-import 'placeholder_screen.dart';
+import 'profile_screen.dart';
 import 'quran_screen.dart';
 
 /// Root shell with the 5-tab bottom navigation (matching Tilawah's layout:
@@ -25,7 +25,7 @@ class _AppShellState extends State<AppShell> {
       const QuranScreen(),
       const CollectionScreen(),
       const NotesScreen(),
-      const PlaceholderScreen(title: 'Profil', icon: Icons.person_outline),
+      const ProfileScreen(),
     ];
     return Scaffold(
       body: IndexedStack(index: _index, children: pages),

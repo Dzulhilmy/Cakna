@@ -30,6 +30,8 @@ class _ReaderScreenState extends State<ReaderScreen> {
     // RTL: page index 0 = mushaf page 604, index 603 = page 1
     _controller = PageController(initialPage: 604 - _page);
     _prefetch(_page);
+    // apply the user's chosen reciter to the shared audio service
+    context.read<AudioService>().reciter = context.read<AppState>().reciter;
   }
 
   void _prefetch(int page) {
