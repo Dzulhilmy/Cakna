@@ -1,0 +1,62 @@
+[
+  {
+    "id": 6,
+    "name": "Mishari Rashid al-`Afasy",
+    "value": "alafasy"
+  },
+  {
+    "id": 0,
+    "name": "AbdulBaset AbdulSamad (Mujawwad)",
+    "value": "abdulbaset_mujawwad"
+  },
+  {
+    "id": 1,
+    "name": "AbdulBaset AbdulSamad (Murattal)",
+    "value": "abdulbaset_murattal"
+  },
+  {
+    "id": 2,
+    "name": "Abdur-Rahman as-Sudais",
+    "value": "sudais"
+  },
+  {
+    "id": 3,
+    "name": "Abu Bakr al-Shatri",
+    "value": "shatri"
+  },
+  {
+    "id": 4,
+    "name": "Hani ar-Rifai",
+    "value": "rifai"
+  },
+  {
+    "id": 5,
+    "name": "Mahmoud Khalil Al-Husary",
+    "value": "husary"
+  },
+  {
+    "id": 11,
+    "name": "Mahmoud Khalil Al-Husary (Muallim)",
+    "value": "husary_muallim"
+  },
+  {
+    "id": 7,
+    "name": "Mahmoud Khalil Al-Husary",
+    "value": "minshawi_mujawwad"
+  },
+  {
+    "id": 8,
+    "name": "Mohamed Siddiq al-Minshawi (Murattal)",
+    "value": "minshawi_murattal"
+  },
+  {
+    "id": 9,
+    "name": "Sa`ud ash-Shuraym",
+    "value": "shuraym"
+  },
+  {
+    "id": 10,
+    "name": "Mohamed al-Tablawi",
+    "value": "mohammad_al_tablaway"
+  }
+]

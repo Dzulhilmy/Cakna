@@ -1,0 +1,207 @@
+[
+  {
+    "rule": "1",
+    "title": "Mad lazim (harfi mukhaffaf)",
+    "description": "The meeting of the letter Mad with a permanent sukoon that does not merge into the letter that comes after it. The rate of harakat is 6 harakat."
+  },
+  {
+    "rule": "1",
+    "title": "Mad lazim (harfi muthaqqal)",
+    "description": "If a Madd letter is followed by a Mushaddad letter, the reader is required to prolong the Madd letter. The rate of harakat is 6 harakat."
+  },
+  {
+    "rule": "1",
+    "title": "Mad faraq (kalimi muthaqqal)",
+    "description": "Mad Farq is classified as part of Mad Lazim Kalimi Musaqqal and Mad Lazim Kalimi Mukhaffaf. Only the term Mad Farq was made because it wanted to show the existence of Hamzah istifhamiyah at the beginning of word which caused Hamzah Wasal who came after it to be changed to the letter Mad. The letter Mad then meets the original Sukun in the letter after it."
+  },
+  {
+    "rule": "2",
+    "title": "Mad silah kubra (thowilah)",
+    "description": "Mad Silah Towilah is the Ha ’Dhomir or Ha’ Kinayah come across with hamzah in two words with the condition that the Ha ’dhomir must be located between two vowel letters. The rate of Harakat Mad Silah Towilah is the same as the long rate of Mad Munfasil which is 4 or 5 harakat when Wasal (continue) and should be Sukun or not extended when Waqaf (stop)."
+  },
+  {
+    "rule": "2",
+    "title": "Mad jaiz (munfasil)",
+    "description": "Munfasil means separated or split, which is, separated in two words. In terms of terminology, Mad Munfasil means the letter Mad meets Hamzah in two different words. The rate of harakat for Mad Munfasil is 4 or 5 harakat."
+  },
+  {
+    "rule": "2",
+    "title": "Mad wajib (muttasil)",
+    "description": "Mad Muttasil means connected or related. Mad Muttasil in terms of terminology is a Mad letter that meets or connects on Hamzah in the same word. The letters mad and hamzah are met in the middle of the word and some meet at the end of the word. The rate of harakat for Mad Muttasil differs according to situation of wasal (in the middle) and waqaf (at the end) as follows: 4 or 5 harakat: if Wasal on Hamzah 4, 5 or 6 harakat: if Waqaf on Hamzah."
+  },
+  {
+    "rule": "2",
+    "title": "Mad faarq",
+    "description": "When Hamzatul Istifham meets hamzatul Wasl, and Hamzatul Wasl changes into a letter of madd. The rate of harakat is 6 harakat."
+  },
+  {
+    "rule": "3",
+    "title": "Mad lin",
+    "description": "Al-madd al-leen occurs when a waaw saakinah ( وْ ) or a yaa saakinah ( يْ ) are preceded by a letter with the fat-h diacritic ( ــَـ). To be able to sound al-madd al-leen, the yaa or waaw must be “stretched” and not simply read with a sukoon. The rate of harakat is 2/4/6."
+  },
+  {
+    "rule": "3",
+    "title": "Mad aridh lissukun",
+    "description": "When a letter of madd is followed by a voweled letter that is read with a sukoon due to stopping. This madd can be stretched 2/4/6 harakat. The length of recitation (if waqf) is 2/4/6 harakat."
+  },
+  {
+    "rule": "4",
+    "title": "Mad silah sughra (qasirah)",
+    "description": "When Haa is not followed immediately by Hamza. It has to be stretched for 2 counts/harakat."
+  },
+  {
+    "rule": "4",
+    "title": "Alif khanjariyya",
+    "description": "This is a small vertical line placed above a letter and represents a long /a/. The rate of harakat is 2 harakat."
+  },
+  {
+    "rule": "5",
+    "title": "Ghunnah ikhfa' & ikhfa' syafawi",
+    "description": "Ikhfa’ syafawi is non-vowel Mim (free from any vowel and has a fixed sukun) was followed immediately by letter Baa. Ikhfa ‘Syafawi means to hide or to vague the pronunciation of Mim Sakinah into the pronunciation of letter Ba with ghunnah. It is 2 harakat."
+  },
+  {
+    "rule": "5",
+    "title": "Nun musyaddadah",
+    "description": "It is read with ghunnah 2 harakat."
+  },
+  {
+    "rule": "5",
+    "title": "Mim musyaddadah",
+    "description": "It is read with ghunnah 2 harakat."
+  },
+  {
+    "rule": "5",
+    "title": "Iqlab",
+    "description": "After every Noon Saakinah or Tanween, if the letter baa (ب) follows, the sound must be flipped [i.e. changed] to the sound of the letter meem (م). The pronunciation should be with ghunnah and the rate is 2 harakat."
+  },
+  {
+    "rule": "5",
+    "title": "Idgham bighunnah",
+    "description": "Idgham Bi Ghunnah means to merge or combine the Nun sakinah (non-vowel) to the vowel letters with ghunnah 2 harakat."
+  },
+  {
+    "rule": "6",
+    "title": "Lam syamsiah",
+    "description": "Alif Lam Syamsiyyah is Lam Sakinah/Sukun which meets with one of the Syamsiyyah letters and must be pronounced the sound like MERGING (idgham) the letter Lam with the letter next to it."
+  },
+  {
+    "rule": "6",
+    "title": "Alif tafriq",
+    "description": "It has no place in grammar and is not really part of the word, but it is written by the Arabs to indicate that it is the end of a word. We do not pronounce that letter in any case."
+  },
+  {
+    "rule": "6",
+    "title": "Hamzah wasal",
+    "description": "Sign in the Qur’an is ٱ. Appears only at the beginning of a word. Pronounced only if there is no letter before it."
+  },
+  {
+    "rule": "6",
+    "title": "Idgham kamil (bilaghunnah)",
+    "description": "It is read without ghunnah. Two letters for Idgha bila ghunnah ﺮ ﻞ. When these letters follow a Noon Saakinah or Tanween, the 'nn' sound from Tanween or Noon Saakinah is completely eliminated, and the ﺮ ﻞ are said straight away without any emphasis on their sounds."
+  },
+  {
+    "rule": "6",
+    "title": "Idgham mutajanis",
+    "description": "Idghaam of similarity. This is when two such letters that have the same makhraj but different sifaat come together. The 1st letter is saakina, the 2nd is mutaharrik. The 2nd letter takes a shaddah. Incomplete Idgham or complete Idgham depending on the order of the two letters. The saakined letter is blended into the mutaharrik letter."
+  },
+  {
+    "rule": "6",
+    "title": "Idgham mutaqorib",
+    "description": "Idgham of proximity. This idgham occurs when 2 letters have a makhraj that are close together. This occurs in two sets of letters: Laam and Raa, Qaaf and Kaaf. The Laam is blended into Raa or the Qaaf blended into the Kaaf. Complete Idgham is preferred."
+  },
+  {
+    "rule": "7",
+    "title": "Tafkhim ra'",
+    "description": "Tafkhim is the thick of the letter. Ra, if it is read dhammah or fattah, it is obligatory to read taffkhim."
+  },
+  {
+    "rule": "8",
+    "title": "Qalqalah Sughra",
+    "description": "Qalqalah is sound articulation and echo. Letters of qalqalah ق,ط,ب,ج,د. Qalqalah is echoing these five letters when they are in state of sukoon. If any of qalqalah letters with sukun appear in the middle of the word, it is read with subtle echo."
+  },
+  {
+    "rule": "8",
+    "title": "Qalqalah Wusta",
+    "description": "Qalqalah is sound articulation and echo. Letters of qalqalah ق,ط,ب,ج,د. Qalqalah is echoing these five letters when they are in state of sukoon. It occurs at the end of a word in the middle of the ayah.It is read with medium echo."
+  },
+  {
+    "rule": "8",
+    "title": "Qalqalah Kubra",
+    "description": "Qalqalah is sound articulation and echo. Letters of qalqalah ق,ط,ب,ج,د. Qalqalah is echoing these five letters when they are in state of sukoon. It occurs at the end of a ayah.It is read with strong echo."
+  },
+  {
+    "rule": "9",
+    "title": "Iltiqa sakinain",
+    "description": "The meeting of two sakins. If two unvowelled letters occur next to each other then the first unvowelled is vowelled when read. The second letter with the sukoon is left as it is. The vowel the first letter takes depends on the letter just before it"
+  },
+  {
+    "rule": "10",
+    "title": "Ibdal",
+    "description": "When 2 hamzah meets in one word.In term of language, it means to change the letter Hamzah to the letter Mad.When two hamzah meets in one word, the first hamzah read as usual, the second hamzah changed (Ibdal) into Mad. The rate of harakat or length is 2 harakat same as Mad Badal."
+  },
+  {
+    "rule": "11",
+    "title": "Imalah (Inclination)",
+    "description": "There is only one Imalah which is in Surah Hud,ayah 41. The sign of ◊. To incline the sounds between the fathah and kasrah, the Raa is read as Ray, Maj-Ray-Ha."
+  },
+  {
+    "rule": "11",
+    "title": "Imalah (Inclination)",
+    "description": "There is only one Imalah which is in Surah Hud,ayah 41. The sign of ◊. To incline the sounds between the fathah and kasrah, the Raa is read as Ray, Maj-Ray-Ha."
+  },
+  {
+    "rule": "12",
+    "title": "Tashil",
+    "description": "Tashil came from root word of Sa-Ha-La (means ease). The sign of tashil is (۬). There is only one Tashil sign in Al-Quran which is in Surah Fussilat, ayah 44. The sound of tashil is a sound in between hurf Alif (ا) and hurf Hamzah (ء) ."
+  },
+  {
+    "rule": "13",
+    "title": "Isymam",
+    "description": "Ishmam is to shape your lips in the shape of a Dhamma (circular shape) without actually pronouncing the Dhamma/To add a hint of a harakah or another letter to an existing letter so as to denote a particular action taking place on that letter."
+  },
+  {
+    "rule": "14",
+    "title": "Naqal",
+    "description": "To switch the harakat hamzah to hurf Lam in word Alif Lam."
+  },
+  {
+    "rule": "20",
+    "title": "Waqaf",
+    "description": "A stop or pause in recitation of the Quran. There are different types of waqf indicated by various symbols in the text."
+  },
+  {
+    "rule": "21",
+    "title": "Must stop (Waqf Lazim)",
+    "description": "Must stop. You must stop on this sign. Represented by the symbol ۘ (meem). Continuing without stopping would change the meaning of the verse."
+  },
+  {
+    "rule": "22",
+    "title": "Better to stop (Waqf Mujawwaz)",
+    "description": "Better to stop. Stopping is desirable. Represented by the symbol ۗ (seen-lam-ya). It is preferable to stop here, though continuing is permissible."
+  },
+  {
+    "rule": "23",
+    "title": "Stop at one (Waqf Mu'anaqah)",
+    "description": "Stop at one. You can only stop at one of these two marked places, not both. Represented by the symbol ۛ (three dots). If you stop at the first, continue at the second, and vice versa."
+  },
+  {
+    "rule": "24",
+    "title": "A slight pause (Saktah)",
+    "description": "A slight pause. Take a slight pause without breathing. Represented by the symbol ۜ (seen). Pause briefly without taking a breath, then continue."
+  },
+  {
+    "rule": "25",
+    "title": "Stop or continue (Waqf Ja'iz)",
+    "description": "Stop or continue. Both are fine. Represented by the symbol ۚ (jeem). Either stopping or continuing is equally acceptable."
+  },
+  {
+    "rule": "26",
+    "title": "Better to continue (Wasl Awla)",
+    "description": "Better to continue. Continuation is desirable. Represented by the symbol ۖ (seen-lam-ya meem). It is preferable to continue reading without stopping, though stopping is permissible."
+  },
+  {
+    "rule": "27",
+    "title": "Can't stop (La Waqf)",
+    "description": "Can't stop. Never stop on this sign. Represented by the symbol ۙ (lam-alif). Stopping here is prohibited as it would break the meaning or grammatical structure."
+  }
+]

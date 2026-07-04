@@ -1,0 +1,207 @@
+[
+  {
+    "rule": "1",
+    "title": "Madd laazim (harfi mukhaffaf)",
+    "description": "Sebutan huruf setelah huruf mad tidak diidghamkan pada huruf berikutnya"
+  },
+  {
+    "rule": "1",
+    "title": "Madd laazim (harfee muthaqqal)",
+    "description": "Sebutan huruf setelah huruf mad diidghamkan ke dalam huruf berikutnya"
+  },
+  {
+    "rule": "1",
+    "title": "Mad faraq (kalimi muthaqqal)",
+    "description": "Sebutan huruf setelah huruf mad diidghamkan"
+  },
+  {
+    "rule": "2",
+    "title": "Mad silah kubra (thowilah)",
+    "description": "Dibaca dengan silah atau mad ketika menghubungkan bacaan"
+  },
+  {
+    "rule": "2",
+    "title": "Mad jaiz (munfasil)",
+    "description": "Dibaca panjang dengan kadar 4/5 harakat"
+  },
+  {
+    "rule": "2",
+    "title": "Mad wajib (muttasil)",
+    "description": "Dibaca panjang dengan kadar 4/5/6 harakat"
+  },
+  {
+    "rule": "2",
+    "title": "Mad faarq",
+    "description": "Dibaca panjang dengan kadar 6 harakat"
+  },
+  {
+    "rule": "3",
+    "title": "Mad lin",
+    "description": "Dibaca ketika waqaf dengan kadar 2/4/6 harakat. Jika tidak diwaqafkan, hilanglah hukum mad"
+  },
+  {
+    "rule": "3",
+    "title": "Mad aridh lissukun",
+    "description": "Dibaca ketika waqaf dengan kadar 2/4/6 harakat. Jika tidak diwaqafkan, hukumnya kembali seperti hukum asal mad asli"
+  },
+  {
+    "rule": "4",
+    "title": "Mad silah sughra (qasirah)",
+    "description": "Dibaca dengan silah atau mad ketika menghubungkan bacaan"
+  },
+  {
+    "rule": "4",
+    "title": "Alif hanjariah",
+    "description": "Dibaca panjang dengan kadar 2 harakat"
+  },
+  {
+    "rule": "5",
+    "title": "Ghunnah ikhfa' & ikhfa' syafawi",
+    "description": "Didengungkan dengan kadar 2 harakat"
+  },
+  {
+    "rule": "5",
+    "title": "Nun musyaddadah",
+    "description": "Didengungkan dengan kadar 2 harakat"
+  },
+  {
+    "rule": "5",
+    "title": "Mim musyaddadah",
+    "description": "Didengungkan dengan kadar 2 harakat"
+  },
+  {
+    "rule": "5",
+    "title": "Iqlab",
+    "description": "Bunyi nun mati ditukar menjadi bunyi huruf mim mati dan didengungkan dengan kadar 2 harakat"
+  },
+  {
+    "rule": "5",
+    "title": "Idgham bighunnah",
+    "description": "Dimasukkan huruf mim mati/tanwin dan didengungkan dengan kadar 2 harakat"
+  },
+  {
+    "rule": "6",
+    "title": "Lam syamsiah",
+    "description": "Huruf lam tidak dibaca (dileburkan) dan huruf syamsiah setelah lam harus ditasydid"
+  },
+  {
+    "rule": "6",
+    "title": "Alif tafriq",
+    "description": "Ditulis namun tidak dilafazkan"
+  },
+  {
+    "rule": "6",
+    "title": "Hamzah wasal",
+    "description": "Dibunyikan (dibariskan) ketika memulai membaca di atasnya saja. Jika bacaan dilanjutkan dengan perkataan sebelumnya, hilanglah hamzah tersebut dari sebutan (baris)"
+  },
+  {
+    "rule": "6",
+    "title": "Idgham kamil (bilaghunnah)",
+    "description": "Huruf mim mati/tanwin dimasukkan tanpa dengung dengan kadar 2 harakat"
+  },
+  {
+    "rule": "6",
+    "title": "Idgham mutajanis",
+    "description": "Huruf pertama dimasukkan ke dalam huruf yang kedua secara sempurna"
+  },
+  {
+    "rule": "6",
+    "title": "Idgham mutaqorib",
+    "description": "Huruf pertama dimasukkan ke dalam huruf yang kedua secara sempurna tanpa dengung"
+  },
+  {
+    "rule": "7",
+    "title": "Tafkhim ra'",
+    "description": "Huruf ra' dibaca tebal"
+  },
+  {
+    "rule": "8",
+    "title": "Qalqalah Sughra",
+    "description": "Dilantunkan dengan lantunan paling kecil"
+  },
+  {
+    "rule": "8",
+    "title": "Qalqalah Wusta",
+    "description": "Dilantunkan dengan lantunan sederhana"
+  },
+  {
+    "rule": "8",
+    "title": "Qalqalah Kubra",
+    "description": "Dilantunkan dengan lantunan paling kuat"
+  },
+  {
+    "rule": "9",
+    "title": "Pertemuan dua huruf bertanda sukun",
+    "description": "Apabila tanwin bertemu dengan hamzah washal ketika bacaan sambung antara kedua - duanya, maka cara bacanya adalah dengan menukarkan tanwin (baris dua) kepada satu baris, serta menggantikannya dengan huruf nun berbaris kasrah"
+  },
+  {
+    "rule": "10",
+    "title": "Menukarkan huruf hamzah kepada huruf mad",
+    "description": "Apabila dua hamzah bertemu dalam satu kalimat (hamzah pertama berbaris, hamzah kedua sukun), maka hamzah kedua berbaris sukun tersebut diibdalkan (ditukarkan) ke huruf mad. Ia juga sama seperti hukum bacaan Mad Badal"
+  },
+  {
+    "rule": "11",
+    "title": "Bacaan yang condong",
+    "description": "Mengubah baris biasa ke baris pertengahan (antara fathah dan kasrah)."
+  },
+  {
+    "rule": "11",
+    "title": "Bacaan yang condong",
+    "description": "Mengubah baris biasa ke baris pertengahan (antara fathah dan kasrah)."
+  },
+  {
+    "rule": "12",
+    "title": "Meringankan bacaan",
+    "description": "Meringankan bacaan secara samar-samar. Ia berlaku apabila terdapat dua hamzah yang berturutan dalam satu kalimat. Cara bacanya adalah dengan membaca hamzah pertama dengan bacaan biasa, dan hamzah kedua dibaca dengan bunyi samar-samar (seakan-akan bunyi di antara huruf hamzah dan alif)"
+  },
+  {
+    "rule": "13",
+    "title": "Isymam",
+    "description": "Ia adalah bacaan yang memuncungkan kedua bibir mulut"
+  },
+  {
+    "rule": "14",
+    "title": "Memindahkan baris huruf",
+    "description": "Memindahkan baris huruf hamzah kepada huruf lam sebelumnya pada kalimah alif lam."
+  },
+  {
+    "rule": "20",
+    "title": "Waqaf",
+    "description": "Berhenti atau jeda dalam bacaan Al-Quran. Terdapat berbagai jenis waqaf yang ditunjukkan oleh berbagai simbol dalam teks."
+  },
+  {
+    "rule": "21",
+    "title": "Tanda waqaf lazim",
+    "description": "Diharuskan berhenti. Wajib berhenti pada tanda ini. Diwakili oleh simbol ۘ (meem). Meneruskan bacaan tanpa berhenti akan mengubah makna ayat."
+  },
+  {
+    "rule": "22",
+    "title": "Tanda waqaf kafi (cukup)",
+    "description": "Lebih baik berhenti. Berhenti adalah disukai. Diwakili oleh simbol ۗ (seen-lam-ya). Lebih baik berhenti di sini, walaupun meneruskan bacaan adalah dibenarkan."
+  },
+  {
+    "rule": "23",
+    "title": "Tanda waqaf ta'anuq (mu'anaqah)",
+    "description": "Berhenti pada salah satu tanda. Anda hanya boleh berhenti pada salah satu dari dua tempat yang ditanda, bukan keduanya. Diwakili oleh simbol ۛ (tiga titik). Jika berhenti pada yang pertama, teruskan pada yang kedua, dan sebaliknya."
+  },
+  {
+    "rule": "24",
+    "title": "Tanda saktah",
+    "description": "Jeda sebentar. Buat jeda sebentar tanpa mengambil nafas. Diwakili oleh simbol ۜ (seen). Jeda sebentar tanpa mengambil nafas, kemudian teruskan."
+  },
+  {
+    "rule": "25",
+    "title": "Tanda waqaf ja'iz (harus)",
+    "description": "Boleh berhenti/meneruskan bacaan. Kedua-duanya baik. Diwakili oleh simbol ۚ (jeem). Sama ada berhenti atau meneruskan adalah sama-sama dapat diterima."
+  },
+  {
+    "rule": "26",
+    "title": "Tanda waqaf hasan (baik)",
+    "description": "Lebih baik diteruskan. Penerusan bacaan adalah disukai. Diwakili oleh simbol ۖ (seen-lam-ya meem). Lebih baik meneruskan bacaan tanpa berhenti, walaupun berhenti adalah dibenarkan."
+  },
+  {
+    "rule": "27",
+    "title": "Tanda waqaf qabih (tidak elok)",
+    "description": "Dilarang berhenti. Jangan berhenti pada tanda ini. Diwakili oleh simbol ۙ (lam-alif). Berhenti di sini adalah dilarang karena akan memutus makna atau struktur tata bahasa."
+  }
+]
