@@ -5,6 +5,7 @@ import '../data/models.dart';
 import '../data/quran_repo.dart';
 import '../state/app_state.dart';
 import '../state/audio_service.dart';
+import '../state/user_data.dart';
 import '../theme.dart';
 
 /// Bottom sheet for a single ayah: Arabic, translation, word-by-word and
@@ -29,6 +30,8 @@ class VerseSheet extends StatefulWidget {
 class _VerseSheetState extends State<VerseSheet> {
   late Future<(Verse, Surah, List<Word>)> _future;
   bool _showWords = false;
+  bool _editingNote = false;
+  final _noteController = TextEditingController();
 
   @override
   void initState() {
@@ -40,6 +43,13 @@ class _VerseSheetState extends State<VerseSheet> {
       final w = await repo.words(widget.verseId);
       return (v, s, w);
     }();
+    _noteController.text = context.read<UserData>().noteBody(widget.verseId);
+  }
+
+  @override
+  void dispose() {
+    _noteController.dispose();
+    super.dispose();
   }
 
   String _tr(Verse v, String lang) => switch (lang) {
@@ -84,6 +94,15 @@ class _VerseSheetState extends State<VerseSheet> {
                         style: const TextStyle(
                             fontSize: 12, fontWeight: FontWeight.w600, color: CaknaColors.tealDeep)),
                   ),
+                  const Spacer(),
+                  Builder(builder: (context) {
+                    final marked = context.watch<UserData>().isBookmarked(widget.verseId);
+                    return IconButton(
+                      icon: Icon(marked ? Icons.bookmark : Icons.bookmark_border,
+                          color: marked ? CaknaColors.teal : CaknaColors.inkSoft),
+                      onPressed: () => context.read<UserData>().toggleBookmark(widget.verseId),
+                    );
+                  }),
                 ],
               ),
               const SizedBox(height: 16),
@@ -128,8 +147,48 @@ class _VerseSheetState extends State<VerseSheet> {
                     active: _showWords,
                     onTap: () => setState(() => _showWords = !_showWords),
                   ),
+                  const SizedBox(width: 10),
+                  _IconAction(
+                    icon: context.watch<UserData>().hasNote(widget.verseId)
+                        ? Icons.edit_note
+                        : Icons.note_add_outlined,
+                    label: 'Nota',
+                    active: _editingNote,
+                    onTap: () => setState(() => _editingNote = !_editingNote),
+                  ),
                 ],
               ),
+              if (_editingNote) ...[
+                const SizedBox(height: 14),
+                TextField(
+                  controller: _noteController,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    hintText: 'Tulis nota anda untuk ayat ini…',
+                    filled: true,
+                    fillColor: dark ? CaknaColors.surfaceDark : CaknaColors.bg,
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: dark ? CaknaColors.borderDark : CaknaColors.border)),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: FilledButton(
+                    style: FilledButton.styleFrom(backgroundColor: CaknaColors.teal),
+                    onPressed: () async {
+                      await context.read<UserData>().setNote(widget.verseId, _noteController.text);
+                      if (context.mounted) {
+                        setState(() => _editingNote = false);
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(content: Text('Nota disimpan')));
+                      }
+                    },
+                    child: const Text('Simpan'),
+                  ),
+                ),
+              ],
               if (_showWords) ...[
                 const SizedBox(height: 16),
                 Wrap(

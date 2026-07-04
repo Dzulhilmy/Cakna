@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
+import 'collection_screen.dart';
 import 'home_screen.dart';
-import 'quran_screen.dart';
+import 'notes_screen.dart';
 import 'placeholder_screen.dart';
+import 'quran_screen.dart';
 
 /// Root shell with the 5-tab bottom navigation (matching Tilawah's layout:
 /// Home, Quran, Collection, Notes, Profile).
@@ -21,8 +23,8 @@ class _AppShellState extends State<AppShell> {
     final pages = [
       HomeScreen(onNavigateTab: (i) => setState(() => _index = i)),
       const QuranScreen(),
-      const PlaceholderScreen(title: 'Koleksi', icon: Icons.bookmark_border),
-      const PlaceholderScreen(title: 'Nota', icon: Icons.edit_note),
+      const CollectionScreen(),
+      const NotesScreen(),
       const PlaceholderScreen(title: 'Profil', icon: Icons.person_outline),
     ];
     return Scaffold(
