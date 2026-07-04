@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../services/location_service.dart';
+import '../services/notification_service.dart';
+import '../state/app_state.dart';
 import '../theme.dart';
 import '../utils/prayers.dart';
 
@@ -68,6 +71,8 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
                     ],
                   ),
                 ),
+                const SizedBox(height: 14),
+                _AzanToggle(calc: calc),
                 const SizedBox(height: 12),
                 Text(
                   'Waktu dikira secara astronomi (Subuh 20°, Isyak 18°, Asar Syafi\'i). '
@@ -122,6 +127,56 @@ class _NextPrayerCard extends StatelessWidget {
                     color: Colors.white, fontSize: 30, fontFamily: 'Lora', fontWeight: FontWeight.w600)),
             Text('${DateFormat('h:mm a').format(time)}  ·  dalam $countdown',
                 style: const TextStyle(color: Colors.white, fontSize: 14)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AzanToggle extends StatelessWidget {
+  final PrayerCalc calc;
+  const _AzanToggle({required this.calc});
+
+  @override
+  Widget build(BuildContext context) {
+    final app = context.watch<AppState>();
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        child: Row(
+          children: [
+            const Icon(Icons.notifications_active_outlined, color: CaknaColors.teal, size: 20),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Text('Notifikasi azan', style: TextStyle(fontSize: 14)),
+            ),
+            Switch(
+              value: app.azanEnabled,
+              activeThumbColor: CaknaColors.teal,
+              onChanged: (on) async {
+                if (on) {
+                  final granted = await NotificationService.requestPermission();
+                  if (!granted) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text('Kebenaran notifikasi diperlukan untuk azan.')));
+                    }
+                    return;
+                  }
+                  await NotificationService.scheduleAzan(calc.lat, calc.lng);
+                } else {
+                  await NotificationService.cancelAll();
+                }
+                if (context.mounted) {
+                  context.read<AppState>().azanEnabled = on;
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(on
+                          ? 'Notifikasi azan diaktifkan.'
+                          : 'Notifikasi azan dimatikan.')));
+                }
+              },
+            ),
           ],
         ),
       ),

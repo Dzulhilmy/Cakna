@@ -33,5 +33,12 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// azan (prayer-time) notifications enabled
+  bool get azanEnabled => prefs.getBool('azanEnabled') ?? false;
+  set azanEnabled(bool v) {
+    prefs.setBool('azanEnabled', v);
+    notifyListeners();
+  }
+
   static Future<AppState> load() async => AppState(await SharedPreferences.getInstance());
 }
