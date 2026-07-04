@@ -3,8 +3,11 @@ import 'package:provider/provider.dart';
 import '../data/page_font.dart';
 import '../data/quran_repo.dart';
 import '../state/app_state.dart';
+import '../state/audio_service.dart';
 import '../theme.dart';
+import '../widgets/mini_player.dart';
 import '../widgets/mushaf_page.dart';
+import '../widgets/verse_sheet.dart';
 
 /// The mushaf reader: a horizontally-paged 604-page Madani view. RTL paging
 /// (swipe right-to-left advances, matching a physical mushaf).
@@ -41,44 +44,65 @@ class _ReaderScreenState extends State<ReaderScreen> {
     super.dispose();
   }
 
+  Future<void> _playPage(int page) async {
+    final repo = context.read<QuranRepo>();
+    final verses = await repo.versesForPage(page);
+    if (verses.isEmpty || !mounted) return;
+    await context.read<AudioService>().playFrom(verses.first.id, stopAfter: verses.last.id);
+  }
+
   @override
   Widget build(BuildContext context) {
     final repo = context.read<QuranRepo>();
+    final playingVerseId = context.watch<AudioService>().playingVerseId;
     return Scaffold(
       appBar: AppBar(
         title: Text('Halaman $_page'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.play_circle_outline),
+            tooltip: 'Main halaman',
+            onPressed: () => _playPage(_page),
+          ),
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {}, // wired in a later pass
           ),
         ],
       ),
-      body: PageView.builder(
-        controller: _controller,
-        reverse: true, // RTL paging
-        itemCount: 604,
-        onPageChanged: (i) {
-          final page = 604 - i;
-          setState(() => _page = page);
-          context.read<AppState>().lastPage = page;
-          _prefetch(page);
-        },
-        itemBuilder: (context, i) {
-          final page = 604 - i;
-          return Column(
-            children: [
-              Expanded(
-                child: MushafPageView(
-                  page: page,
-                  repo: repo,
-                  onTapVerse: (_) {},
-                ),
-              ),
-              _PageFooter(page: page),
-            ],
-          );
-        },
+      body: Column(
+        children: [
+          Expanded(
+            child: PageView.builder(
+              controller: _controller,
+              reverse: true, // RTL paging
+              itemCount: 604,
+              onPageChanged: (i) {
+                final page = 604 - i;
+                setState(() => _page = page);
+                context.read<AppState>().lastPage = page;
+                _prefetch(page);
+              },
+              itemBuilder: (context, i) {
+                final page = 604 - i;
+                return Column(
+                  children: [
+                    Expanded(
+                      child: MushafPageView(
+                        page: page,
+                        repo: repo,
+                        playingVerseId: playingVerseId,
+                        onTapVerse: (verseId) => showVerseSheet(context, verseId),
+                      ),
+                    ),
+                    _PageFooter(page: page),
+                  ],
+                );
+              },
+            ),
+          ),
+          const MiniPlayer(),
+        ],
       ),
     );
   }

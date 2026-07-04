@@ -4,6 +4,7 @@ import 'data/db.dart';
 import 'data/quran_repo.dart';
 import 'screens/app_shell.dart';
 import 'state/app_state.dart';
+import 'state/audio_service.dart';
 import 'theme.dart';
 
 Future<void> main() async {
@@ -24,6 +25,7 @@ class CaknaApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider.value(value: appState),
         Provider<QuranRepo>.value(value: repo),
+        ChangeNotifierProvider(create: (_) => AudioService()),
       ],
       child: Consumer<AppState>(
         builder: (context, app, _) => MaterialApp(
