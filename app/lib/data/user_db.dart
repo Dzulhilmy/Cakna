@@ -13,21 +13,43 @@ class UserDb {
     final dir = await getApplicationSupportDirectory();
     return openDatabase(
       p.join(dir.path, 'cakna_user.db'),
-      version: 1,
+      version: 2,
       onCreate: (db, _) async {
-        await db.execute('''
-          CREATE TABLE bookmarks (
-            verse_id   INTEGER PRIMARY KEY,
-            collection TEXT NOT NULL DEFAULT 'Umum',
-            created_at INTEGER NOT NULL
-          )''');
-        await db.execute('''
-          CREATE TABLE notes (
-            verse_id   INTEGER PRIMARY KEY,
-            body       TEXT NOT NULL,
-            updated_at INTEGER NOT NULL
-          )''');
+        await _bookmarksAndNotes(db);
+        await _reading(db);
+      },
+      onUpgrade: (db, oldV, newV) async {
+        if (oldV < 2) await _reading(db);
       },
     );
+  }
+
+  Future<void> _bookmarksAndNotes(Database db) async {
+    await db.execute('''
+      CREATE TABLE bookmarks (
+        verse_id   INTEGER PRIMARY KEY,
+        collection TEXT NOT NULL DEFAULT 'Umum',
+        created_at INTEGER NOT NULL
+      )''');
+    await db.execute('''
+      CREATE TABLE notes (
+        verse_id   INTEGER PRIMARY KEY,
+        body       TEXT NOT NULL,
+        updated_at INTEGER NOT NULL
+      )''');
+  }
+
+  Future<void> _reading(Database db) async {
+    // pages ever read (for khatam progress) and per-day counts (for streak)
+    await db.execute('''
+      CREATE TABLE read_pages (
+        page    INTEGER PRIMARY KEY,
+        read_at INTEGER NOT NULL
+      )''');
+    await db.execute('''
+      CREATE TABLE read_log (
+        day   TEXT PRIMARY KEY,
+        count INTEGER NOT NULL
+      )''');
   }
 }

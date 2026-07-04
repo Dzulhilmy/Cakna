@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../state/app_state.dart';
 import '../theme.dart';
+import '../widgets/khatam_card.dart';
 import 'mathurat_screen.dart';
 import 'prayer_times_screen.dart';
 import 'qibla_screen.dart';
@@ -38,6 +39,8 @@ class HomeScreen extends StatelessWidget {
                 MaterialPageRoute(builder: (_) => ReaderScreen(initialPage: app.lastPage)),
               ),
             ),
+            const SizedBox(height: 14),
+            const KhatamCard(),
             const SizedBox(height: 20),
             const Text('Modul',
                 style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),

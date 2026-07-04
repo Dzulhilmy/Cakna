@@ -4,6 +4,7 @@ import '../data/page_font.dart';
 import '../data/quran_repo.dart';
 import '../state/app_state.dart';
 import '../state/audio_service.dart';
+import '../state/user_data.dart';
 import '../theme.dart';
 import '../widgets/mini_player.dart';
 import '../widgets/mushaf_page.dart';
@@ -33,6 +34,9 @@ class _ReaderScreenState extends State<ReaderScreen> {
     _prefetch(_page);
     // apply the user's chosen reciter to the shared audio service
     context.read<AudioService>().reciter = context.read<AppState>().reciter;
+    // mark the opening page read
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => context.read<UserData>().markRead(_page));
   }
 
   void _prefetch(int page) {
@@ -85,6 +89,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
                 final page = 604 - i;
                 setState(() => _page = page);
                 context.read<AppState>().lastPage = page;
+                context.read<UserData>().markRead(page);
                 _prefetch(page);
               },
               itemBuilder: (context, i) {

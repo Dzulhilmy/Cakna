@@ -23,6 +23,8 @@ class UserData extends ChangeNotifier {
 
   final Set<int> _bookmarks = {};
   final Map<int, String> _notes = {};
+  final Set<int> _readPages = {};
+  final Map<String, int> _readLog = {};
   bool _loaded = false;
 
   Future<void> ensureLoaded() async {
@@ -33,6 +35,12 @@ class UserData extends ChangeNotifier {
     }
     for (final r in await db.query('notes', columns: ['verse_id', 'body'])) {
       _notes[r['verse_id'] as int] = r['body'] as String;
+    }
+    for (final r in await db.query('read_pages', columns: ['page'])) {
+      _readPages.add(r['page'] as int);
+    }
+    for (final r in await db.query('read_log')) {
+      _readLog[r['day'] as String] = r['count'] as int;
     }
     _loaded = true;
     notifyListeners();
@@ -94,5 +102,44 @@ class UserData extends ChangeNotifier {
     return rows
         .map((r) => NoteEntry(r['verse_id'] as int, r['body'] as String, r['updated_at'] as int))
         .toList();
+  }
+
+  // ---- reading progress ----
+  int get readCount => _readPages.length;
+  double get khatamProgress => _readPages.length / 604;
+
+  static String _dayKey(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  /// Consecutive days (ending today, or yesterday if nothing read today yet)
+  /// with at least one page read.
+  int get streak {
+    var day = DateTime.now();
+    if (!_readLog.containsKey(_dayKey(day))) {
+      day = day.subtract(const Duration(days: 1));
+    }
+    var count = 0;
+    while (_readLog.containsKey(_dayKey(day))) {
+      count++;
+      day = day.subtract(const Duration(days: 1));
+    }
+    return count;
+  }
+
+  int get todayPages => _readLog[_dayKey(DateTime.now())] ?? 0;
+
+  /// Mark a page read (idempotent per page). First-ever read bumps today's log.
+  Future<void> markRead(int page) async {
+    if (_readPages.contains(page)) return;
+    _readPages.add(page);
+    final today = _dayKey(DateTime.now());
+    _readLog[today] = (_readLog[today] ?? 0) + 1;
+    final db = await _udb.db;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await db.insert('read_pages', {'page': page, 'read_at': now},
+        conflictAlgorithm: ConflictAlgorithm.ignore);
+    await db.insert('read_log', {'day': today, 'count': _readLog[today]},
+        conflictAlgorithm: ConflictAlgorithm.replace);
+    notifyListeners();
   }
 }

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../state/app_state.dart';
 import '../state/audio_service.dart';
 import '../theme.dart';
+import '../widgets/khatam_card.dart';
 import 'reader_screen.dart';
 
 const _reciters = [
@@ -35,6 +36,8 @@ class ProfileScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _ContinueCard(page: app.lastPage),
+                const SizedBox(height: 14),
+                const KhatamCard(),
                 const SizedBox(height: 20),
                 const _SectionTitle('Tetapan'),
                 Card(
