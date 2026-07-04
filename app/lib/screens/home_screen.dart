@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../state/app_state.dart';
 import '../theme.dart';
+import 'mathurat_screen.dart';
 import 'prayer_times_screen.dart';
 import 'qibla_screen.dart';
 import 'reader_screen.dart';
@@ -59,7 +60,11 @@ class HomeScreen extends StatelessWidget {
                     label: 'Kiblat',
                     onTap: () => Navigator.push(
                         context, MaterialPageRoute(builder: (_) => const QiblaScreen()))),
-                _ModuleTile(icon: Icons.brightness_5, label: "Ma'thurat", onTap: () {}),
+                _ModuleTile(
+                    icon: Icons.brightness_5,
+                    label: "Ma'thurat",
+                    onTap: () => Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => const MathuratScreen()))),
               ],
             ),
           ],

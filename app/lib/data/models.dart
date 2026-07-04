@@ -112,6 +112,66 @@ class LineMark {
       );
 }
 
+class QuranRef {
+  final int surah, ayahFrom, ayahTo;
+  QuranRef(this.surah, this.ayahFrom, this.ayahTo);
+  factory QuranRef.fromJson(Map<String, dynamic> j) =>
+      QuranRef(j['surah'] as int, j['ayah_from'] as int, j['ayah_to'] as int);
+}
+
+/// One Al-Ma'thurat item (from mathurat.json). Either a Quran range
+/// (`quranRef`), a fixed dhikr (`arabic`), or morning/evening variants
+/// (`arabicPagi`/`arabicPetang`).
+class MathuratItem {
+  final int position; // 1..28
+  final QuranRef? quranRef;
+  final String? arabic;
+  final String? arabicPagi;
+  final String? arabicPetang;
+  final int repeatN; // Sughra count
+  final int? repeatFull; // Kubra count (defaults to repeatN)
+  final bool core; // Kubra-only
+  final String titleMs, titleEn;
+  final String? meaningMs, meaningEn;
+
+  MathuratItem({
+    required this.position,
+    required this.quranRef,
+    required this.arabic,
+    required this.arabicPagi,
+    required this.arabicPetang,
+    required this.repeatN,
+    required this.repeatFull,
+    required this.core,
+    required this.titleMs,
+    required this.titleEn,
+    required this.meaningMs,
+    required this.meaningEn,
+  });
+
+  factory MathuratItem.fromJson(Map<String, dynamic> j) => MathuratItem(
+        position: j['position'] as int,
+        quranRef: j['quran_ref'] == null
+            ? null
+            : QuranRef.fromJson(j['quran_ref'] as Map<String, dynamic>),
+        arabic: j['arabic'] as String?,
+        arabicPagi: j['arabic_pagi'] as String?,
+        arabicPetang: j['arabic_petang'] as String?,
+        repeatN: j['repeat_n'] as int,
+        repeatFull: j['repeat_full'] as int?,
+        core: j['core'] as bool,
+        titleMs: j['title_ms'] as String,
+        titleEn: j['title_en'] as String,
+        meaningMs: j['meaning_ms'] as String?,
+        meaningEn: j['meaning_en'] as String?,
+      );
+
+  int target(bool kubra) => kubra ? (repeatFull ?? repeatN) : repeatN;
+
+  /// Fixed dhikr text for a given time of day (null for Quran-ref items).
+  String? dhikrFor(bool pagi) => arabic ?? (pagi ? arabicPagi : arabicPetang);
+}
+
 class Word {
   final int verseId;
   final int position;
