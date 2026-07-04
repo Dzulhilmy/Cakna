@@ -71,7 +71,7 @@ class _MathuratScreenState extends State<MathuratScreen> {
                   const Spacer(),
                   Switch(
                     value: state.showMeaning,
-                    activeThumbColor: CaknaColors.teal,
+                    activeThumbColor: CaknaColors.olive,
                     onChanged: state.setShowMeaning,
                   ),
                 ],
@@ -146,7 +146,7 @@ class _Segment extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 11),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: active ? CaknaColors.teal : Colors.transparent,
+                color: active ? CaknaColors.olive : Colors.transparent,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(label,
@@ -159,7 +159,7 @@ class _Segment extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: CaknaColors.teal.withValues(alpha: 0.08),
+        color: CaknaColors.olive.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(children: [seg(left, leftActive, onLeft), seg(right, !leftActive, onRight)]),
@@ -186,7 +186,7 @@ class _ProgressCard extends StatelessWidget {
                 const Text('Kemajuan hari ini',
                     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
                 Text('$done / $total selesai',
-                    style: const TextStyle(color: CaknaColors.tealDeep, fontWeight: FontWeight.w700)),
+                    style: const TextStyle(color: CaknaColors.oliveDeep, fontWeight: FontWeight.w700)),
               ],
             ),
             const SizedBox(height: 10),
@@ -195,8 +195,8 @@ class _ProgressCard extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: frac,
                 minHeight: 8,
-                backgroundColor: CaknaColors.teal.withValues(alpha: 0.12),
-                valueColor: const AlwaysStoppedAnimation(CaknaColors.teal),
+                backgroundColor: CaknaColors.olive.withValues(alpha: 0.12),
+                valueColor: const AlwaysStoppedAnimation(CaknaColors.olive),
               ),
             ),
           ],

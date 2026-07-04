@@ -29,7 +29,7 @@ class HomeScreen extends StatelessWidget {
                     fontFamily: 'Lora',
                     fontSize: 30,
                     fontWeight: FontWeight.w600,
-                    color: CaknaColors.tealDeep)),
+                    color: CaknaColors.oliveDeep)),
             const Text('Mushaf Digital',
                 style: TextStyle(fontSize: 13, color: CaknaColors.inkSoft)),
             const SizedBox(height: 20),
@@ -95,7 +95,7 @@ class _ContinueCard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
           gradient: const LinearGradient(
-            colors: [CaknaColors.teal, CaknaColors.tealBright],
+            colors: [CaknaColors.olive, CaknaColors.oliveBright],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -142,9 +142,9 @@ class _ModuleTile extends StatelessWidget {
             height: 52,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
-              color: CaknaColors.teal.withValues(alpha: dark ? 0.18 : 0.10),
+              color: CaknaColors.olive.withValues(alpha: dark ? 0.18 : 0.10),
             ),
-            child: Icon(icon, color: CaknaColors.teal),
+            child: Icon(icon, color: CaknaColors.olive),
           ),
           const SizedBox(height: 6),
           Text(label, style: const TextStyle(fontSize: 11), textAlign: TextAlign.center),

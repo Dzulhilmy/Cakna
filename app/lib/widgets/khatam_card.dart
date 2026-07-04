@@ -25,7 +25,7 @@ class KhatamCard extends StatelessWidget {
                     style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
                 Text('${pct.toStringAsFixed(pct < 10 ? 1 : 0)}%',
                     style: const TextStyle(
-                        color: CaknaColors.tealDeep, fontWeight: FontWeight.w700, fontSize: 15)),
+                        color: CaknaColors.oliveDeep, fontWeight: FontWeight.w700, fontSize: 15)),
               ],
             ),
             const SizedBox(height: 10),
@@ -34,8 +34,8 @@ class KhatamCard extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: u.khatamProgress,
                 minHeight: 9,
-                backgroundColor: CaknaColors.teal.withValues(alpha: 0.12),
-                valueColor: const AlwaysStoppedAnimation(CaknaColors.teal),
+                backgroundColor: CaknaColors.olive.withValues(alpha: 0.12),
+                valueColor: const AlwaysStoppedAnimation(CaknaColors.olive),
               ),
             ),
             const SizedBox(height: 14),
@@ -70,7 +70,7 @@ class _Stat extends StatelessWidget {
         children: [
           Text(value,
               style: const TextStyle(
-                  fontSize: 20, fontWeight: FontWeight.w700, color: CaknaColors.tealDeep)),
+                  fontSize: 20, fontWeight: FontWeight.w700, color: CaknaColors.oliveDeep)),
           const SizedBox(height: 2),
           Text(label,
               textAlign: TextAlign.center,

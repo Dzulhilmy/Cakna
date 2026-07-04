@@ -3,8 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:cakna/theme.dart';
 
 void main() {
-  test('themes build with the teal identity', () {
-    expect(caknaLight().colorScheme.primary, CaknaColors.teal);
+  test('themes build with the olive identity', () {
+    expect(caknaLight().colorScheme.primary, CaknaColors.olive);
     expect(caknaDark().brightness.name, 'dark');
   });
 }

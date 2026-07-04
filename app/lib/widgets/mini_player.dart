@@ -17,7 +17,7 @@ class MiniPlayer extends StatelessWidget {
     final repo = context.read<QuranRepo>();
 
     return Material(
-      color: CaknaColors.teal,
+      color: CaknaColors.olive,
       child: SafeArea(
         top: false,
         child: Padding(

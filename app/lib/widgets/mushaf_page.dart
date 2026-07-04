@@ -138,7 +138,7 @@ class _GlyphLine extends StatelessWidget {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final family = PageFontLoader.family(page);
-    final ink = dark ? CaknaColors.inkDark : const Color(0xFF1B2A2B);
+    final ink = dark ? CaknaColors.inkDark : const Color(0xFF1F2410);
     final spans = <InlineSpan>[];
     for (final g in glyphs) {
       final playing = g.verseId == playingVerseId;
@@ -154,8 +154,8 @@ class _GlyphLine extends StatelessWidget {
             fontFamily: family,
             fontSize: 26,
             height: 1.0,
-            color: playing ? CaknaColors.teal : ink,
-            backgroundColor: playing ? CaknaColors.teal.withValues(alpha: 0.10) : null,
+            color: playing ? CaknaColors.olive : ink,
+            backgroundColor: playing ? CaknaColors.olive.withValues(alpha: 0.10) : null,
           ),
         ));
       }
@@ -190,8 +190,8 @@ class _AyahBadge extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: CaknaColors.teal.withValues(alpha: 0.55), width: 1.2),
-          color: CaknaColors.teal.withValues(alpha: dark ? 0.18 : 0.08),
+          border: Border.all(color: CaknaColors.olive.withValues(alpha: 0.55), width: 1.2),
+          color: CaknaColors.olive.withValues(alpha: dark ? 0.18 : 0.08),
         ),
         child: Text(
           _toArabicNumber(number),
@@ -199,7 +199,7 @@ class _AyahBadge extends StatelessWidget {
             fontFamily: 'Uthmani',
             fontSize: 11,
             height: 1.0,
-            color: CaknaColors.tealDeep,
+            color: CaknaColors.oliveDeep,
           ),
         ),
       ),
@@ -219,10 +219,10 @@ class _SurahBand extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: CaknaColors.teal.withValues(alpha: 0.4)),
+        border: Border.all(color: CaknaColors.olive.withValues(alpha: 0.4)),
         gradient: LinearGradient(
           colors: [
-            CaknaColors.teal.withValues(alpha: dark ? 0.18 : 0.10),
+            CaknaColors.olive.withValues(alpha: dark ? 0.18 : 0.10),
             Colors.transparent,
           ],
           begin: Alignment.topCenter,
@@ -233,7 +233,7 @@ class _SurahBand extends StatelessWidget {
         children: [
           Text('سُورَةُ ${surah.name}',
               style: const TextStyle(
-                  fontFamily: 'Uthmani', fontSize: 20, color: CaknaColors.tealDeep)),
+                  fontFamily: 'Uthmani', fontSize: 20, color: CaknaColors.oliveDeep)),
           Text('${surah.id}. ${surah.nameTrans}',
               style: TextStyle(
                   fontSize: 11,
@@ -256,7 +256,7 @@ class _BismillahLine extends StatelessWidget {
         style: TextStyle(
           fontFamily: 'Uthmani',
           fontSize: 22,
-          color: dark ? CaknaColors.inkDark : const Color(0xFF1B2A2B),
+          color: dark ? CaknaColors.inkDark : const Color(0xFF1F2410),
         ),
       ),
     );

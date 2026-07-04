@@ -85,7 +85,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         fontSize: 13,
-                        color: isAligned ? CaknaColors.teal : CaknaColors.inkSoft),
+                        color: isAligned ? CaknaColors.olive : CaknaColors.inkSoft),
                   ),
                 ),
               ],
@@ -116,13 +116,13 @@ class _Compass extends StatelessWidget {
           angle: (qibla - heading) * math.pi / 180,
           child: CustomPaint(
             size: Size.infinite,
-            painter: _NeedlePainter(color: aligned ? CaknaColors.teal : CaknaColors.gold),
+            painter: _NeedlePainter(color: aligned ? CaknaColors.olive : CaknaColors.gold),
           ),
         ),
         Container(
           width: 14,
           height: 14,
-          decoration: const BoxDecoration(color: CaknaColors.tealDeep, shape: BoxShape.circle),
+          decoration: const BoxDecoration(color: CaknaColors.oliveDeep, shape: BoxShape.circle),
         ),
       ],
     );
@@ -153,7 +153,7 @@ class _DialPainter extends CustomPainter {
             style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: entry.key == 0 ? CaknaColors.teal : CaknaColors.inkSoft)),
+                color: entry.key == 0 ? CaknaColors.olive : CaknaColors.inkSoft)),
         textDirection: TextDirection.ltr,
       )..layout();
       tp.paint(canvas, p - Offset(tp.width / 2, tp.height / 2));

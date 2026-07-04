@@ -89,14 +89,14 @@ class _TargetPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: complete ? CaknaColors.teal : CaknaColors.teal.withValues(alpha: 0.10),
+        color: complete ? CaknaColors.olive : CaknaColors.olive.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(20),
       ),
       child: complete
           ? const Icon(Icons.check, size: 15, color: Colors.white)
           : Text('$count / $target',
               style: const TextStyle(
-                  fontSize: 12, fontWeight: FontWeight.w700, color: CaknaColors.tealDeep)),
+                  fontSize: 12, fontWeight: FontWeight.w700, color: CaknaColors.oliveDeep)),
     );
   }
 }

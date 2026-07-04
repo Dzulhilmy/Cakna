@@ -52,7 +52,7 @@ class _NoteTile extends StatelessWidget {
       builder: (context, vSnap) {
         final v = vSnap.data;
         return ListTile(
-          leading: const Icon(Icons.sticky_note_2_outlined, color: CaknaColors.teal),
+          leading: const Icon(Icons.sticky_note_2_outlined, color: CaknaColors.olive),
           title: Text(entry.body, maxLines: 2, overflow: TextOverflow.ellipsis),
           subtitle: v == null
               ? null
@@ -79,7 +79,7 @@ class _Empty extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 48, color: CaknaColors.teal.withValues(alpha: 0.35)),
+          Icon(icon, size: 48, color: CaknaColors.olive.withValues(alpha: 0.35)),
           const SizedBox(height: 12),
           Text(text, textAlign: TextAlign.center, style: const TextStyle(color: CaknaColors.inkSoft)),
         ],

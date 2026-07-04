@@ -88,7 +88,7 @@ class ProfileScreen extends StatelessWidget {
                 const _SectionTitle('Akaun'),
                 Card(
                   child: ListTile(
-                    leading: const Icon(Icons.cloud_sync_outlined, color: CaknaColors.teal),
+                    leading: const Icon(Icons.cloud_sync_outlined, color: CaknaColors.olive),
                     title: const Text('Log masuk untuk segerak'),
                     subtitle: const Text('Akan datang — simpan penanda & nota merentas peranti'),
                     trailing: const Icon(Icons.chevron_right, color: CaknaColors.inkSoft),
@@ -110,7 +110,7 @@ class ProfileScreen extends StatelessWidget {
                                 fontFamily: 'Lora',
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
-                                color: CaknaColors.tealDeep)),
+                                color: CaknaColors.oliveDeep)),
                         SizedBox(height: 2),
                         Text('Mushaf Digital · versi 1.0.0',
                             style: TextStyle(fontSize: 12, color: CaknaColors.inkSoft)),
@@ -140,7 +140,7 @@ class _Banner extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [CaknaColors.teal.withValues(alpha: 0.85), CaknaColors.tealBright.withValues(alpha: 0.6)],
+            colors: [CaknaColors.olive.withValues(alpha: 0.85), CaknaColors.oliveBright.withValues(alpha: 0.6)],
             begin: Alignment.bottomLeft,
             end: Alignment.topRight,
           ),
@@ -183,7 +183,7 @@ class _ContinueCard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
           gradient: const LinearGradient(
-              colors: [CaknaColors.teal, CaknaColors.tealBright],
+              colors: [CaknaColors.olive, CaknaColors.oliveBright],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight),
         ),
@@ -233,7 +233,7 @@ class _SettingRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: CaknaColors.teal),
+            Icon(icon, size: 20, color: CaknaColors.olive),
             const SizedBox(width: 12),
             Text(label, style: const TextStyle(fontSize: 14)),
             const Spacer(),
@@ -255,7 +255,7 @@ class _Dropdown extends StatelessWidget {
       value: value,
       underline: const SizedBox.shrink(),
       borderRadius: BorderRadius.circular(12),
-      style: const TextStyle(fontSize: 13, color: CaknaColors.tealDeep, fontWeight: FontWeight.w600),
+      style: const TextStyle(fontSize: 13, color: CaknaColors.oliveDeep, fontWeight: FontWeight.w600),
       items: [
         for (final (id, name) in items) DropdownMenuItem(value: id, child: Text(name)),
       ],

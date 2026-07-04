@@ -27,7 +27,7 @@ class CollectionScreen extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.bookmark_border,
-                      size: 48, color: CaknaColors.teal.withValues(alpha: 0.35)),
+                      size: 48, color: CaknaColors.olive.withValues(alpha: 0.35)),
                   const SizedBox(height: 12),
                   const Text('Belum ada penanda.\nKetuk ayat, kemudian ikon penanda.',
                       textAlign: TextAlign.center, style: TextStyle(color: CaknaColors.inkSoft)),
@@ -63,7 +63,7 @@ class _BookmarkTile extends StatelessWidget {
           builder: (context, sSnap) {
             final s = sSnap.data;
             return ListTile(
-              leading: const Icon(Icons.bookmark, color: CaknaColors.teal),
+              leading: const Icon(Icons.bookmark, color: CaknaColors.olive),
               title: Text(s == null || v == null ? '…' : '${s.nameTrans}  ${v.surahId}:${v.verseNumber}',
                   style: const TextStyle(fontWeight: FontWeight.w600)),
               subtitle: v == null

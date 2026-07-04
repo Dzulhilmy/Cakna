@@ -87,19 +87,19 @@ class _VerseSheetState extends State<VerseSheet> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                     decoration: BoxDecoration(
-                      color: CaknaColors.teal.withValues(alpha: 0.12),
+                      color: CaknaColors.olive.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text('${surah.nameTrans} · ${verse.surahId}:${verse.verseNumber}',
                         style: const TextStyle(
-                            fontSize: 12, fontWeight: FontWeight.w600, color: CaknaColors.tealDeep)),
+                            fontSize: 12, fontWeight: FontWeight.w600, color: CaknaColors.oliveDeep)),
                   ),
                   const Spacer(),
                   Builder(builder: (context) {
                     final marked = context.watch<UserData>().isBookmarked(widget.verseId);
                     return IconButton(
                       icon: Icon(marked ? Icons.bookmark : Icons.bookmark_border,
-                          color: marked ? CaknaColors.teal : CaknaColors.inkSoft),
+                          color: marked ? CaknaColors.olive : CaknaColors.inkSoft),
                       onPressed: () => context.read<UserData>().toggleBookmark(widget.verseId),
                     );
                   }),
@@ -176,7 +176,7 @@ class _VerseSheetState extends State<VerseSheet> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: FilledButton(
-                    style: FilledButton.styleFrom(backgroundColor: CaknaColors.teal),
+                    style: FilledButton.styleFrom(backgroundColor: CaknaColors.olive),
                     onPressed: () async {
                       await context.read<UserData>().setNote(widget.verseId, _noteController.text);
                       if (context.mounted) {
@@ -238,7 +238,7 @@ class _PlayButton extends StatelessWidget {
     final playing = audio.playingVerseId == verseId && audio.isPlaying;
     return FilledButton.icon(
       style: FilledButton.styleFrom(
-          backgroundColor: CaknaColors.teal, minimumSize: const Size.fromHeight(46)),
+          backgroundColor: CaknaColors.olive, minimumSize: const Size.fromHeight(46)),
       onPressed: () => context.read<AudioService>().toggleVerse(verseId),
       icon: Icon(playing ? Icons.stop : Icons.play_arrow),
       label: Text(playing ? 'Berhenti' : 'Main'),
@@ -256,7 +256,7 @@ class _IconAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = active ? CaknaColors.teal : CaknaColors.inkSoft;
+    final color = active ? CaknaColors.olive : CaknaColors.inkSoft;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),

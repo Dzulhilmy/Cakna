@@ -146,14 +146,14 @@ class _AzanToggle extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         child: Row(
           children: [
-            const Icon(Icons.notifications_active_outlined, color: CaknaColors.teal, size: 20),
+            const Icon(Icons.notifications_active_outlined, color: CaknaColors.olive, size: 20),
             const SizedBox(width: 12),
             const Expanded(
               child: Text('Notifikasi azan', style: TextStyle(fontSize: 14)),
             ),
             Switch(
               value: app.azanEnabled,
-              activeThumbColor: CaknaColors.teal,
+              activeThumbColor: CaknaColors.olive,
               onChanged: (on) async {
                 if (on) {
                   final granted = await NotificationService.requestPermission();
@@ -193,7 +193,7 @@ class _PrayerRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: isNext ? CaknaColors.teal.withValues(alpha: 0.08) : null,
+      color: isNext ? CaknaColors.olive.withValues(alpha: 0.08) : null,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -202,13 +202,13 @@ class _PrayerRow extends StatelessWidget {
               style: TextStyle(
                   fontSize: 15,
                   fontWeight: isNext ? FontWeight.w700 : FontWeight.w500,
-                  color: isNext ? CaknaColors.tealDeep : null)),
+                  color: isNext ? CaknaColors.oliveDeep : null)),
           Text(DateFormat('h:mm a').format(time),
               style: TextStyle(
                   fontSize: 15,
                   fontFeatures: const [],
                   fontWeight: isNext ? FontWeight.w700 : FontWeight.w500,
-                  color: isNext ? CaknaColors.tealDeep : null)),
+                  color: isNext ? CaknaColors.oliveDeep : null)),
         ],
       ),
     );

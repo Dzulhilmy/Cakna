@@ -160,7 +160,7 @@ class _ResultTile extends StatelessWidget {
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 4),
             child: Text('$name · ${verse.surahId}:${verse.verseNumber} · Hal. ${verse.page}',
-                style: const TextStyle(fontSize: 12, color: CaknaColors.tealDeep)),
+                style: const TextStyle(fontSize: 12, color: CaknaColors.oliveDeep)),
           ),
           onTap: () => Navigator.push(context,
               MaterialPageRoute(builder: (_) => ReaderScreen(initialPage: verse.page))),
@@ -179,7 +179,7 @@ class _Hint extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.search, size: 48, color: CaknaColors.teal.withValues(alpha: 0.35)),
+          Icon(Icons.search, size: 48, color: CaknaColors.olive.withValues(alpha: 0.35)),
           const SizedBox(height: 12),
           const Text('Taip perkataan Arab atau terjemahan\nuntuk mencari ayat.',
               textAlign: TextAlign.center, style: TextStyle(color: CaknaColors.inkSoft)),

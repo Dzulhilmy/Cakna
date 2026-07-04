@@ -16,7 +16,7 @@ class PlaceholderScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 48, color: CaknaColors.teal.withValues(alpha: 0.4)),
+            Icon(icon, size: 48, color: CaknaColors.olive.withValues(alpha: 0.4)),
             const SizedBox(height: 12),
             Text('$title — akan datang',
                 style: const TextStyle(color: CaknaColors.inkSoft)),

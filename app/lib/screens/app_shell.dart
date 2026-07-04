@@ -32,27 +32,27 @@ class _AppShellState extends State<AppShell> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),
-        indicatorColor: CaknaColors.teal.withValues(alpha: 0.14),
+        indicatorColor: CaknaColors.olive.withValues(alpha: 0.14),
         destinations: const [
           NavigationDestination(
               icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home, color: CaknaColors.teal),
+              selectedIcon: Icon(Icons.home, color: CaknaColors.olive),
               label: 'Utama'),
           NavigationDestination(
               icon: Icon(Icons.menu_book_outlined),
-              selectedIcon: Icon(Icons.menu_book, color: CaknaColors.teal),
+              selectedIcon: Icon(Icons.menu_book, color: CaknaColors.olive),
               label: 'Al-Quran'),
           NavigationDestination(
               icon: Icon(Icons.bookmark_border),
-              selectedIcon: Icon(Icons.bookmark, color: CaknaColors.teal),
+              selectedIcon: Icon(Icons.bookmark, color: CaknaColors.olive),
               label: 'Koleksi'),
           NavigationDestination(
               icon: Icon(Icons.edit_note_outlined),
-              selectedIcon: Icon(Icons.edit_note, color: CaknaColors.teal),
+              selectedIcon: Icon(Icons.edit_note, color: CaknaColors.olive),
               label: 'Nota'),
           NavigationDestination(
               icon: Icon(Icons.person_outline),
-              selectedIcon: Icon(Icons.person, color: CaknaColors.teal),
+              selectedIcon: Icon(Icons.person, color: CaknaColors.olive),
               label: 'Profil'),
         ],
       ),

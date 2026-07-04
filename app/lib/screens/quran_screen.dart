@@ -33,8 +33,8 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
         ],
         bottom: TabBar(
           controller: _tabs,
-          labelColor: CaknaColors.teal,
-          indicatorColor: CaknaColors.teal,
+          labelColor: CaknaColors.olive,
+          indicatorColor: CaknaColors.olive,
           tabs: const [Tab(text: 'Surah'), Tab(text: 'Juzuk')],
         ),
       ),
@@ -130,7 +130,7 @@ class _SurahNameGlyph extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
-    final color = dark ? CaknaColors.tealBright : CaknaColors.tealDeep;
+    final color = dark ? CaknaColors.oliveBright : CaknaColors.oliveDeep;
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 130),
       child: SvgPicture.asset(
@@ -158,12 +158,12 @@ class _NumberMedallion extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: CaknaColors.teal.withValues(alpha: 0.10),
-        border: Border.all(color: CaknaColors.teal.withValues(alpha: 0.3)),
+        color: CaknaColors.olive.withValues(alpha: 0.10),
+        border: Border.all(color: CaknaColors.olive.withValues(alpha: 0.3)),
       ),
       child: Text('$n',
           style: const TextStyle(
-              fontWeight: FontWeight.w700, color: CaknaColors.tealDeep, fontSize: 13)),
+              fontWeight: FontWeight.w700, color: CaknaColors.oliveDeep, fontSize: 13)),
     );
   }
 }

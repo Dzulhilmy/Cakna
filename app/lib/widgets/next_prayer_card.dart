@@ -58,8 +58,8 @@ class _NextPrayerCardState extends State<NextPrayerCard> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: CaknaColors.teal.withValues(alpha: 0.35)),
-          color: CaknaColors.teal.withValues(alpha: 0.06),
+          border: Border.all(color: CaknaColors.olive.withValues(alpha: 0.35)),
+          color: CaknaColors.olive.withValues(alpha: 0.06),
         ),
         child: Row(
           children: [
@@ -68,9 +68,9 @@ class _NextPrayerCardState extends State<NextPrayerCard> {
               height: 46,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: CaknaColors.teal.withValues(alpha: 0.14),
+                color: CaknaColors.olive.withValues(alpha: 0.14),
               ),
-              child: const Icon(Icons.access_time_filled, color: CaknaColors.teal),
+              child: const Icon(Icons.access_time_filled, color: CaknaColors.olive),
             ),
             const SizedBox(width: 14),
             Column(
@@ -80,7 +80,7 @@ class _NextPrayerCardState extends State<NextPrayerCard> {
                     style: const TextStyle(fontSize: 12, color: CaknaColors.inkSoft)),
                 Text('${DateFormat('h:mm a').format(time)}  ·  dalam $countdown',
                     style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w700, color: CaknaColors.tealDeep)),
+                        fontSize: 16, fontWeight: FontWeight.w700, color: CaknaColors.oliveDeep)),
               ],
             ),
             const Spacer(),
