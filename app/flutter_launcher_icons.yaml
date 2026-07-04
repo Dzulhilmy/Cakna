@@ -1,0 +1,7 @@
+flutter_launcher_icons:
+  image_path: "tool/icon/cakna_icon.png"
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  adaptive_icon_background: "#0F9B9E"
+  adaptive_icon_foreground: "tool/icon/cakna_icon_fg.png"
