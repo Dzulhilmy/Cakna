@@ -107,15 +107,34 @@ class QuranRepo {
     return (r.first['n'] as int?) ?? 604;
   }
 
-  /// Full-text-ish search over Uthmani text and Malay/English translation.
-  Future<List<Verse>> search(String q, {int limit = 60}) async {
+  /// Search verses. Arabic queries match the harakat-free `text_simple`
+  /// column (diacritic-insensitive); other queries match the translation in
+  /// the given language.
+  Future<List<Verse>> search(String q, {String lang = 'ms', int limit = 60}) async {
+    final query = q.trim();
+    if (query.length < 2) return [];
     final db = await _db.quran;
-    final like = '%${q.trim()}%';
-    final rows = await db.rawQuery('''
-      SELECT * FROM quran_verse
-      WHERE text_uthmani LIKE ? OR translation_ms LIKE ? OR translation_en LIKE ?
-      ORDER BY id LIMIT ?
-    ''', [like, like, like, limit]);
+    final isArabic = RegExp(r'[؀-ۿ]').hasMatch(query);
+    if (isArabic) {
+      final bare = _stripHarakat(query);
+      final rows = await db.rawQuery(
+        'SELECT * FROM quran_verse WHERE text_simple LIKE ? ORDER BY id LIMIT ?',
+        ['%$bare%', limit],
+      );
+      return rows.map(Verse.fromRow).toList();
+    }
+    final col = switch (lang) { 'en' => 'translation_en', 'id' => 'translation_id', _ => 'translation_ms' };
+    final rows = await db.rawQuery(
+      'SELECT * FROM quran_verse WHERE $col LIKE ? ORDER BY id LIMIT ?',
+      ['%$query%', limit],
+    );
     return rows.map(Verse.fromRow).toList();
   }
+
+  static String _stripHarakat(String t) => t
+      .replaceAll(RegExp(r'[ً-ٰٟۖ-ۭـ]'), '')
+      .replaceAll(RegExp('[أإآٱ]'), 'ا')
+      .replaceAll('ى', 'ي')
+      .replaceAll('ؤ', 'و')
+      .replaceAll('ئ', 'ي');
 }

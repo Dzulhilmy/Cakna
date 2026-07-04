@@ -4,6 +4,7 @@ import '../data/models.dart';
 import '../data/quran_repo.dart';
 import '../theme.dart';
 import 'reader_screen.dart';
+import 'search_screen.dart';
 
 /// Quran tab: Surah / Juz list. Tapping opens the mushaf reader at that page.
 class QuranScreen extends StatefulWidget {
@@ -22,6 +23,13 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
     return Scaffold(
       appBar: AppBar(
         title: const Text('Al-Quran'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () => Navigator.push(
+                context, MaterialPageRoute(builder: (_) => const SearchScreen())),
+          ),
+        ],
         bottom: TabBar(
           controller: _tabs,
           labelColor: CaknaColors.teal,

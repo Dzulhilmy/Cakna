@@ -8,6 +8,7 @@ import '../theme.dart';
 import '../widgets/mini_player.dart';
 import '../widgets/mushaf_page.dart';
 import '../widgets/verse_sheet.dart';
+import 'search_screen.dart';
 
 /// The mushaf reader: a horizontally-paged 604-page Madani view. RTL paging
 /// (swipe right-to-left advances, matching a physical mushaf).
@@ -68,7 +69,8 @@ class _ReaderScreenState extends State<ReaderScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.search),
-            onPressed: () {}, // wired in a later pass
+            onPressed: () => Navigator.push(
+                context, MaterialPageRoute(builder: (_) => const SearchScreen())),
           ),
         ],
       ),
