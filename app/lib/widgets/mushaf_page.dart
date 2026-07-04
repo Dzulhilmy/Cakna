@@ -138,7 +138,7 @@ class _GlyphLine extends StatelessWidget {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final family = PageFontLoader.family(page);
-    final ink = dark ? CaknaColors.inkDark : const Color(0xFF1F2410);
+    final ink = dark ? CaknaColors.inkDark : const Color(0xFF1D1D16);
     final spans = <InlineSpan>[];
     for (final g in glyphs) {
       final playing = g.verseId == playingVerseId;
@@ -256,7 +256,7 @@ class _BismillahLine extends StatelessWidget {
         style: TextStyle(
           fontFamily: 'Uthmani',
           fontSize: 22,
-          color: dark ? CaknaColors.inkDark : const Color(0xFF1F2410),
+          color: dark ? CaknaColors.inkDark : const Color(0xFF1D1D16),
         ),
       ),
     );
