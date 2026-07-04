@@ -181,6 +181,22 @@ pub async fn ayah(
     Ok(Json(json!({ "surah": surahs.into_iter().next(), "ayah": AyahOut::from(row) })))
 }
 
+/// Word-by-word data for one ayah: ordered array of { ar, ms, en, id }.
+pub async fn words(
+    State(st): State<AppState>,
+    Path(global): Path<i32>,
+) -> Result<Json<Value>, AppError> {
+    if !(1..=6236).contains(&global) {
+        return Err(AppError::NotFound);
+    }
+    let words: Value = sqlx::query_scalar("SELECT words FROM ayah_words WHERE global = $1")
+        .bind(global)
+        .fetch_optional(&st.pool)
+        .await?
+        .ok_or(AppError::NotFound)?;
+    Ok(Json(json!({ "global": global, "words": words })))
+}
+
 #[derive(Deserialize)]
 pub struct SearchParams {
     q: String,

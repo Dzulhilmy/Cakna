@@ -30,6 +30,18 @@ export interface PageBundle {
 	ayahs: Ayah[];
 }
 
+export interface Word {
+	ar: string; // Uthmani word text
+	ms: string;
+	en: string;
+	id: string;
+}
+
+export interface WordsBundle {
+	global: number;
+	words: Word[];
+}
+
 export interface SurahBundle {
 	surah: SurahMeta;
 	ayahs: Ayah[];

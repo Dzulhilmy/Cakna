@@ -10,7 +10,8 @@
     "cities": 54,
     "dhikr": 14,
     "duas": 42,
-    "mathurat": 28
+    "mathurat": 28,
+    "words": 77429
   },
   "artifacts": {
     "surahs.json": {
@@ -64,6 +65,11 @@
     "yasin.json": {
       "sha256": "0b976ae4defc6d958e841b179b7ad90e89d15bf0dc4d97d810febe0879f503dc",
       "bytes": 507
+    },
+    "words.json": {
+      "sha256": "f5bff84c153c9bc529c6d04f185ed9027cda744e7d28c4bd16240097aa9137a6",
+      "bytes": 5937581
     }
-  }
+  },
+  "words_source_sha256": "80286dff0c4dece61dd44fe28937412f5da2686ec531562274f3e4639be04371"
 }

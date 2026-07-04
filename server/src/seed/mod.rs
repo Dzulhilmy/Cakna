@@ -65,11 +65,16 @@ pub async fn run(pool: &PgPool, data_dir: &Path) -> Result<(), BoxError> {
     let ibadah: Value = read_json(data_dir, "ibadah.json")?;
     let mengaji: Value = read_json(data_dir, "mengaji.json")?;
     let yasin: Value = read_json(data_dir, "yasin.json")?;
+    // words.json: { "<global>": [ { ar, ms, en, id }, ... ] }
+    let words: std::collections::BTreeMap<String, Value> = read_json(data_dir, "words.json")?;
     let manifest_raw = std::fs::read(data_dir.join("manifest.json"))?;
     let content_version = format!("{:x}", Sha256::digest(&manifest_raw));
 
     if surahs.len() != 114 || ayahs.len() != 6236 {
         return Err("artifact counts wrong before seeding".into());
+    }
+    if words.len() != 6236 {
+        return Err(format!("words.json has {} ayahs, expected 6236", words.len()).into());
     }
 
     // first_page per surah, derived from the ayah rows
@@ -81,7 +86,7 @@ pub async fn run(pool: &PgPool, data_dir: &Path) -> Result<(), BoxError> {
     let mut tx = pool.begin().await?;
 
     sqlx::query(
-        "TRUNCATE ayah_translations, ayah_transliterations, ayahs, surahs, \
+        "TRUNCATE ayah_words, ayah_translations, ayah_transliterations, ayahs, surahs, \
          asma_ul_husna, cities, hijri_events, dhikr, duas, mathurat_items, \
          module_docs, meta RESTART IDENTITY CASCADE",
     )
@@ -149,6 +154,22 @@ pub async fn run(pool: &PgPool, data_dir: &Path) -> Result<(), BoxError> {
     )
     .bind(&globals)
     .bind(&transliterations)
+    .execute(&mut *tx)
+    .await?;
+
+    // word-by-word: batch by chunks of globals + jsonb arrays
+    let mut word_globals: Vec<i32> = Vec::with_capacity(6236);
+    let mut word_arrays: Vec<Value> = Vec::with_capacity(6236);
+    for (g, arr) in &words {
+        word_globals.push(g.parse::<i32>().map_err(|_| format!("bad word key {g}"))?);
+        word_arrays.push(arr.clone());
+    }
+    sqlx::query(
+        "INSERT INTO ayah_words (global, words) \
+         SELECT u.g, u.w FROM UNNEST($1::int4[], $2::jsonb[]) AS u(g, w)",
+    )
+    .bind(&word_globals)
+    .bind(&word_arrays)
     .execute(&mut *tx)
     .await?;
 
@@ -232,11 +253,12 @@ pub async fn run(pool: &PgPool, data_dir: &Path) -> Result<(), BoxError> {
     tx.commit().await?;
 
     // Post-seed validation
-    let checks: [(&str, i64); 10] = [
+    let checks: [(&str, i64); 11] = [
         ("surahs", 114),
         ("ayahs", 6236),
         ("ayah_translations", 18708),
         ("ayah_transliterations", 6236),
+        ("ayah_words", 6236),
         ("asma_ul_husna", 99),
         ("cities", 54),
         ("dhikr", 14),

@@ -1,5 +1,6 @@
 <script lang="ts">
-	import type { Ayah, PageBundle } from '$lib/api/types';
+	import { getWords } from '$lib/api/content';
+	import type { Ayah, PageBundle, Word } from '$lib/api/types';
 	import { Button } from '$lib/components/ui/button';
 	import * as Drawer from '$lib/components/ui/drawer';
 	import { Textarea } from '$lib/components/ui/textarea';
@@ -8,7 +9,7 @@
 	import { player } from '$lib/state/player.svelte';
 	import { hls, notes, settings } from '$lib/state/stores.svelte';
 	import { downloadAyahCard } from '$lib/utils/share-card';
-	import { Copy, Image, Play, Repeat, Square } from '@lucide/svelte';
+	import { Copy, Image, Languages, Play, Repeat, Square } from '@lucide/svelte';
 	import { toast } from 'svelte-sonner';
 
 	interface Props {
@@ -26,10 +27,34 @@
 		noteDraft = g != null ? (notes.value[String(g)] ?? '') : '';
 	});
 	let showTaj = $state(false);
+
+	// word-by-word (fetched on demand; the gloss lang follows transLang, falling
+	// back to ms since the Tilawah dataset always has ms/en/id)
+	let showWords = $state(false);
+	let words = $state<Word[] | null>(null);
+	let wordsLoading = $state(false);
 	$effect(() => {
 		void g;
 		showTaj = false;
+		showWords = false;
+		words = null;
 	});
+
+	async function toggleWords() {
+		showWords = !showWords;
+		if (showWords && !words && g != null) {
+			wordsLoading = true;
+			try {
+				words = (await getWords(g)).words;
+			} catch {
+				toast.error(t('t_audio'));
+				showWords = false;
+			} finally {
+				wordsLoading = false;
+			}
+		}
+	}
+	const glossLang = $derived(settings.value.transLang as 'ms' | 'en' | 'id');
 
 	async function copyAyah() {
 		if (!ayah) return;
@@ -152,7 +177,33 @@
 						<span class="font-arabic text-[15px]">نّ</span>
 						{t('act_taj')}
 					</Button>
+					<Button variant="outline" class="justify-start" onclick={toggleWords}>
+						<Languages size={16} />
+						{t('act_words')}
+					</Button>
 				</div>
+
+				{#if showWords}
+					<div class="mt-3 rounded-xl border bg-background p-3">
+						{#if wordsLoading}
+							<p class="py-2 text-center text-sm text-muted-foreground">…</p>
+						{:else if words}
+							<div class="flex flex-wrap gap-2" dir="rtl">
+								{#each words as w, i (i)}
+									<div
+										class="flex min-w-16 flex-col items-center rounded-lg border bg-card px-2 py-1.5 text-center"
+									>
+										<span class="font-arabic text-[22px] leading-tight">{w.ar}</span>
+										<span class="mt-0.5 text-[11px] text-muted-foreground" dir="ltr">
+											{w[glossLang]}
+										</span>
+									</div>
+								{/each}
+							</div>
+							<p class="mt-2 text-[10px] text-muted-foreground">{t('words_src')}</p>
+						{/if}
+					</div>
+				{/if}
 
 				{#if showTaj}
 					<div class="mt-3 rounded-xl border bg-background p-3">

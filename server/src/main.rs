@@ -1,7 +1,6 @@
 use cakna::config::Config;
 use cakna::state::AppState;
 use sqlx::postgres::PgPoolOptions;
-use std::sync::Arc;
 use std::time::Duration;
 
 #[tokio::main]

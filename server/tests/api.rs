@@ -79,6 +79,24 @@ async fn content_parity() {
     assert_eq!(last["ayah"]["surah"], 114);
     assert_eq!(last["ayah"]["ayah"], 6);
 
+    // word-by-word: 1:1 has 4 words, each with ms/en/id gloss
+    let words: serde_json::Value = c.get(format!("{base}/api/ayahs/1/words")).send().await.unwrap().json().await.unwrap();
+    assert_eq!(words["global"], 1);
+    let ws = words["words"].as_array().unwrap();
+    assert_eq!(ws.len(), 4);
+    assert_eq!(ws[1]["ms"], "Allah");
+    assert!(ws[0]["ar"].as_str().unwrap().contains('س')); // بِسْمِ
+    for w in ws {
+        for k in ["ar", "ms", "en", "id"] {
+            assert!(!w[k].as_str().unwrap().is_empty(), "empty {k}");
+        }
+    }
+    // 2:255 (Ayat Kursi, global 262) = 50 words
+    let kursi: serde_json::Value = c.get(format!("{base}/api/ayahs/262/words")).send().await.unwrap().json().await.unwrap();
+    assert_eq!(kursi["words"].as_array().unwrap().len(), 50);
+    // out of range → 404
+    assert_eq!(c.get(format!("{base}/api/ayahs/9999/words")).send().await.unwrap().status(), 404);
+
     // meta: 114 surahs, juz 2 starts at global 149
     let meta: serde_json::Value = c.get(format!("{base}/api/meta")).send().await.unwrap().json().await.unwrap();
     assert_eq!(meta["surahs"].as_array().unwrap().len(), 114);

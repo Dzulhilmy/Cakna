@@ -12,6 +12,7 @@ import type {
 	PageBundle,
 	SearchResult,
 	SurahBundle,
+	WordsBundle,
 	YasinDoc
 } from './types';
 
@@ -19,6 +20,16 @@ type Fetch = typeof fetch;
 
 // In-memory page cache so revisits and prefetched neighbours are instant.
 const pageCache = new Map<number, PageBundle>();
+
+// Word-by-word data is fetched on demand (tap an ayah's word view) and cached.
+const wordsCache = new Map<number, WordsBundle>();
+export async function getWords(global: number, fetchFn: Fetch = fetch): Promise<WordsBundle> {
+	const cached = wordsCache.get(global);
+	if (cached) return cached;
+	const bundle = await api.get<WordsBundle>(`/api/ayahs/${global}/words`, fetchFn);
+	wordsCache.set(global, bundle);
+	return bundle;
+}
 
 export async function getPage(page: number, fetchFn: Fetch = fetch): Promise<PageBundle> {
 	const cached = pageCache.get(page);

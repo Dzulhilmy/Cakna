@@ -31,6 +31,7 @@ pub fn router(st: AppState) -> Router {
         .route("/pages/:page", get(content::routes::page))
         .route("/surahs/:number", get(content::routes::surah))
         .route("/ayahs/:global", get(content::routes::ayah))
+        .route("/ayahs/:global/words", get(content::routes::words))
         .route("/search", get(content::routes::search))
         .route("/modules/:slug", get(content::routes::module))
         .layer(axum::middleware::from_fn_with_state(
