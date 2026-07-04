@@ -5,6 +5,24 @@ import 'package:geolocator/geolocator.dart';
 class LocationService {
   static const fallback = (lat: 3.139, lng: 101.6869, name: 'Kuala Lumpur');
 
+  /// Location without prompting: uses the device position only if permission
+  /// was already granted, else the fallback. Safe to call on passive screens
+  /// (e.g. the home dashboard) that shouldn't trigger a permission dialog.
+  static Future<({double lat, double lng, bool isFallback})> currentSilent() async {
+    try {
+      final perm = await Geolocator.checkPermission();
+      if (perm == LocationPermission.whileInUse || perm == LocationPermission.always) {
+        if (await Geolocator.isLocationServiceEnabled()) {
+          final pos = await Geolocator.getCurrentPosition(
+            locationSettings: const LocationSettings(accuracy: LocationAccuracy.low),
+          );
+          return (lat: pos.latitude, lng: pos.longitude, isFallback: false);
+        }
+      }
+    } catch (_) {/* fall through */}
+    return (lat: fallback.lat, lng: fallback.lng, isFallback: true);
+  }
+
   static Future<({double lat, double lng, bool isFallback})> current() async {
     try {
       if (!await Geolocator.isLocationServiceEnabled()) {

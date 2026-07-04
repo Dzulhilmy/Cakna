@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../state/app_state.dart';
 import '../theme.dart';
 import '../widgets/khatam_card.dart';
+import '../widgets/next_prayer_card.dart';
 import 'mathurat_screen.dart';
 import 'prayer_times_screen.dart';
 import 'qibla_screen.dart';
@@ -39,6 +40,8 @@ class HomeScreen extends StatelessWidget {
                 MaterialPageRoute(builder: (_) => ReaderScreen(initialPage: app.lastPage)),
               ),
             ),
+            const SizedBox(height: 14),
+            const NextPrayerCard(),
             const SizedBox(height: 14),
             const KhatamCard(),
             const SizedBox(height: 20),
