@@ -6,6 +6,7 @@ import 'data/mathurat_repo.dart';
 import 'data/quran_repo.dart';
 import 'data/user_db.dart';
 import 'screens/app_shell.dart';
+import 'screens/onboarding_screen.dart';
 import 'state/app_state.dart';
 import 'state/audio_service.dart';
 import 'state/mathurat_state.dart';
@@ -62,7 +63,7 @@ class CaknaApp extends StatelessWidget {
           theme: caknaLight(),
           darkTheme: caknaDark(),
           themeMode: app.themeMode,
-          home: const AppShell(),
+          home: app.onboarded ? const AppShell() : const OnboardingScreen(),
         ),
       ),
     );

@@ -19,6 +19,13 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// whether the first-run onboarding has been completed
+  bool get onboarded => prefs.getBool('onboarded') ?? false;
+  set onboarded(bool v) {
+    prefs.setBool('onboarded', v);
+    notifyListeners();
+  }
+
   /// verse translation language: 'ms' | 'en' | 'id'
   String get transLang => prefs.getString('transLang') ?? 'ms';
   set transLang(String v) {
