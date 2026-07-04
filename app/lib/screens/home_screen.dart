@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../state/app_state.dart';
 import '../theme.dart';
+import 'prayer_times_screen.dart';
+import 'qibla_screen.dart';
 import 'reader_screen.dart';
 
 /// Home dashboard: continue-reading card + quick module shortcuts.
@@ -47,8 +49,16 @@ class HomeScreen extends StatelessWidget {
               crossAxisSpacing: 12,
               children: [
                 _ModuleTile(icon: Icons.menu_book, label: 'Al-Quran', onTap: () => onNavigateTab?.call(1)),
-                _ModuleTile(icon: Icons.access_time, label: 'Solat', onTap: () {}),
-                _ModuleTile(icon: Icons.explore, label: 'Kiblat', onTap: () {}),
+                _ModuleTile(
+                    icon: Icons.access_time,
+                    label: 'Solat',
+                    onTap: () => Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => const PrayerTimesScreen()))),
+                _ModuleTile(
+                    icon: Icons.explore,
+                    label: 'Kiblat',
+                    onTap: () => Navigator.push(
+                        context, MaterialPageRoute(builder: (_) => const QiblaScreen()))),
                 _ModuleTile(icon: Icons.brightness_5, label: "Ma'thurat", onTap: () {}),
               ],
             ),
