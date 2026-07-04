@@ -6,3 +6,7 @@ web/.svelte-kit/
 .env
 *.pem
 Tilawah/
+
+# Android signing secrets — never commit
+app/android/key.properties
+app/android/app/*.jks

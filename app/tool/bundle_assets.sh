@@ -13,7 +13,7 @@ if [ ! -d "$src" ]; then
 fi
 
 mkdir -p "$here/assets/"{data,fonts,images,page_fonts,sounds}
-cp "$src/data/"*.db "$src/data/"*.json "$here/assets/data/"
+cp "$src/data/quran.db" "$src/data/"*.json "$here/assets/data/"
 cp "$src/fonts/"*.ttf "$here/assets/fonts/"
 cp -R "$src/images/"* "$here/assets/images/"
 cp "$src/page_fonts/"*.ttf "$here/assets/page_fonts/"
