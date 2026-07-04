@@ -54,5 +54,26 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Settings snapshot for cloud sync.
+  Map<String, Object> exportSettings() => {
+        'theme': themeMode.index,
+        'transLang': transLang,
+        'reciter': reciter,
+        'azan': azanEnabled,
+        'tajweed': tajweed,
+        'lastPage': lastPage,
+      };
+
+  /// Apply a synced settings map (server-wins on sign-in).
+  void applySettings(Map<String, dynamic> s) {
+    if (s['theme'] is int) prefs.setInt('themeMode', s['theme'] as int);
+    if (s['transLang'] is String) prefs.setString('transLang', s['transLang'] as String);
+    if (s['reciter'] is String) prefs.setString('reciter', s['reciter'] as String);
+    if (s['azan'] is bool) prefs.setBool('azanEnabled', s['azan'] as bool);
+    if (s['tajweed'] is bool) prefs.setBool('tajweed', s['tajweed'] as bool);
+    if (s['lastPage'] is int) prefs.setInt('lastPage', s['lastPage'] as int);
+    notifyListeners();
+  }
+
   static Future<AppState> load() async => AppState(await SharedPreferences.getInstance());
 }

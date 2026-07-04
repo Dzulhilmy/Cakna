@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../state/app_state.dart';
 import '../state/audio_service.dart';
+import '../state/auth.dart';
+import '../state/sync_service.dart';
 import '../theme.dart';
 import '../widgets/khatam_card.dart';
+import 'auth_screen.dart';
 import 'reader_screen.dart';
 
 const _reciters = [
@@ -86,17 +89,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 const _SectionTitle('Akaun'),
-                Card(
-                  child: ListTile(
-                    leading: const Icon(Icons.cloud_sync_outlined, color: CaknaColors.olive),
-                    title: const Text('Log masuk untuk segerak'),
-                    subtitle: const Text('Akan datang — simpan penanda & nota merentas peranti'),
-                    trailing: const Icon(Icons.chevron_right, color: CaknaColors.inkSoft),
-                    onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Segerak akaun akan datang.')),
-                    ),
-                  ),
-                ),
+                const _AccountCard(),
                 const SizedBox(height: 20),
                 const _SectionTitle('Mengenai'),
                 const Card(
@@ -127,6 +120,49 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
+class _AccountCard extends StatelessWidget {
+  const _AccountCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = context.watch<Auth>();
+    final sync = context.watch<SyncService>();
+    if (!auth.signedIn) {
+      return Card(
+        child: ListTile(
+          leading: const Icon(Icons.cloud_sync_outlined, color: CaknaColors.olive),
+          title: const Text('Log masuk untuk segerak'),
+          subtitle: const Text('Simpan penanda, nota & kemajuan merentas peranti'),
+          trailing: const Icon(Icons.chevron_right, color: CaknaColors.inkSoft),
+          onTap: () => Navigator.push(
+              context, MaterialPageRoute(builder: (_) => const AuthScreen())),
+        ),
+      );
+    }
+    return Card(
+      child: Column(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.cloud_done_outlined, color: CaknaColors.olive),
+            title: Text(auth.email ?? 'Log masuk'),
+            subtitle: Text(sync.syncing
+                ? 'Menyegerak…'
+                : sync.lastSynced != null
+                    ? 'Disegerak'
+                    : 'Log masuk'),
+          ),
+          const Divider(height: 1),
+          ListTile(
+            leading: const Icon(Icons.logout, color: CaknaColors.inkSoft),
+            title: const Text('Log keluar'),
+            onTap: () => context.read<Auth>().logout(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _Banner extends StatelessWidget {
   const _Banner();
 
@@ -146,23 +182,35 @@ class _Banner extends StatelessWidget {
           ),
         ),
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const CircleAvatar(
-              radius: 34,
-              backgroundColor: Colors.white24,
-              child: Icon(Icons.person, size: 38, color: Colors.white),
-            ),
-            const SizedBox(height: 10),
-            const Text('Tetamu',
-                style: TextStyle(
-                    color: Colors.white, fontSize: 22, fontFamily: 'Lora', fontWeight: FontWeight.w600)),
-            const Text('Data disimpan pada peranti ini',
-                style: TextStyle(color: Colors.white70, fontSize: 12)),
-          ],
-        ),
+        child: Builder(builder: (context) {
+          final auth = context.watch<Auth>();
+          final signedIn = auth.signedIn;
+          final name = signedIn ? (auth.email ?? '') : 'Tetamu';
+          final initial = signedIn && name.isNotEmpty ? name[0].toUpperCase() : null;
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                radius: 34,
+                backgroundColor: Colors.white24,
+                child: initial != null
+                    ? Text(initial,
+                        style: const TextStyle(
+                            fontSize: 30, fontWeight: FontWeight.w700, color: Colors.white))
+                    : const Icon(Icons.person, size: 38, color: Colors.white),
+              ),
+              const SizedBox(height: 10),
+              Text(name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                      color: Colors.white, fontSize: 22, fontFamily: 'Lora', fontWeight: FontWeight.w600)),
+              Text(signedIn ? 'Disegerak ke awan' : 'Data disimpan pada peranti ini',
+                  style: const TextStyle(color: Colors.white70, fontSize: 12)),
+            ],
+          );
+        }),
       ),
     );
   }

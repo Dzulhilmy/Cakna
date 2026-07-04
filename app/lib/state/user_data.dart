@@ -128,6 +128,61 @@ class UserData extends ChangeNotifier {
 
   int get todayPages => _readLog[_dayKey(DateTime.now())] ?? 0;
 
+  // ---- cloud sync (bookmarks/notes/read/readlog) ----
+  /// Snapshot of the syncable user data as JSON values keyed by sync key.
+  Map<String, Object> exportSync() => {
+        'bookmarks': _bookmarks.toList()..sort(),
+        'notes': _notes.map((k, v) => MapEntry(k.toString(), v)),
+        'read': _readPages.toList()..sort(),
+        'readlog': Map<String, int>.from(_readLog),
+      };
+
+  /// Union-merge remote data into the local store (never loses local data),
+  /// writing new rows to the DB. Returns true if anything changed locally.
+  Future<bool> mergeSync(Map<String, dynamic> remote) async {
+    final db = await _udb.db;
+    var changed = false;
+    final now = DateTime.now().millisecondsSinceEpoch;
+
+    for (final v in (remote['bookmarks'] as List? ?? const [])) {
+      final id = v as int;
+      if (_bookmarks.add(id)) {
+        changed = true;
+        await db.insert('bookmarks', {'verse_id': id, 'collection': 'Umum', 'created_at': now},
+            conflictAlgorithm: ConflictAlgorithm.ignore);
+      }
+    }
+    (remote['notes'] as Map?)?.forEach((k, v) {
+      final id = int.tryParse(k.toString());
+      if (id != null && !_notes.containsKey(id)) {
+        _notes[id] = v as String;
+        changed = true;
+        db.insert('notes', {'verse_id': id, 'body': v, 'updated_at': now},
+            conflictAlgorithm: ConflictAlgorithm.ignore);
+      }
+    });
+    for (final v in (remote['read'] as List? ?? const [])) {
+      final p = v as int;
+      if (_readPages.add(p)) {
+        changed = true;
+        await db.insert('read_pages', {'page': p, 'read_at': now},
+            conflictAlgorithm: ConflictAlgorithm.ignore);
+      }
+    }
+    (remote['readlog'] as Map?)?.forEach((k, v) {
+      final day = k.toString();
+      final n = v as int;
+      if ((_readLog[day] ?? 0) < n) {
+        _readLog[day] = n;
+        changed = true;
+        db.insert('read_log', {'day': day, 'count': n},
+            conflictAlgorithm: ConflictAlgorithm.replace);
+      }
+    });
+    if (changed) notifyListeners();
+    return changed;
+  }
+
   /// Mark a page read (idempotent per page). First-ever read bumps today's log.
   Future<void> markRead(int page) async {
     if (_readPages.contains(page)) return;
