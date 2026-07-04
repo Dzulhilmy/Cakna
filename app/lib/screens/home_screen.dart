@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../state/app_state.dart';
 import '../theme.dart';
+import '../widgets/cakna_mark.dart';
 import '../widgets/khatam_card.dart';
 import '../widgets/next_prayer_card.dart';
 import 'mathurat_screen.dart';
@@ -24,14 +25,26 @@ class HomeScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           children: [
             const SizedBox(height: 8),
-            Text('Cakna',
-                style: TextStyle(
-                    fontFamily: 'Lora',
-                    fontSize: 30,
-                    fontWeight: FontWeight.w600,
-                    color: CaknaColors.oliveDeep)),
-            const Text('Mushaf Digital',
-                style: TextStyle(fontSize: 13, color: CaknaColors.inkSoft)),
+            Row(
+              children: [
+                const CaknaMark(size: 46, color: CaknaColors.oliveDeep),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Cakna',
+                        style: TextStyle(
+                            fontFamily: 'Lora',
+                            fontSize: 30,
+                            fontWeight: FontWeight.w600,
+                            height: 1.0,
+                            color: CaknaColors.oliveDeep)),
+                    const Text('Mushaf Digital',
+                        style: TextStyle(fontSize: 13, color: CaknaColors.inkSoft)),
+                  ],
+                ),
+              ],
+            ),
             const SizedBox(height: 20),
             _ContinueCard(
               page: app.lastPage,
