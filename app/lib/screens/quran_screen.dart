@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import '../data/models.dart';
 import '../data/quran_repo.dart';
@@ -75,8 +76,7 @@ class _SurahList extends StatelessWidget {
               style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
           subtitle: Text('${s.isMakki ? "Makkiyah" : "Madaniyah"} · ${s.verseCount} ayat',
               style: const TextStyle(fontSize: 12)),
-          trailing: Text(s.name,
-              style: const TextStyle(fontFamily: 'Uthmani', fontSize: 20, color: CaknaColors.tealDeep)),
+          trailing: _SurahNameGlyph(id: s.id, fallback: s.name),
           onTap: () async {
             final verses = await repo.versesForSurah(s.id);
             if (!context.mounted) return;
@@ -116,6 +116,32 @@ class _JuzList extends StatelessWidget {
           },
         );
       },
+    );
+  }
+}
+
+/// The surah name rendered from its bundled calligraphic SVG (tinted to the
+/// theme), falling back to Uthmani text if the asset is missing.
+class _SurahNameGlyph extends StatelessWidget {
+  final int id;
+  final String fallback;
+  const _SurahNameGlyph({required this.id, required this.fallback});
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final color = dark ? CaknaColors.tealBright : CaknaColors.tealDeep;
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 130),
+      child: SvgPicture.asset(
+        'assets/images/sname_$id.svg',
+        height: 26,
+        fit: BoxFit.contain,
+        alignment: Alignment.centerRight,
+        colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+        placeholderBuilder: (_) => Text(fallback,
+            style: TextStyle(fontFamily: 'Uthmani', fontSize: 20, color: color)),
+      ),
     );
   }
 }
