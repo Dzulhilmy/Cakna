@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../data/models.dart';
 import '../data/quran_repo.dart';
+import '../quran/tajweed.dart';
 import '../state/app_state.dart';
 import '../state/audio_service.dart';
 import '../state/user_data.dart';
@@ -64,6 +65,29 @@ class _VerseSheetState extends State<VerseSheet> {
         _ => w.ms,
       };
 
+  /// The ayah Arabic as spans — tajweed-coloured (from per-word rules) when
+  /// enabled, otherwise plain. Falls back to the verse's own text.
+  List<InlineSpan> _ayahSpans(List<Word> words, String fallback, bool dark, BuildContext context) {
+    final base = TextStyle(
+      fontFamily: 'Uthmani',
+      fontSize: 26,
+      height: 1.9,
+      color: dark ? CaknaColors.inkDark : CaknaColors.ink,
+    );
+    final tajweedOn = context.watch<AppState>().tajweed;
+    if (words.isEmpty) return [TextSpan(text: fallback, style: base)];
+    final out = <InlineSpan>[];
+    for (var i = 0; i < words.length; i++) {
+      if (tajweedOn) {
+        out.addAll(Tajweed.spans(words[i].arabic, words[i].rules, base));
+      } else {
+        out.add(TextSpan(text: words[i].arabic, style: base));
+      }
+      if (i != words.length - 1) out.add(TextSpan(text: ' ', style: base));
+    }
+    return out;
+  }
+
   @override
   Widget build(BuildContext context) {
     final lang = context.watch<AppState>().transLang;
@@ -95,6 +119,15 @@ class _VerseSheetState extends State<VerseSheet> {
                             fontSize: 12, fontWeight: FontWeight.w600, color: CaknaColors.oliveDeep)),
                   ),
                   const Spacer(),
+                  IconButton(
+                    tooltip: 'Warna tajwid',
+                    icon: Icon(Icons.brush_outlined,
+                        color: context.watch<AppState>().tajweed
+                            ? CaknaColors.olive
+                            : CaknaColors.inkSoft),
+                    onPressed: () =>
+                        context.read<AppState>().tajweed = !context.read<AppState>().tajweed,
+                  ),
                   Builder(builder: (context) {
                     final marked = context.watch<UserData>().isBookmarked(widget.verseId);
                     return IconButton(
@@ -106,16 +139,15 @@ class _VerseSheetState extends State<VerseSheet> {
                 ],
               ),
               const SizedBox(height: 16),
-              Text(
-                verse.textUthmani,
+              Text.rich(
+                TextSpan(children: _ayahSpans(words, verse.textUthmani, dark, context)),
                 textAlign: TextAlign.right,
                 textDirection: TextDirection.rtl,
-                style: TextStyle(
-                    fontFamily: 'Uthmani',
-                    fontSize: 26,
-                    height: 1.9,
-                    color: dark ? CaknaColors.inkDark : CaknaColors.ink),
               ),
+              if (context.watch<AppState>().tajweed) ...[
+                const SizedBox(height: 12),
+                const _TajweedLegend(),
+              ],
               const SizedBox(height: 12),
               Text(_tr(verse, lang),
                   style: TextStyle(
@@ -224,6 +256,36 @@ class _VerseSheetState extends State<VerseSheet> {
           ),
         );
       },
+    );
+  }
+}
+
+class _TajweedLegend extends StatelessWidget {
+  const _TajweedLegend();
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 12,
+      runSpacing: 6,
+      children: [
+        for (final (code, label) in Tajweed.legend)
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(
+                  color: Tajweed.colors[code],
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
+              const SizedBox(width: 4),
+              Text(label, style: const TextStyle(fontSize: 10.5, color: CaknaColors.inkSoft)),
+            ],
+          ),
+      ],
     );
   }
 }

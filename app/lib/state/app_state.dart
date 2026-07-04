@@ -40,5 +40,12 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// colour Arabic by tajweed rule in the verse sheet
+  bool get tajweed => prefs.getBool('tajweed') ?? true;
+  set tajweed(bool v) {
+    prefs.setBool('tajweed', v);
+    notifyListeners();
+  }
+
   static Future<AppState> load() async => AppState(await SharedPreferences.getInstance());
 }

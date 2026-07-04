@@ -179,6 +179,7 @@ class Word {
   final String ms;
   final String en;
   final String id;
+  final String? rules; // per-char tajweed rule codes (comma-separated)
 
   Word({
     required this.verseId,
@@ -187,6 +188,7 @@ class Word {
     required this.ms,
     required this.en,
     required this.id,
+    required this.rules,
   });
 
   factory Word.fromRow(Map<String, Object?> r) => Word(
@@ -196,5 +198,6 @@ class Word {
         ms: (r['translation_ms'] ?? '') as String,
         en: (r['translation_en'] ?? '') as String,
         id: (r['translation_id'] ?? '') as String,
+        rules: r['rules'] as String?,
       );
 }
