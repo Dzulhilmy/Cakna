@@ -59,13 +59,30 @@ export interface Puasa {
 	recs: PuasaRecord[];
 }
 
+// Al-Ma'thurat v2 — kaunter tasbih satu-item: progres kekal per versi
+// sehingga sesi lengkap/di-set semula; rekod harian memacu streak. Nilai
+// bentuk lama (v1 dengan s_pagi/…) digantikan dengan lalai semasa migrasi.
+export interface MathuratTetapan {
+	arSaiz: number;
+	bmSaiz: number;
+	paparBm: boolean;
+	paparRumi: boolean;
+	jajarAr: 'kanan' | 'tengah' | 'kiri';
+	jajarBm: 'kiri' | 'tengah' | 'kanan';
+	bahasa: 'bm' | 'bi';
+	getar: boolean;
+	autoMaju: boolean;
+	skrinTerang: boolean;
+	autoWaktu: boolean;
+}
 export interface MathuratState {
-	d: string; // device-local YYYY-MM-DD; wiped on date change
-	v: 's' | 'k'; // sughra | kubra
-	s_pagi: number[]; // 28 counters each
-	s_petang: number[];
-	k_pagi: number[];
-	k_petang: number[];
+	v2: true;
+	version: 'sughra' | 'kubra';
+	mode: 'pagi' | 'petang';
+	idx: { sughra: number; kubra: number };
+	counts: { sughra: number[]; kubra: number[] };
+	tetapan: MathuratTetapan;
+	rekod: Record<string, { pagi?: boolean; petang?: boolean }>;
 }
 
 export type CityChoice = number | { g: [number, number] }; // city index | GPS
