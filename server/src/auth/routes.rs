@@ -100,6 +100,34 @@ pub async fn logout(State(st): State<AppState>, headers: HeaderMap) -> Result<Re
         .into_response())
 }
 
+/// Permanently delete the signed-in user and all their data (App Store /
+/// Play requirement for account-creating apps).
+pub async fn delete_account(
+    State(st): State<AppState>,
+    user: session::AuthUser,
+) -> Result<Response, AppError> {
+    let mut tx = st.pool.begin().await?;
+    sqlx::query("DELETE FROM user_data WHERE user_id = $1")
+        .bind(user.id)
+        .execute(&mut *tx)
+        .await?;
+    sqlx::query("DELETE FROM sessions WHERE user_id = $1")
+        .bind(user.id)
+        .execute(&mut *tx)
+        .await?;
+    sqlx::query("DELETE FROM users WHERE id = $1")
+        .bind(user.id)
+        .execute(&mut *tx)
+        .await?;
+    tx.commit().await?;
+    Ok((
+        StatusCode::OK,
+        [(SET_COOKIE, session::clear_cookie(st.cfg.cookie_secure))],
+        Json(json!({ "ok": true })),
+    )
+        .into_response())
+}
+
 pub async fn me(
     State(st): State<AppState>,
     user: session::AuthUser,

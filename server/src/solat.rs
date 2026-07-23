@@ -71,6 +71,7 @@ pub async fn zone_times(
             "Imsak": pt["imsak"],
             "Subuh": pt["fajr"],
             "Syuruk": pt["syuruk"],
+            "Dhuha": pt["dhuha"],
             "Zohor": pt["dhuhr"],
             "Asar": pt["asr"],
             "Maghrib": pt["maghrib"],

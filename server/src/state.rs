@@ -1,4 +1,5 @@
 use crate::config::Config;
+use crate::mathurat::MathuratHub;
 use crate::solat::SolatCache;
 use sqlx::PgPool;
 use std::sync::Arc;
@@ -12,6 +13,8 @@ pub struct AppState {
     /// e-solat proxy: per-zone daily cache + shared HTTP client.
     pub solat_cache: SolatCache,
     pub http: reqwest::Client,
+    /// Live Al-Ma'thurat session: in-memory presence + broadcast (not persisted).
+    pub mathurat: MathuratHub,
 }
 
 impl AppState {
@@ -22,6 +25,7 @@ impl AppState {
             content_version,
             solat_cache: SolatCache::default(),
             http: reqwest::Client::new(),
+            mathurat: MathuratHub::default(),
         }
     }
 }

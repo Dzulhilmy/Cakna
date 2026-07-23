@@ -2,13 +2,14 @@ pub mod auth;
 pub mod config;
 pub mod content;
 pub mod error;
+pub mod mathurat;
 pub mod normalize;
 pub mod seed;
 pub mod solat;
 pub mod state;
 pub mod sync;
 
-use axum::routing::{get, post, put};
+use axum::routing::{delete, get, post, put};
 use axum::{Json, Router};
 use state::AppState;
 use tower_http::compression::CompressionLayer;
@@ -43,10 +44,18 @@ pub fn router(st: AppState) -> Router {
         .route("/health", get(health))
         .merge(content)
         .route("/solat/:zone", get(solat::zone_times))
+        // Live Al-Ma'thurat session (real-time presence). Reads open; writes authed.
+        .route("/mathurat/live", get(mathurat::live))
+        .route(
+            "/mathurat/presence",
+            get(mathurat::snapshot).post(mathurat::update),
+        )
+        .route("/mathurat/leave", post(mathurat::leave))
         .route("/auth/register", post(auth::routes::register))
         .route("/auth/login", post(auth::routes::login))
         .route("/auth/logout", post(auth::routes::logout))
         .route("/auth/me", get(auth::routes::me))
+        .route("/account", delete(auth::routes::delete_account))
         .route("/sync", get(sync::routes::get_all).put(sync::routes::put_batch))
         .route("/sync/export", get(sync::routes::export))
         .route("/sync/:key", put(sync::routes::put_key))
