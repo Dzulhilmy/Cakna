@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../data/models.dart';
 import '../data/quran_repo.dart';
+import '../state/app_state.dart';
 import '../state/user_data.dart';
 import '../theme.dart';
+import '../utils/note_text.dart';
+import '../widgets/tab_scaffold.dart';
 import 'reader_screen.dart';
 
-/// The "Nota" tab: every per-ayah note, newest first. Tap opens the reader at
-/// that verse's page.
+/// Notes tab — per-ayah notes, newest first (matches Tilawah's Notes). Notes
+/// are authored from an ayah in the mushaf; the empty state opens the reader.
 class NotesScreen extends StatelessWidget {
   const NotesScreen({super.key});
 
@@ -16,27 +19,43 @@ class NotesScreen extends StatelessWidget {
     final userData = context.watch<UserData>();
     final repo = context.read<QuranRepo>();
     return Scaffold(
-      appBar: AppBar(title: const Text('Nota')),
-      body: FutureBuilder<List<NoteEntry>>(
-        // rebuilds when UserData notifies (watch above)
-        future: userData.notes(),
-        builder: (context, snap) {
-          final notes = snap.data ?? const [];
-          if (snap.connectionState == ConnectionState.done && notes.isEmpty) {
-            return const _Empty(
-              icon: Icons.edit_note,
-              text: 'Belum ada nota.\nKetuk ayat dalam mushaf, kemudian butang Nota.',
-            );
-          }
-          return ListView.separated(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            itemCount: notes.length,
-            separatorBuilder: (_, _) => const Divider(height: 1, indent: 16),
-            itemBuilder: (context, i) => _NoteTile(entry: notes[i], repo: repo),
-          );
-        },
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TabHeader(title: 'Nota', onAdd: () => _openReader(context)),
+            Expanded(
+              child: FutureBuilder<List<NoteEntry>>(
+                future: userData.notes(),
+                builder: (context, snap) {
+                  final notes = snap.data ?? const [];
+                  if (snap.connectionState == ConnectionState.done && notes.isEmpty) {
+                    return EmptyState(
+                      icon: Icons.edit_note_rounded,
+                      title: 'Nota',
+                      body: 'Cipta nota untuk mencatat pengajaran dan renungan ayat.',
+                      actionLabel: 'Cipta nota',
+                      onAction: () => _openReader(context),
+                    );
+                  }
+                  return ListView.separated(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    itemCount: notes.length,
+                    separatorBuilder: (_, _) => const Divider(height: 1, indent: 16),
+                    itemBuilder: (context, i) => _NoteTile(entry: notes[i], repo: repo),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  void _openReader(BuildContext context) {
+    final page = context.read<AppState>().lastPage;
+    Navigator.push(context, MaterialPageRoute(builder: (_) => ReaderScreen(initialPage: page)));
   }
 }
 
@@ -52,8 +71,16 @@ class _NoteTile extends StatelessWidget {
       builder: (context, vSnap) {
         final v = vSnap.data;
         return ListTile(
-          leading: const Icon(Icons.sticky_note_2_outlined, color: CaknaColors.olive),
-          title: Text(entry.body, maxLines: 2, overflow: TextOverflow.ellipsis),
+          leading: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: CaknaColors.olive.withValues(alpha: 0.12),
+            ),
+            child: const Icon(Icons.sticky_note_2_outlined, size: 20, color: CaknaColors.olive),
+          ),
+          title: Text(notePlainText(entry.body), maxLines: 2, overflow: TextOverflow.ellipsis),
           subtitle: v == null
               ? null
               : Text('Ayat ${v.surahId}:${v.verseNumber}',
@@ -64,26 +91,6 @@ class _NoteTile extends StatelessWidget {
                   MaterialPageRoute(builder: (_) => ReaderScreen(initialPage: v.page))),
         );
       },
-    );
-  }
-}
-
-class _Empty extends StatelessWidget {
-  final IconData icon;
-  final String text;
-  const _Empty({required this.icon, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 48, color: CaknaColors.olive.withValues(alpha: 0.35)),
-          const SizedBox(height: 12),
-          Text(text, textAlign: TextAlign.center, style: const TextStyle(color: CaknaColors.inkSoft)),
-        ],
-      ),
     );
   }
 }

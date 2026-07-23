@@ -3,9 +3,10 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import '../services/location_service.dart';
-import '../theme.dart';
 import '../utils/prayers.dart';
 
+/// Qibla compass — dark full-screen with an olive accent ring and the qibla
+/// bearing at centre (matches Tilawah's layout). Turns green when aligned.
 class QiblaScreen extends StatefulWidget {
   const QiblaScreen({super.key});
 
@@ -14,8 +15,12 @@ class QiblaScreen extends StatefulWidget {
 }
 
 class _QiblaScreenState extends State<QiblaScreen> {
-  double? _qibla; // bearing from north to Kaaba
-  double _heading = 0; // device heading from north
+  static const _bg = Color(0xFF0C0C09);
+  static const _accent = Color(0xFFC9C87E); // warm olive-gold, legible on dark
+  static const _aligned = Color(0xFF8FBF6B); // green when facing qibla
+
+  double? _qibla;
+  double _heading = 0;
   StreamSubscription? _sub;
   bool _noCompass = false;
 
@@ -48,147 +53,163 @@ class _QiblaScreenState extends State<QiblaScreen> {
   @override
   Widget build(BuildContext context) {
     final qibla = _qibla;
-    // angle of the qibla marker relative to the device's current heading
-    final relative = qibla == null ? 0.0 : (qibla - _heading);
-    final aligned = ((relative % 360) + 360) % 360;
-    final isAligned = aligned < 5 || aligned > 355;
+    final relative = qibla == null ? 0.0 : ((qibla - _heading) % 360 + 360) % 360;
+    final isAligned = qibla != null && (relative < 5 || relative > 355);
+    final accent = isAligned ? _aligned : _accent;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Arah Kiblat')),
-      body: qibla == null
-          ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
-          : Column(
+      backgroundColor: _bg,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Row(
               children: [
-                const SizedBox(height: 24),
-                Text('${qibla.toStringAsFixed(1)}° dari Utara',
-                    style: const TextStyle(fontSize: 15, color: CaknaColors.inkSoft)),
-                const SizedBox(height: 24),
-                Expanded(
-                  child: Center(
-                    child: AspectRatio(
-                      aspectRatio: 1,
-                      child: Padding(
-                        padding: const EdgeInsets.all(28),
-                        child: _Compass(heading: _heading, qibla: qibla, aligned: isAligned),
-                      ),
-                    ),
-                  ),
+                IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white70),
+                  onPressed: () => Navigator.maybePop(context),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Text(
-                    _noCompass
-                        ? 'Kompas tidak tersedia pada peranti ini — gunakan bacaan darjah di atas dengan kompas fizikal.'
-                        : isAligned
-                            ? 'Anda sedang menghadap kiblat. 🕋'
-                            : 'Putarkan peranti sehingga penunjuk emas berada di atas.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 13,
-                        color: isAligned ? CaknaColors.olive : CaknaColors.inkSoft),
-                  ),
+                const Spacer(),
+                const Padding(
+                  padding: EdgeInsets.only(right: 16),
+                  child: Text('Arah Kiblat',
+                      style: TextStyle(color: Colors.white, fontSize: 16, fontFamily: 'Lora')),
                 ),
+                const Spacer(),
+                const SizedBox(width: 48),
               ],
             ),
+            const SizedBox(height: 20),
+            const Text('🕋', style: TextStyle(fontSize: 40)),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: Text(
+                _noCompass
+                    ? 'Kompas tidak tersedia — gunakan bacaan darjah di bawah dengan kompas fizikal.'
+                    : isAligned
+                        ? 'Anda sedang menghadap kiblat.'
+                        : 'Putarkan peranti sehingga penunjuk berada di atas.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: isAligned ? _aligned : Colors.white60, fontSize: 13, height: 1.4),
+              ),
+            ),
+            Expanded(
+              child: Center(
+                child: qibla == null
+                    ? const CircularProgressIndicator(strokeWidth: 2, color: Colors.white24)
+                    : AspectRatio(
+                        aspectRatio: 1,
+                        child: Padding(
+                          padding: const EdgeInsets.all(36),
+                          child: CustomPaint(
+                            painter: _QiblaDial(
+                                heading: _heading, qibla: qibla, accent: accent),
+                            child: Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text('${qibla.toStringAsFixed(1)}°',
+                                      style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 44,
+                                          fontWeight: FontWeight.w700)),
+                                  const Text('dari Utara',
+                                      style: TextStyle(color: Colors.white38, fontSize: 12)),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
     );
   }
 }
 
-class _Compass extends StatelessWidget {
-  final double heading;
-  final double qibla;
-  final bool aligned;
-  const _Compass({required this.heading, required this.qibla, required this.aligned});
-
-  @override
-  Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        // dial rotates opposite to heading so N points to true north
-        Transform.rotate(
-          angle: -heading * math.pi / 180,
-          child: CustomPaint(size: Size.infinite, painter: _DialPainter(dark: dark)),
-        ),
-        // qibla needle points to (qibla - heading)
-        Transform.rotate(
-          angle: (qibla - heading) * math.pi / 180,
-          child: CustomPaint(
-            size: Size.infinite,
-            painter: _NeedlePainter(color: aligned ? CaknaColors.olive : CaknaColors.gold),
-          ),
-        ),
-        Container(
-          width: 14,
-          height: 14,
-          decoration: const BoxDecoration(color: CaknaColors.oliveDeep, shape: BoxShape.circle),
-        ),
-      ],
-    );
-  }
-}
-
-class _DialPainter extends CustomPainter {
-  final bool dark;
-  _DialPainter({required this.dark});
+class _QiblaDial extends CustomPainter {
+  final double heading, qibla;
+  final Color accent;
+  _QiblaDial({required this.heading, required this.qibla, required this.accent});
 
   @override
   void paint(Canvas canvas, Size size) {
     final c = size.center(Offset.zero);
     final r = size.width / 2;
-    final ring = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2
-      ..color = dark ? CaknaColors.borderDark : CaknaColors.border;
-    canvas.drawCircle(c, r, ring);
 
-    const marks = {0: 'U', 90: 'T', 180: 'S', 270: 'B'};
-    for (final entry in marks.entries) {
-      final ang = (entry.key - 90) * math.pi / 180;
-      final p = Offset(c.dx + (r - 18) * math.cos(ang), c.dy + (r - 18) * math.sin(ang));
+    // base ring
+    canvas.drawCircle(
+        c,
+        r,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2
+          ..color = Colors.white.withValues(alpha: 0.10));
+
+    // tick marks (rotate with -heading so N is true north)
+    for (var deg = 0; deg < 360; deg += 15) {
+      final a = (deg - heading - 90) * math.pi / 180;
+      final major = deg % 90 == 0;
+      final inner = r - (major ? 16 : 9);
+      canvas.drawLine(
+        Offset(c.dx + inner * math.cos(a), c.dy + inner * math.sin(a)),
+        Offset(c.dx + r * math.cos(a), c.dy + r * math.sin(a)),
+        Paint()
+          ..strokeWidth = major ? 2 : 1
+          ..color = Colors.white.withValues(alpha: major ? 0.5 : 0.18),
+      );
+    }
+
+    // cardinal letters
+    const cards = {0: 'U', 90: 'T', 180: 'S', 270: 'B'};
+    for (final e in cards.entries) {
+      final a = (e.key - heading - 90) * math.pi / 180;
+      final p = Offset(c.dx + (r - 34) * math.cos(a), c.dy + (r - 34) * math.sin(a));
       final tp = TextPainter(
         text: TextSpan(
-            text: entry.value,
+            text: e.value,
             style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: entry.key == 0 ? CaknaColors.olive : CaknaColors.inkSoft)),
+                color: e.key == 0 ? accent : Colors.white54,
+                fontSize: 15,
+                fontWeight: FontWeight.w700)),
         textDirection: TextDirection.ltr,
       )..layout();
       tp.paint(canvas, p - Offset(tp.width / 2, tp.height / 2));
     }
+
+    // qibla accent arc + marker at (qibla - heading)
+    final qa = (qibla - heading - 90) * math.pi / 180;
+    canvas.drawArc(
+      Rect.fromCircle(center: c, radius: r),
+      qa - 0.35,
+      0.70,
+      false,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 5
+        ..strokeCap = StrokeCap.round
+        ..color = accent,
+    );
+    final marker = Offset(c.dx + (r - 2) * math.cos(qa), c.dy + (r - 2) * math.sin(qa));
+    canvas.drawCircle(marker, 7, Paint()..color = accent);
+
+    // needle to qibla
+    final tip = Offset(c.dx + (r - 20) * math.cos(qa), c.dy + (r - 20) * math.sin(qa));
+    canvas.drawLine(
+        c,
+        tip,
+        Paint()
+          ..strokeWidth = 3
+          ..strokeCap = StrokeCap.round
+          ..color = accent.withValues(alpha: 0.8));
   }
 
   @override
-  bool shouldRepaint(_DialPainter old) => old.dark != dark;
-}
-
-class _NeedlePainter extends CustomPainter {
-  final Color color;
-  _NeedlePainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final c = size.center(Offset.zero);
-    final r = size.width / 2 - 30;
-    final tip = Offset(c.dx, c.dy - r);
-    final left = Offset(c.dx - 12, c.dy);
-    final right = Offset(c.dx + 12, c.dy);
-    final path = Path()
-      ..moveTo(tip.dx, tip.dy)
-      ..lineTo(left.dx, left.dy)
-      ..lineTo(right.dx, right.dy)
-      ..close();
-    canvas.drawPath(path, Paint()..color = color);
-    // Kaaba glyph at the tip
-    final tp = TextPainter(
-      text: const TextSpan(text: '🕋', style: TextStyle(fontSize: 22)),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    tp.paint(canvas, tip - Offset(tp.width / 2, tp.height + 2));
-  }
-
-  @override
-  bool shouldRepaint(_NeedlePainter old) => old.color != color;
+  bool shouldRepaint(_QiblaDial old) =>
+      old.heading != heading || old.qibla != qibla || old.accent != accent;
 }

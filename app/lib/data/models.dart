@@ -25,7 +25,7 @@ class Surah {
         id: r['id'] as int,
         name: r['name'] as String,
         nameTrans: r['name_trans'] as String,
-        nameEn: r['name_en'] as String,
+        nameEn: (r['name_en'] as String).trim(),
         type: r['type'] as String,
         order: r['order'] as int,
         bismillah: (r['bismillah'] as int) == 1,
@@ -79,11 +79,12 @@ class Verse {
 /// their verse id so taps map back to an ayah.
 class PageGlyph {
   final int line;
-  final int position;
+  final int position; // page `arrangement` sequence (correct render order)
   final String code; // page-font glyph string (words only)
   final int verseId;
   final int ayahNumber;
-  final bool isEnd;
+  final String marker; // '' = word; else 'end' | 'rub-el-hizb' | 'sajdah' | 'sajdah_obligatory'
+  final int wordPos; // 1-based word position in the ayah (0 for punctuation)
 
   PageGlyph({
     required this.line,
@@ -91,8 +92,14 @@ class PageGlyph {
     required this.code,
     required this.verseId,
     required this.ayahNumber,
-    required this.isEnd,
+    required this.marker,
+    this.wordPos = 0,
   });
+
+  bool get isWord => marker.isEmpty;
+  bool get isEnd => marker == 'end';
+  bool get isRub => marker == 'rub-el-hizb';
+  bool get isSajdah => marker == 'sajdah' || marker == 'sajdah_obligatory';
 }
 
 /// Marks a special line on a page (surah header band or bismillah).
@@ -176,6 +183,8 @@ class Word {
   final int verseId;
   final int position;
   final String arabic; // uthmani
+  final String madani; // text_madani — pre-shaped glyphs for the MeQuran font;
+  // its codepoints align 1:1 with the `rules` tokens (unlike text_uthmani)
   final String ms;
   final String en;
   final String id;
@@ -185,6 +194,7 @@ class Word {
     required this.verseId,
     required this.position,
     required this.arabic,
+    required this.madani,
     required this.ms,
     required this.en,
     required this.id,
@@ -195,6 +205,7 @@ class Word {
         verseId: r['verse_id'] as int,
         position: r['position'] as int,
         arabic: r['text_uthmani'] as String,
+        madani: (r['text_madani'] ?? r['text_uthmani'] ?? '') as String,
         ms: (r['translation_ms'] ?? '') as String,
         en: (r['translation_en'] ?? '') as String,
         id: (r['translation_id'] ?? '') as String,

@@ -5,6 +5,7 @@ import '../data/models.dart';
 import '../state/app_state.dart';
 import '../state/mathurat_state.dart';
 import '../theme.dart';
+import 'ayah_marker.dart';
 
 /// One Al-Ma'thurat item card: index badge, title, RTL Arabic body (Quran
 /// range from the DB or a dhikr string), optional meaning, and a tap-to-count
@@ -39,6 +40,7 @@ class MathuratCard extends StatelessWidget {
       opacity: complete ? 0.55 : 1,
       child: GestureDetector(
         onTap: onTap,
+        onLongPress: () => context.read<MathuratState>().decrement(pagi, item.position - 1),
         child: Card(
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -115,11 +117,19 @@ class _ArabicBody extends StatelessWidget {
         future: repo.versesFor(item.quranRef!),
         builder: (context, snap) {
           final verses = snap.data ?? const [];
-          final text = verses
-              .map((v) => '${v.textUthmani} ۝${_arabicNum(v.verseNumber)}')
-              .join('  ');
-          return Text(text,
-              textAlign: TextAlign.right, textDirection: TextDirection.rtl, style: style);
+          // Build a single numbered ayah-end badge per verse (the previous
+          // "۝{number}" rendered as TWO ornate circles in the mushaf font).
+          final spans = <InlineSpan>[];
+          for (var i = 0; i < verses.length; i++) {
+            spans.add(TextSpan(text: verses[i].textUthmani, style: style));
+            spans.add(WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: AyahEndMarker(number: verses[i].verseNumber, size: 26),
+            ));
+            if (i != verses.length - 1) spans.add(const TextSpan(text: '  ', style: style));
+          }
+          return Text.rich(TextSpan(children: spans),
+              textAlign: TextAlign.right, textDirection: TextDirection.rtl);
         },
       );
     }
@@ -160,6 +170,3 @@ class _Meaning extends StatelessWidget {
   }
 }
 
-const _arabicIndic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-String _arabicNum(int n) =>
-    n.toString().split('').map((d) => _arabicIndic[int.parse(d)]).join();

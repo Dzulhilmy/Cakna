@@ -66,24 +66,30 @@ ThemeData _base(Brightness b, ColorScheme scheme) {
   );
 }
 
-ThemeData caknaLight() => _base(
-      Brightness.light,
-      const ColorScheme.light(
-        primary: CaknaColors.olive,
-        secondary: CaknaColors.oliveBright,
-        surface: CaknaColors.surface,
-        onPrimary: Colors.white,
-        onSurface: CaknaColors.ink,
-      ),
-    );
+// Built once — MaterialApp rebuilds on AppState notifications and must not
+// reconstruct the full ThemeData objects each time.
+final ThemeData _caknaLight = _base(
+  Brightness.light,
+  const ColorScheme.light(
+    primary: CaknaColors.olive,
+    secondary: CaknaColors.oliveBright,
+    surface: CaknaColors.surface,
+    onPrimary: Colors.white,
+    onSurface: CaknaColors.ink,
+  ),
+);
 
-ThemeData caknaDark() => _base(
-      Brightness.dark,
-      const ColorScheme.dark(
-        primary: CaknaColors.o300,
-        secondary: CaknaColors.oliveBright,
-        surface: CaknaColors.surfaceDark,
-        onPrimary: CaknaColors.o900,
-        onSurface: CaknaColors.inkDark,
-      ),
-    );
+final ThemeData _caknaDark = _base(
+  Brightness.dark,
+  const ColorScheme.dark(
+    primary: CaknaColors.o300,
+    secondary: CaknaColors.oliveBright,
+    surface: CaknaColors.surfaceDark,
+    onPrimary: CaknaColors.o900,
+    onSurface: CaknaColors.inkDark,
+  ),
+);
+
+ThemeData caknaLight() => _caknaLight;
+
+ThemeData caknaDark() => _caknaDark;

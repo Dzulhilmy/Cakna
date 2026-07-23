@@ -21,6 +21,7 @@ class _SearchScreenState extends State<SearchScreen> {
   final _controller = TextEditingController();
   Timer? _debounce;
   List<Verse> _results = [];
+  List<Surah> _surahResults = [];
   bool _searching = false;
   String _query = '';
 
@@ -49,14 +50,20 @@ class _SearchScreenState extends State<SearchScreen> {
     final q = value.trim();
     setState(() => _query = q);
     if (q.length < 2) {
-      setState(() => _results = []);
+      setState(() {
+        _results = [];
+        _surahResults = [];
+      });
       return;
     }
     setState(() => _searching = true);
+    final repo = context.read<QuranRepo>();
     final lang = context.read<AppState>().transLang;
-    final res = await context.read<QuranRepo>().search(q, lang: lang);
+    final surahs = await repo.searchSurahs(q);
+    final res = await repo.search(q, lang: lang);
     if (!mounted) return;
     setState(() {
+      _surahResults = surahs;
       _results = res;
       _searching = false;
     });
@@ -100,30 +107,75 @@ class _SearchScreenState extends State<SearchScreen> {
     if (_query.length < 2) {
       return const _Hint();
     }
-    if (_results.isEmpty) {
+    if (_results.isEmpty && _surahResults.isEmpty) {
       return const Center(
         child: Text('Tiada padanan ditemui.', style: TextStyle(color: CaknaColors.inkSoft)),
       );
     }
     final lang = context.read<AppState>().transLang;
-    return Column(
+    return ListView(
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text('${_results.length} padanan${_results.length >= 60 ? "+" : ""}',
-                style: const TextStyle(fontSize: 12, color: CaknaColors.inkSoft)),
-          ),
-        ),
-        Expanded(
-          child: ListView.separated(
-            itemCount: _results.length,
-            separatorBuilder: (_, _) => const Divider(height: 1, indent: 16),
-            itemBuilder: (context, i) => _ResultTile(verse: _results[i], arabic: isArabic, lang: lang),
-          ),
-        ),
+        if (_surahResults.isNotEmpty) ...[
+          const _SectionLabel('Surah'),
+          for (final s in _surahResults) _SurahResultTile(surah: s),
+          if (_results.isNotEmpty) const Divider(height: 12),
+        ],
+        if (_results.isNotEmpty) ...[
+          _SectionLabel('Ayat · ${_results.length} padanan${_results.length >= 60 ? "+" : ""}'),
+          for (final v in _results) ...[
+            _ResultTile(verse: v, arabic: isArabic, lang: lang),
+            const Divider(height: 1, indent: 16),
+          ],
+        ],
       ],
+    );
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  final String text;
+  const _SectionLabel(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+      child: Text(text, style: const TextStyle(fontSize: 12, color: CaknaColors.inkSoft)),
+    );
+  }
+}
+
+class _SurahResultTile extends StatelessWidget {
+  final Surah surah;
+  const _SurahResultTile({required this.surah});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Container(
+        width: 34,
+        height: 34,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: CaknaColors.olive.withValues(alpha: 0.12),
+        ),
+        child: Text('${surah.id}',
+            style: const TextStyle(
+                fontSize: 13, fontWeight: FontWeight.w700, color: CaknaColors.oliveDeep)),
+      ),
+      title: Text(surah.nameTrans, style: const TextStyle(fontWeight: FontWeight.w600)),
+      subtitle: Text('${surah.nameEn} · ${surah.verseCount} ayat',
+          style: const TextStyle(fontSize: 12, color: CaknaColors.inkSoft)),
+      trailing: Text(surah.name,
+          style: const TextStyle(fontFamily: 'Uthmani', fontSize: 18)),
+      onTap: () async {
+        final page = await context.read<QuranRepo>().firstPageOfSurah(surah.id);
+        if (context.mounted) {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (_) => ReaderScreen(initialPage: page)));
+        }
+      },
     );
   }
 }

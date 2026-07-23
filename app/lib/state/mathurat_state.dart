@@ -14,7 +14,7 @@ class MathuratState extends ChangeNotifier {
   final SharedPreferences _prefs;
   static const _key = 'mathurat_progress';
 
-  final String _date = _todayKey();
+  String _date = _todayKey();
   String version = 's'; // 's' sughra | 'k' kubra
   bool showMeaning = true;
   final Map<String, List<int>> _counts = {
@@ -49,6 +49,19 @@ class MathuratState extends ChangeNotifier {
     _prefs.setString(_key, jsonEncode({'d': _date, ..._counts}));
   }
 
+  /// Reset the counts if the calendar day has rolled over since they were
+  /// loaded (call on app resume so a resident app self-heals at midnight).
+  void refreshDay() {
+    final today = _todayKey();
+    if (today == _date) return;
+    _date = today;
+    for (final k in _counts.keys) {
+      _counts[k] = List.filled(28, 0);
+    }
+    _persist();
+    notifyListeners();
+  }
+
   String _activeKey(bool pagi) => '${version}_${pagi ? 'pagi' : 'petang'}';
 
   int count(bool pagi, int index) => _counts[_activeKey(pagi)]![index];
@@ -57,6 +70,15 @@ class MathuratState extends ChangeNotifier {
     final arr = _counts[_activeKey(pagi)]!;
     if (arr[index] >= target) return;
     arr[index]++;
+    _persist();
+    notifyListeners();
+  }
+
+  /// Untick one count (long-press). Never goes below zero.
+  void decrement(bool pagi, int index) {
+    final arr = _counts[_activeKey(pagi)]!;
+    if (arr[index] <= 0) return;
+    arr[index]--;
     _persist();
     notifyListeners();
   }

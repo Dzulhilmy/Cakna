@@ -50,4 +50,28 @@ class Auth extends ChangeNotifier {
     _id = null;
     notifyListeners();
   }
+
+  /// Clear local identity without a network call (e.g. after a 401 — the
+  /// server session already expired).
+  void forceSignOut() {
+    if (_id == null && _email == null) return;
+    _email = null;
+    _id = null;
+    notifyListeners();
+  }
+
+  /// Permanently delete the account on the server, then sign out. On failure
+  /// the identity is kept so the caller can show an error and retry.
+  Future<void> deleteAccount() async {
+    _busy = true;
+    notifyListeners();
+    try {
+      await api.deleteAccount();
+      _email = null;
+      _id = null;
+    } finally {
+      _busy = false;
+      notifyListeners();
+    }
+  }
 }

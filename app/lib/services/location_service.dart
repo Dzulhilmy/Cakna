@@ -1,9 +1,28 @@
+import 'package:geocoding/geocoding.dart' as geo;
 import 'package:geolocator/geolocator.dart';
 
 /// Resolves the device location, handling permission requests. Falls back to
 /// Kuala Lumpur so prayer times / qibla always render something sensible.
 class LocationService {
   static const fallback = (lat: 3.139, lng: 101.6869, name: 'Kuala Lumpur');
+
+  /// Reverse-geocode to a "City, State" label (null on failure/offline).
+  static Future<String?> placeName(double lat, double lng) async {
+    try {
+      final marks = await geo.placemarkFromCoordinates(lat, lng);
+      if (marks.isEmpty) return null;
+      final m = marks.first;
+      final city = (m.locality != null && m.locality!.isNotEmpty)
+          ? m.locality
+          : m.subAdministrativeArea;
+      final state = m.administrativeArea;
+      if (city == null || city.isEmpty) return (state?.isNotEmpty == true) ? state : null;
+      if (state != null && state.isNotEmpty && state != city) return '$city, $state';
+      return city;
+    } catch (_) {
+      return null;
+    }
+  }
 
   /// Location without prompting: uses the device position only if permission
   /// was already granted, else the fallback. Safe to call on passive screens

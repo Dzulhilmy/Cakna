@@ -14,7 +14,13 @@ class ApiException implements Exception {
 /// doesn't persist cookies, so we capture the `cakna_session` token from
 /// Set-Cookie and replay it as a Cookie header (stored in prefs).
 class CaknaApi {
-  static const base = 'https://cakna.qcxis.com/api';
+  // Override for local dev with:
+  //   --dart-define=CAKNA_API_BASE=http://10.0.2.2:8787/api   (Android emulator)
+  //   --dart-define=CAKNA_API_BASE=http://localhost:8787/api  (iOS sim / desktop)
+  static const base = String.fromEnvironment(
+    'CAKNA_API_BASE',
+    defaultValue: 'https://cakna.qcxis.com/api',
+  );
   final SharedPreferences _prefs;
   CaknaApi(this._prefs);
 
@@ -85,11 +91,17 @@ class CaknaApi {
     _tokenValue = null;
   }
 
+  /// Clears the session on 401 so the UI can reflect the expired state.
+  Never _authFail(http.Response r) {
+    if (r.statusCode == 401) _tokenValue = null;
+    _fail(r);
+  }
+
   // ---- sync ----
   /// GET all keys → { key: { value, updated_at } }
   Future<Map<String, dynamic>> getSync() async {
     final r = await http.get(Uri.parse('$base/sync'), headers: _headers());
-    if (r.statusCode != 200) _fail(r);
+    if (r.statusCode != 200) _authFail(r);
     return (jsonDecode(r.body)['keys'] as Map).cast<String, dynamic>();
   }
 
@@ -97,6 +109,13 @@ class CaknaApi {
   Future<void> putSync(String key, Object? value) async {
     final r = await http.put(Uri.parse('$base/sync/$key'),
         headers: _headers(json: true), body: jsonEncode(value));
-    if (r.statusCode != 200) _fail(r);
+    if (r.statusCode != 200) _authFail(r);
+  }
+
+  /// Permanently delete the signed-in account and all its data.
+  Future<void> deleteAccount() async {
+    final r = await http.delete(Uri.parse('$base/account'), headers: _headers());
+    if (r.statusCode != 200 && r.statusCode != 204) _authFail(r);
+    _tokenValue = null;
   }
 }

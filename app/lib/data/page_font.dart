@@ -1,9 +1,10 @@
 import 'package:flutter/services.dart';
 
 /// Loads the per-page QCF fonts (assets/page_fonts/p{N}.ttf) on demand and
-/// registers each as family "QCFP{N}". Each page font maps the words' code_v2
-/// private-use codepoints to page-justified glyphs, giving the authentic
-/// 15-line Madani mushaf.
+/// registers each as family "QCFP{N}". Each page font maps the words'
+/// **`text_code`** private-use codepoints (rendered by quran_repo.pageGlyphs)
+/// to page-justified glyphs, giving the authentic 15-line Madani mushaf.
+/// (`code_v2` is a different, unused encoding.)
 class PageFontLoader {
   static final _loaded = <int>{};
   static final _inflight = <int, Future<void>>{};

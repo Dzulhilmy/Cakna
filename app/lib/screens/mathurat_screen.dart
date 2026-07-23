@@ -16,7 +16,7 @@ class MathuratScreen extends StatefulWidget {
   State<MathuratScreen> createState() => _MathuratScreenState();
 }
 
-class _MathuratScreenState extends State<MathuratScreen> {
+class _MathuratScreenState extends State<MathuratScreen> with WidgetsBindingObserver {
   late bool _pagi; // morning vs evening
   Future<List<MathuratItem>>? _future;
 
@@ -25,6 +25,24 @@ class _MathuratScreenState extends State<MathuratScreen> {
     super.initState();
     _pagi = DateTime.now().hour < 15; // morning until mid-afternoon
     _future = context.read<MathuratRepo>().items();
+    WidgetsBinding.instance.addObserver(this);
+    context.read<MathuratState>().refreshDay();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      if (mounted) {
+        setState(() => _pagi = DateTime.now().hour < 15);
+        context.read<MathuratState>().refreshDay();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override

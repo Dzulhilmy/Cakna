@@ -13,13 +13,17 @@ class UserDb {
     final dir = await getApplicationSupportDirectory();
     return openDatabase(
       p.join(dir.path, 'cakna_user.db'),
-      version: 2,
+      version: 4,
       onCreate: (db, _) async {
         await _bookmarksAndNotes(db);
         await _reading(db);
+        await _readTime(db);
+        await _deletions(db);
       },
       onUpgrade: (db, oldV, newV) async {
         if (oldV < 2) await _reading(db);
+        if (oldV < 3) await _readTime(db);
+        if (oldV < 4) await _deletions(db);
       },
     );
   }
@@ -50,6 +54,27 @@ class UserDb {
       CREATE TABLE read_log (
         day   TEXT PRIMARY KEY,
         count INTEGER NOT NULL
+      )''');
+  }
+
+  Future<void> _readTime(Database db) async {
+    // per-day reading time in seconds (for the "Minutes" progress stat)
+    await db.execute('''
+      CREATE TABLE read_time (
+        day     TEXT PRIMARY KEY,
+        seconds INTEGER NOT NULL
+      )''');
+  }
+
+  Future<void> _deletions(Database db) async {
+    // tombstones for cross-device deletion sync (LWW-element-set).
+    // kind: 'bm' (bookmark) | 'nt' (note); ref = verse_id.
+    await db.execute('''
+      CREATE TABLE deletions (
+        kind       TEXT NOT NULL,
+        ref        INTEGER NOT NULL,
+        deleted_at INTEGER NOT NULL,
+        PRIMARY KEY (kind, ref)
       )''');
   }
 }

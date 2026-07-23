@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 /// Tajweed rule colouring for word text. The bundled quran.db stores a
 /// per-character rule code per word (`quran_word.rules`, comma-separated, one
-/// token per character of `text_uthmani`). Recitation rules 1–9 are coloured;
-/// waqf marks (20–27) keep the default text colour.
+/// token per codepoint of **`text_madani`** — NOT text_uthmani, which only
+/// aligns for ~66% of words). Callers must pass the madani string (rendered
+/// with the MeQuran font). Recitation rules 1–14 are coloured (10–14 are the
+/// five gharaib words); waqf marks (codes 20–27) keep the default text colour.
 class Tajweed {
   /// rule code → colour
   static const colors = <int, Color>{
@@ -16,6 +18,14 @@ class Tajweed {
     7: Color(0xFF1565C0), // Tafkhim ra' — blue
     8: Color(0xFF00838F), // Qalqalah — teal
     9: Color(0xFF9E9E9E), // two sukun meeting — grey
+    // gharaib (special recitations, one classic word each):
+    // 10 Ibdal 46:4 · 11 Imalah 11:41 · 12 Tashil 41:44 · 13 Isymam 12:11 ·
+    // 14 Naqal 49:11 — shared deep purple
+    10: Color(0xFF6A1B9A),
+    11: Color(0xFF6A1B9A),
+    12: Color(0xFF6A1B9A),
+    13: Color(0xFF6A1B9A),
+    14: Color(0xFF6A1B9A),
   };
 
   /// Grouped legend (colour → label) for the UI.

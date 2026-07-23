@@ -1,121 +1,253 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../data/reciters.dart';
+import '../services/tafsir_service.dart';
 import '../state/app_state.dart';
 import '../state/audio_service.dart';
 import '../state/auth.dart';
 import '../state/sync_service.dart';
 import '../theme.dart';
-import '../widgets/khatam_card.dart';
+import '../widgets/cakna_mark.dart';
 import 'auth_screen.dart';
-import 'reader_screen.dart';
+import 'mathurat_screen.dart';
+import 'prayer_times_screen.dart';
+import 'progress_screen.dart';
+import 'quran_settings_screen.dart';
 
-const _reciters = [
-  ('ar.alafasy', 'Mishary Alafasy'),
-  ('ar.abdulbasitmurattal', 'Abdul Basit (Murattal)'),
-  ('ar.husary', 'Al-Husary'),
-  ('ar.abdurrahmaansudais', 'Abdurrahman As-Sudais'),
-  ('ar.saoodshuraym', 'Saood Ash-Shuraym'),
-];
+final _reciters = [for (final r in kReciters) (r.id, r.name)];
 
 const _langs = [('ms', 'Bahasa Melayu'), ('en', 'English'), ('id', 'Bahasa Indonesia')];
 
-/// The "Profil" tab. Local-only (Option A): identity is a guest, everything
-/// shown is on-device settings + reading progress. Sign-in/sync is a future
-/// (backend) decision, surfaced as a disabled "coming soon" row.
+/// App version — single source (keep in sync with pubspec `version`).
+const kAppVersion = '1.0.0';
+
+/// Profile tab — matches Tilawah's layout: app identity, account prompt,
+/// settings list, and info list.
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final app = context.watch<AppState>();
+    // Watch so the Qari / Terjemahan / Bahasa tile labels refresh after a
+    // change (this screen lives in a const IndexedStack).
+    context.watch<AppState>();
     return Scaffold(
       body: ListView(
-        padding: EdgeInsets.zero,
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
         children: [
-          const _Banner(),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _ContinueCard(page: app.lastPage),
-                const SizedBox(height: 14),
-                const KhatamCard(),
-                const SizedBox(height: 20),
-                const _SectionTitle('Tetapan'),
-                Card(
-                  child: Column(
-                    children: [
-                      _SettingRow(
-                        icon: Icons.brightness_6_outlined,
-                        label: 'Tema',
-                        trailing: SegmentedButton<ThemeMode>(
-                          style: const ButtonStyle(visualDensity: VisualDensity.compact),
-                          segments: const [
-                            ButtonSegment(value: ThemeMode.light, icon: Icon(Icons.light_mode, size: 18)),
-                            ButtonSegment(value: ThemeMode.system, icon: Icon(Icons.brightness_auto, size: 18)),
-                            ButtonSegment(value: ThemeMode.dark, icon: Icon(Icons.dark_mode, size: 18)),
-                          ],
-                          selected: {app.themeMode},
-                          showSelectedIcon: false,
-                          onSelectionChanged: (s) => app.themeMode = s.first,
-                        ),
-                      ),
-                      const Divider(height: 1),
-                      _SettingRow(
-                        icon: Icons.translate,
-                        label: 'Terjemahan',
-                        trailing: _Dropdown(
-                          value: app.transLang,
-                          items: _langs,
-                          onChanged: (v) => app.transLang = v,
-                        ),
-                      ),
-                      const Divider(height: 1),
-                      _SettingRow(
-                        icon: Icons.record_voice_over_outlined,
-                        label: 'Qari',
-                        trailing: _Dropdown(
-                          value: app.reciter,
-                          items: _reciters,
-                          onChanged: (v) {
-                            app.reciter = v;
-                            context.read<AudioService>().reciter = v;
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-                const _SectionTitle('Akaun'),
-                const _AccountCard(),
-                const SizedBox(height: 20),
-                const _SectionTitle('Mengenai'),
-                const Card(
-                  child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Cakna',
-                            style: TextStyle(
-                                fontFamily: 'Lora',
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                color: CaknaColors.oliveDeep)),
-                        SizedBox(height: 2),
-                        Text('Mushaf Digital · versi 1.0.0',
-                            style: TextStyle(fontSize: 12, color: CaknaColors.inkSoft)),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+          SizedBox(height: MediaQuery.of(context).padding.top + 20),
+          const _AppIdentity(),
+          const SizedBox(height: 20),
+          const _AccountCard(),
+          const SizedBox(height: 20),
+          _SettingsCard(children: [
+            _SettingsTile(
+              icon: Icons.menu_book_outlined,
+              label: 'Tetapan Quran',
+              onTap: () => Navigator.push(
+                  context, MaterialPageRoute(builder: (_) => const QuranSettingsScreen())),
             ),
+            const _RowDivider(),
+            _SettingsTile(
+              icon: Icons.translate,
+              label: 'Terjemahan',
+              value: _langName(context),
+              onTap: () => _pickLang(context),
+            ),
+            const _RowDivider(),
+            _SettingsTile(
+              icon: Icons.record_voice_over_outlined,
+              label: 'Qari',
+              value: _reciterName(context),
+              onTap: () => _pickReciter(context),
+            ),
+            const _RowDivider(),
+            _SettingsTile(
+              icon: Icons.auto_stories_outlined,
+              label: 'Urus tafsir',
+              value: tafsirEditionName(context.watch<AppState>().tafsirEdition),
+              onTap: () => _pickTafsir(context),
+            ),
+            const _RowDivider(),
+            _SettingsTile(
+              icon: Icons.access_time,
+              label: 'Waktu solat',
+              onTap: () => Navigator.push(
+                  context, MaterialPageRoute(builder: (_) => const PrayerTimesScreen())),
+            ),
+            const _RowDivider(),
+            _SettingsTile(
+              icon: Icons.wb_twilight_outlined,
+              label: "Al-Ma'thurat",
+              onTap: () => Navigator.push(
+                  context, MaterialPageRoute(builder: (_) => const MathuratScreen())),
+            ),
+            const _RowDivider(),
+            _SettingsTile(
+              icon: Icons.insights_outlined,
+              label: 'Kemajuan bacaan',
+              onTap: () => Navigator.push(
+                  context, MaterialPageRoute(builder: (_) => const ProgressScreen())),
+            ),
+          ]),
+          const SizedBox(height: 16),
+          _SettingsCard(children: [
+            _SettingsTile(
+              icon: Icons.favorite_outline,
+              label: 'Buat sumbangan',
+              onTap: () => _info(context, 'Sumbangan',
+                  'Terima kasih atas sokongan anda. Fungsi sumbangan akan datang.'),
+            ),
+            const _RowDivider(),
+            _SettingsTile(
+              icon: Icons.info_outline,
+              label: 'Tentang kami',
+              onTap: () => _info(context, 'Tentang Cakna',
+                  'Cakna — Mushaf Digital. Membaca, mendengar dan menghayati al-Quran.'),
+            ),
+            const _RowDivider(),
+            _SettingsTile(
+              icon: Icons.description_outlined,
+              label: 'Terma & polisi privasi',
+              onTap: () => _info(context, 'Terma & Polisi Privasi',
+                  'Data anda (penanda, nota, kemajuan bacaan, tetapan) disimpan pada '
+                  'peranti ini. Jika anda log masuk, data tersebut turut disegerak dan '
+                  'disimpan dengan selamat pada pelayan Cakna (cakna.qcxis.com) supaya '
+                  'boleh diakses merentas peranti.\n\n'
+                  'Lokasi peranti digunakan hanya untuk mengira waktu solat dan arah '
+                  'kiblat (termasuk widget skrin utama), dan tidak dikongsi dengan '
+                  'pihak ketiga. Audio bacaan dialirkan dari CDN Islamic Network / '
+                  'EveryAyah; audio yang dimuat turun disimpan pada peranti anda '
+                  'sahaja. Teks tafsir diperoleh dari API Quran.com; waktu solat '
+                  'rasmi diperoleh dari JAKIM e-Solat.\n\n'
+                  'Anda boleh memadam akaun dan semua data awan pada bila-bila masa '
+                  'melalui "Padam akaun". Untuk sebarang pertanyaan privasi, hubungi '
+                  'qcxissdnbhd@gmail.com.'),
+            ),
+            const _RowDivider(),
+            _SettingsTile(
+              icon: Icons.mail_outline,
+              label: 'Hubungi kami',
+              onTap: () => _info(context, 'Hubungi kami', 'qcxissdnbhd@gmail.com'),
+            ),
+          ]),
+          const SizedBox(height: 20),
+          const Center(
+            child: Text('Cakna · versi $kAppVersion',
+                style: TextStyle(fontSize: 12, color: CaknaColors.inkSoft)),
           ),
         ],
       ),
+    );
+  }
+
+  static String _langName(BuildContext context) {
+    final v = context.read<AppState>().transLang;
+    return _langs.firstWhere((l) => l.$1 == v, orElse: () => _langs.first).$2;
+  }
+
+  static String _reciterName(BuildContext context) {
+    final v = context.read<AppState>().reciter;
+    return _reciters.firstWhere((r) => r.$1 == v, orElse: () => _reciters.first).$2;
+  }
+
+  Future<void> _pickLang(BuildContext context) async {
+    final app = context.read<AppState>();
+    final v = await _pickSheet(context, 'Bahasa', _langs, app.transLang);
+    if (v != null) app.transLang = v;
+  }
+
+  Future<void> _pickReciter(BuildContext context) async {
+    final app = context.read<AppState>();
+    final v = await _pickSheet(context, 'Qari', _reciters, app.reciter);
+    if (v != null && context.mounted) {
+      app.reciter = v;
+      await context.read<AudioService>().setReciter(v);
+    }
+  }
+
+  Future<void> _pickTafsir(BuildContext context) async {
+    final app = context.read<AppState>();
+    final v = await _pickSheet(
+      context,
+      'Urus tafsir',
+      [for (final (id, name) in kTafsirEditions) ('$id', name)],
+      '${app.tafsirEdition}',
+    );
+    if (v != null && context.mounted) app.tafsirEdition = int.parse(v);
+  }
+
+  static Future<String?> _pickSheet(
+      BuildContext context, String title, List<(String, String)> items, String current) {
+    return showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(title,
+                    style: const TextStyle(
+                        fontFamily: 'Lora', fontSize: 18, fontWeight: FontWeight.w600)),
+              ),
+            ),
+            for (final (id, name) in items)
+              ListTile(
+                title: Text(name),
+                trailing: id == current
+                    ? const Icon(Icons.check, color: CaknaColors.olive)
+                    : null,
+                onTap: () => Navigator.pop(ctx, id),
+              ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _info(BuildContext context, String title, String body) => showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(title),
+          content: Text(body),
+          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Tutup'))],
+        ),
+      );
+}
+
+class _AppIdentity extends StatelessWidget {
+  const _AppIdentity();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: 80,
+          height: 80,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: const LinearGradient(
+              colors: [CaknaColors.olive, CaknaColors.oliveDeep],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: const Center(child: CaknaMark(size: 46, color: Colors.white)),
+        ),
+        const SizedBox(height: 12),
+        const Text('Cakna',
+            style: TextStyle(fontFamily: 'Lora', fontSize: 24, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 2),
+        const Text('Versi $kAppVersion', style: TextStyle(fontSize: 12.5, color: CaknaColors.inkSoft)),
+      ],
     );
   }
 }
@@ -127,129 +259,159 @@ class _AccountCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = context.watch<Auth>();
     final sync = context.watch<SyncService>();
-    if (!auth.signedIn) {
-      return Card(
-        child: ListTile(
-          leading: const Icon(Icons.cloud_sync_outlined, color: CaknaColors.olive),
-          title: const Text('Log masuk untuk segerak'),
-          subtitle: const Text('Simpan penanda, nota & kemajuan merentas peranti'),
-          trailing: const Icon(Icons.chevron_right, color: CaknaColors.inkSoft),
-          onTap: () => Navigator.push(
-              context, MaterialPageRoute(builder: (_) => const AuthScreen())),
+
+    if (auth.signedIn) {
+      return Container(
+        decoration: BoxDecoration(
+          color: CaknaColors.olive.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: CaknaColors.olive.withValues(alpha: 0.25)),
+        ),
+        child: Column(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.cloud_done_outlined, color: CaknaColors.olive),
+              title: Text(auth.email ?? 'Akaun',
+                  style: const TextStyle(fontWeight: FontWeight.w600)),
+              subtitle: Text(sync.syncing
+                  ? 'Menyegerak…'
+                  : sync.lastSynced != null
+                      ? 'Disegerak ke awan'
+                      : 'Log masuk'),
+            ),
+            const Divider(height: 1),
+            ListTile(
+              leading: const Icon(Icons.logout, color: CaknaColors.inkSoft),
+              title: const Text('Log keluar'),
+              onTap: () => context.read<Auth>().logout(),
+            ),
+            const Divider(height: 1),
+            ListTile(
+              leading: const Icon(Icons.delete_forever_outlined, color: Color(0xFFB3261E)),
+              title: const Text('Padam akaun', style: TextStyle(color: Color(0xFFB3261E))),
+              subtitle: const Text('Padam akaun & semua data awan secara kekal'),
+              onTap: () => _confirmDelete(context),
+            ),
+          ],
         ),
       );
     }
-    return Card(
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: CaknaColors.olive.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: CaknaColors.olive.withValues(alpha: 0.20)),
+      ),
       child: Column(
         children: [
-          ListTile(
-            leading: const Icon(Icons.cloud_done_outlined, color: CaknaColors.olive),
-            title: Text(auth.email ?? 'Log masuk'),
-            subtitle: Text(sync.syncing
-                ? 'Menyegerak…'
-                : sync.lastSynced != null
-                    ? 'Disegerak'
-                    : 'Log masuk'),
+          const Text(
+            'Urus koleksi, penanda & nota dengan akaun Cakna anda (jejak kemajuan)',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 13.5, height: 1.4),
           ),
-          const Divider(height: 1),
-          ListTile(
-            leading: const Icon(Icons.logout, color: CaknaColors.inkSoft),
-            title: const Text('Log keluar'),
-            onTap: () => context.read<Auth>().logout(),
+          const SizedBox(height: 14),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: CaknaColors.olive,
+              minimumSize: const Size.fromHeight(48),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            onPressed: () => Navigator.push(
+                context, MaterialPageRoute(builder: (_) => const AuthScreen())),
+            child: const Text('Cipta akaun',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+          ),
+          const SizedBox(height: 8),
+          TextButton(
+            onPressed: () => Navigator.push(
+                context, MaterialPageRoute(builder: (_) => const AuthScreen())),
+            style: TextButton.styleFrom(foregroundColor: CaknaColors.oliveDeep),
+            child: const Text('Sudah ada akaun? Log masuk di sini'),
           ),
         ],
       ),
     );
   }
+
+  Future<void> _confirmDelete(BuildContext context) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Padam akaun?'),
+        content: const Text(
+            'Akaun anda dan semua data yang disegerak (penanda, nota, kemajuan) '
+            'akan dipadam secara kekal. Tindakan ini tidak boleh dibatalkan.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Batal')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: const Color(0xFFB3261E)),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Padam kekal'),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !context.mounted) return;
+    try {
+      await context.read<Auth>().deleteAccount();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Akaun telah dipadam.')));
+      }
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Gagal memadam akaun. Cuba lagi.')));
+      }
+    }
+  }
 }
 
-class _Banner extends StatelessWidget {
-  const _Banner();
+class _SettingsCard extends StatelessWidget {
+  final List<Widget> children;
+  const _SettingsCard({required this.children});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 200,
-      decoration: const BoxDecoration(
-        image: DecorationImage(image: AssetImage('assets/images/bg_profile.png'), fit: BoxFit.cover),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [CaknaColors.olive.withValues(alpha: 0.85), CaknaColors.oliveBright.withValues(alpha: 0.6)],
-            begin: Alignment.bottomLeft,
-            end: Alignment.topRight,
-          ),
-        ),
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-        child: Builder(builder: (context) {
-          final auth = context.watch<Auth>();
-          final signedIn = auth.signedIn;
-          final name = signedIn ? (auth.email ?? '') : 'Tetamu';
-          final initial = signedIn && name.isNotEmpty ? name[0].toUpperCase() : null;
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CircleAvatar(
-                radius: 34,
-                backgroundColor: Colors.white24,
-                child: initial != null
-                    ? Text(initial,
-                        style: const TextStyle(
-                            fontSize: 30, fontWeight: FontWeight.w700, color: Colors.white))
-                    : const Icon(Icons.person, size: 38, color: Colors.white),
-              ),
-              const SizedBox(height: 10),
-              Text(name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                      color: Colors.white, fontSize: 22, fontFamily: 'Lora', fontWeight: FontWeight.w600)),
-              Text(signedIn ? 'Disegerak ke awan' : 'Data disimpan pada peranti ini',
-                  style: const TextStyle(color: Colors.white70, fontSize: 12)),
-            ],
-          );
-        }),
-      ),
+      child: Column(children: children),
     );
   }
 }
 
-class _ContinueCard extends StatelessWidget {
-  final int page;
-  const _ContinueCard({required this.page});
+class _SettingsTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String? value;
+  final VoidCallback onTap;
+  const _SettingsTile(
+      {required this.icon, required this.label, this.value, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => Navigator.push(
-          context, MaterialPageRoute(builder: (_) => ReaderScreen(initialPage: page))),
-      borderRadius: BorderRadius.circular(18),
-      child: Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
-          gradient: const LinearGradient(
-              colors: [CaknaColors.olive, CaknaColors.oliveBright],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight),
-        ),
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
         child: Row(
           children: [
-            const Icon(Icons.menu_book, color: Colors.white, size: 28),
+            Icon(icon, size: 21, color: CaknaColors.olive),
             const SizedBox(width: 14),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Sambung bacaan', style: TextStyle(color: Colors.white70, fontSize: 12)),
-                Text('Halaman $page',
-                    style: const TextStyle(
-                        color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
-              ],
-            ),
-            const Spacer(),
-            const Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 15),
+            Expanded(child: Text(label, style: const TextStyle(fontSize: 14.5))),
+            if (value != null)
+              Padding(
+                padding: const EdgeInsets.only(right: 6),
+                child: Text(value!,
+                    style: const TextStyle(fontSize: 12.5, color: CaknaColors.inkSoft)),
+              ),
+            const Icon(Icons.chevron_right, size: 20, color: CaknaColors.inkSoft),
           ],
         ),
       ),
@@ -257,57 +419,8 @@ class _ContinueCard extends StatelessWidget {
   }
 }
 
-class _SectionTitle extends StatelessWidget {
-  final String text;
-  const _SectionTitle(this.text);
-
+class _RowDivider extends StatelessWidget {
+  const _RowDivider();
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(bottom: 8, left: 4),
-        child: Text(text.toUpperCase(),
-            style: const TextStyle(
-                fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.6, color: CaknaColors.inkSoft)),
-      );
-}
-
-class _SettingRow extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Widget trailing;
-  const _SettingRow({required this.icon, required this.label, required this.trailing});
-
-  @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        child: Row(
-          children: [
-            Icon(icon, size: 20, color: CaknaColors.olive),
-            const SizedBox(width: 12),
-            Text(label, style: const TextStyle(fontSize: 14)),
-            const Spacer(),
-            trailing,
-          ],
-        ),
-      );
-}
-
-class _Dropdown extends StatelessWidget {
-  final String value;
-  final List<(String, String)> items;
-  final ValueChanged<String> onChanged;
-  const _Dropdown({required this.value, required this.items, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButton<String>(
-      value: value,
-      underline: const SizedBox.shrink(),
-      borderRadius: BorderRadius.circular(12),
-      style: const TextStyle(fontSize: 13, color: CaknaColors.oliveDeep, fontWeight: FontWeight.w600),
-      items: [
-        for (final (id, name) in items) DropdownMenuItem(value: id, child: Text(name)),
-      ],
-      onChanged: (v) => v == null ? null : onChanged(v),
-    );
-  }
+  Widget build(BuildContext context) => const Divider(height: 1, indent: 51);
 }

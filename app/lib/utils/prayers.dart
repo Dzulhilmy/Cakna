@@ -5,7 +5,7 @@ import 'package:adhan/adhan.dart';
 /// matches the `singapore` method) and qibla bearing.
 class PrayerCalc {
   final double lat, lng;
-  final DateTime fajr, syuruk, dhuhr, asr, maghrib, isha, imsak;
+  final DateTime fajr, syuruk, dhuha, dhuhr, asr, maghrib, isha, imsak;
 
   PrayerCalc._({
     required this.lat,
@@ -13,11 +13,41 @@ class PrayerCalc {
     required this.imsak,
     required this.fajr,
     required this.syuruk,
+    required this.dhuha,
     required this.dhuhr,
     required this.asr,
     required this.maghrib,
     required this.isha,
   });
+
+  /// Build from explicit prayer times (e.g. official JAKIM e-Solat) so the
+  /// same nextPrayer/countdown/row UI works regardless of source. [dhuha] is
+  /// optional (older server payloads omit it) — falls back to syuruk + 28 min,
+  /// the JAKIM takwim convention.
+  factory PrayerCalc.fromTimes({
+    required double lat,
+    required double lng,
+    required DateTime imsak,
+    required DateTime fajr,
+    required DateTime syuruk,
+    DateTime? dhuha,
+    required DateTime dhuhr,
+    required DateTime asr,
+    required DateTime maghrib,
+    required DateTime isha,
+  }) =>
+      PrayerCalc._(
+        lat: lat,
+        lng: lng,
+        imsak: imsak,
+        fajr: fajr,
+        syuruk: syuruk,
+        dhuha: dhuha ?? syuruk.add(const Duration(minutes: 28)),
+        dhuhr: dhuhr,
+        asr: asr,
+        maghrib: maghrib,
+        isha: isha,
+      );
 
   factory PrayerCalc.forDate(double lat, double lng, DateTime date) {
     final params = CalculationMethod.singapore.getParameters()..madhab = Madhab.shafi;
@@ -32,6 +62,7 @@ class PrayerCalc {
       imsak: pt.fajr.subtract(const Duration(minutes: 10)),
       fajr: pt.fajr,
       syuruk: pt.sunrise,
+      dhuha: pt.sunrise.add(const Duration(minutes: 28)),
       dhuhr: pt.dhuhr,
       asr: pt.asr,
       maghrib: pt.maghrib,
@@ -39,11 +70,13 @@ class PrayerCalc {
     );
   }
 
-  /// Ordered (label, time) for the 5 obligatory prayers + syuruk, for display.
+  /// Ordered (label, time) for the 5 obligatory prayers + the informational
+  /// times (Imsak, Syuruk, Dhuha), for display.
   List<(String, DateTime)> get all => [
         ('Imsak', imsak),
         ('Subuh', fajr),
         ('Syuruk', syuruk),
+        ('Dhuha', dhuha),
         ('Zohor', dhuhr),
         ('Asar', asr),
         ('Maghrib', maghrib),
