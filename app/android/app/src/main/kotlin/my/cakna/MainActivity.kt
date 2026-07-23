@@ -1,5 +1,7 @@
 package my.cakna
 
-import io.flutter.embedding.android.FlutterActivity
+import com.ryanheise.audioservice.AudioServiceActivity
 
-class MainActivity : FlutterActivity()
+// AudioServiceActivity (a FlutterActivity subclass) hosts the media session
+// for background recitation playback with lock-screen controls.
+class MainActivity : AudioServiceActivity()
