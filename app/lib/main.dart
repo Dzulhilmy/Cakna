@@ -50,6 +50,7 @@ Future<void> main() async {
     debugPrint('UserData.ensureLoaded failed: $e');
   }
   final prefs = await SharedPreferences.getInstance();
+  final mathuratState = MathuratState(prefs);
   final api = CaknaApi(prefs);
   final auth = Auth(api);
   await auth.init();
@@ -58,6 +59,7 @@ Future<void> main() async {
     auth: auth,
     userData: userData,
     appState: appState,
+    mathuratState: mathuratState,
     // remote prayer settings landed → the pending azan set and the widget
     // carry stale zone/sound/modes until rebuilt
     onPrayerSettingsChanged: () => LocationService.currentSilent().then((loc) {
@@ -87,6 +89,7 @@ Future<void> main() async {
     userData: userData,
     mathuratRepo: MathuratRepo(repo),
     prefs: prefs,
+    mathuratState: mathuratState,
     auth: auth,
     sync: sync,
   ));
@@ -99,6 +102,7 @@ class CaknaApp extends StatefulWidget {
   final UserData userData;
   final MathuratRepo mathuratRepo;
   final SharedPreferences prefs;
+  final MathuratState mathuratState;
   final Auth auth;
   final SyncService sync;
   const CaknaApp({
@@ -109,6 +113,7 @@ class CaknaApp extends StatefulWidget {
     required this.userData,
     required this.mathuratRepo,
     required this.prefs,
+    required this.mathuratState,
     required this.auth,
     required this.sync,
   });
@@ -172,7 +177,7 @@ class _CaknaAppState extends State<CaknaApp> {
         ),
         ChangeNotifierProvider.value(value: userData),
         Provider<MathuratRepo>.value(value: mathuratRepo),
-        ChangeNotifierProvider(create: (_) => MathuratState(prefs)),
+        ChangeNotifierProvider.value(value: widget.mathuratState),
         ChangeNotifierProvider.value(value: auth),
         ChangeNotifierProvider.value(value: sync),
       ],

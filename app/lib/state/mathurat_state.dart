@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -100,5 +101,28 @@ class MathuratState extends ChangeNotifier {
     showMeaning = v;
     _prefs.setBool('mathurat_maksud', v);
     notifyListeners();
+  }
+
+  bool isMerging = false;
+
+  /// Export today's progress as a sync payload. Same shape as the prefs JSON.
+  Map<String, dynamic> exportSync() => {'d': _date, ..._counts};
+
+  /// Merge a remote snapshot: element-wise max per array when dates match.
+  /// A stale remote (different date) is a no-op — remote hasn't tracked today.
+  void mergeSync(Map<String, dynamic>? remote) {
+    if (remote == null || remote['d'] != _date) return;
+    isMerging = true;
+    try {
+      for (final k in _counts.keys) {
+        final arr = (remote[k] as List?)?.cast<int>();
+        if (arr == null || arr.length != _size) continue;
+        _counts[k] = List.generate(_size, (i) => max(_counts[k]![i], arr[i]));
+      }
+      _persist();
+      notifyListeners();
+    } finally {
+      isMerging = false;
+    }
   }
 }

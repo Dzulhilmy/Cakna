@@ -43,6 +43,13 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- QCXIS SSO deep-link callback (flutter_web_auth_2) -->
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="cakna"/>
+            </intent-filter>
         </activity>
         <!-- Home-screen prayer-times widget (data fed by PrayerWidgetService). -->
         <receiver android:name=".PrayerWidgetProvider"

@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../api/cakna_api.dart';
 import 'app_state.dart';
 import 'auth.dart';
+import 'mathurat_state.dart';
 import 'user_data.dart';
 
 /// Cloud sync between the local stores and the Cakna API. On sign-in it pulls
@@ -13,6 +14,7 @@ class SyncService extends ChangeNotifier {
   final Auth auth;
   final UserData userData;
   final AppState appState;
+  final MathuratState mathuratState;
 
   /// Fired after a pull applied remote prayer settings that differ from the
   /// local ones — the caller reschedules azan + refreshes the widget.
@@ -32,11 +34,13 @@ class SyncService extends ChangeNotifier {
     required this.auth,
     required this.userData,
     required this.appState,
+    required this.mathuratState,
     this.onPrayerSettingsChanged,
   }) {
     auth.addListener(_onAuthChanged);
     userData.addListener(_onLocalChanged);
     appState.addListener(_onLocalChanged);
+    mathuratState.addListener(_onLocalChanged);
     _wasSignedIn = auth.signedIn;
     if (auth.signedIn) pullAndMerge();
   }
@@ -61,7 +65,7 @@ class SyncService extends ChangeNotifier {
     if (!auth.signedIn) return;
     // Ignore notifications caused by applying remote data during a pull —
     // reacting to those would schedule pull→apply→notify→pull… forever.
-    if (appState.isApplyingRemote || userData.isMerging) return;
+    if (appState.isApplyingRemote || userData.isMerging || mathuratState.isMerging) return;
     _settingsDirty = true;
     _debounce?.cancel();
     _debounce = Timer(const Duration(seconds: 2), _syncCycle);
@@ -104,6 +108,10 @@ class SyncService extends ChangeNotifier {
         }
       }
       await userData.mergeSync(userRemote);
+      if (remote['mathurat'] is Map && remote['mathurat']['value'] is Map) {
+        mathuratState.mergeSync(
+            (remote['mathurat']['value'] as Map).cast<String, dynamic>());
+      }
       if (remote['settings'] is Map && remote['settings']['value'] is Map) {
         final blob = (remote['settings']['value'] as Map).cast<String, dynamic>();
         if (applyRemoteSettings) {
@@ -140,7 +148,11 @@ class SyncService extends ChangeNotifier {
   /// itself was accepted.
   Future<bool> pushAll() async {
     if (!auth.signedIn) return false;
-    final data = {...userData.exportSync(), 'settings': appState.exportSettings()};
+    final data = {
+      ...userData.exportSync(),
+      'settings': appState.exportSettings(),
+      'mathurat': mathuratState.exportSync(),
+    };
     var anyOk = false;
     var settingsOk = false;
     for (final e in data.entries) {
@@ -169,6 +181,7 @@ class SyncService extends ChangeNotifier {
     auth.removeListener(_onAuthChanged);
     userData.removeListener(_onLocalChanged);
     appState.removeListener(_onLocalChanged);
+    mathuratState.removeListener(_onLocalChanged);
     super.dispose();
   }
 }

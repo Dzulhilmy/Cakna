@@ -24,6 +24,18 @@ class _AuthScreenState extends State<AuthScreen> {
     super.dispose();
   }
 
+  Future<void> _ssoLogin() async {
+    setState(() => _error = null);
+    try {
+      await context.read<Auth>().ssoLogin();
+      if (mounted) Navigator.pop(context);
+    } on Exception catch (e) {
+      final msg = e.toString();
+      if (msg.contains('CANCELED') || msg.contains('UserCanceled')) return;
+      setState(() => _error = 'Log masuk QCXIS gagal. Cuba lagi.');
+    }
+  }
+
   Future<void> _submit() async {
     setState(() => _error = null);
     final email = _email.text.trim();
@@ -109,8 +121,37 @@ class _AuthScreenState extends State<AuthScreen> {
                   : 'Belum ada akaun? Daftar'),
             ),
           ),
+          const _OrDivider(),
+          const SizedBox(height: 14),
+          OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(52),
+              side: const BorderSide(color: CaknaColors.olive),
+              foregroundColor: CaknaColors.oliveDeep,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            onPressed: busy ? null : _ssoLogin,
+            icon: const Icon(Icons.account_circle_outlined),
+            label: const Text('Log masuk dengan QCXIS',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+          ),
         ],
       ),
     );
+  }
+}
+
+class _OrDivider extends StatelessWidget {
+  const _OrDivider();
+  @override
+  Widget build(BuildContext context) {
+    return Row(children: [
+      const Expanded(child: Divider()),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Text('atau', style: TextStyle(fontSize: 12, color: CaknaColors.inkSoft)),
+      ),
+      const Expanded(child: Divider()),
+    ]);
   }
 }

@@ -9,6 +9,7 @@ import '../state/sync_service.dart';
 import '../theme.dart';
 import '../widgets/cakna_mark.dart';
 import 'auth_screen.dart';
+import 'donation_screen.dart';
 import 'mathurat_screen.dart';
 import 'prayer_times_screen.dart';
 import 'progress_screen.dart';
@@ -95,8 +96,8 @@ class ProfileScreen extends StatelessWidget {
             _SettingsTile(
               icon: Icons.favorite_outline,
               label: 'Buat sumbangan',
-              onTap: () => _info(context, 'Sumbangan',
-                  'Terima kasih atas sokongan anda. Fungsi sumbangan akan datang.'),
+              onTap: () => Navigator.push(
+                  context, MaterialPageRoute(builder: (_) => const DonationScreen())),
             ),
             const _RowDivider(),
             _SettingsTile(

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -70,6 +71,28 @@ class CaknaApi {
       _auth('register', email, password);
   Future<Map<String, dynamic>> login(String email, String password) =>
       _auth('login', email, password);
+
+  /// Open the QCXIS OIDC consent page in a custom tab, receive the session
+  /// token via a cakna:// deep link, persist it, and return the user info
+  /// from /api/auth/me (same shape as [register]/[login]).
+  Future<Map<String, dynamic>> loginWithSso() async {
+    // SSO routes live at the web root, not under /api.
+    final webRoot = base.replaceFirst(RegExp(r'/api$'), '');
+    final startUrl = '$webRoot/auth/sso/start?mobile=1';
+    final result = await FlutterWebAuth2.authenticate(
+      url: startUrl,
+      callbackUrlScheme: 'cakna',
+    );
+    final uri = Uri.parse(result);
+    final token = uri.queryParameters['token'];
+    if (token == null || token.isEmpty) {
+      throw ApiException(0, 'SSO: tiada token dalam deep link');
+    }
+    _tokenValue = token;
+    final user = await me();
+    if (user == null) throw ApiException(401, 'SSO: sesi tidak sah');
+    return user;
+  }
 
   Future<Map<String, dynamic>?> me() async {
     if (_token == null) return null;

@@ -19,6 +19,8 @@ android {
     namespace = "my.cakna"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
+    // Page fonts ship via Play Asset Delivery (install-time), not the base APK.
+    assetPacks += listOf(":pagefontpack")
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true // required by flutter_local_notifications
@@ -72,6 +74,25 @@ android {
 
 flutter {
     source = "../.."
+}
+
+// After Flutter merges its assets, remove page_fonts from the base APK.
+// They are served by the pagefontpack PAD module instead, so keeping them
+// in the base would double the download and hit the 150 MB limit.
+// Strip page_fonts from the base APK only in release builds.
+// Debug builds keep them bundled so the PAD fallback path (flutter_assets/...)
+// in MainActivity works without a Play Store install.
+afterEvaluate {
+    androidComponents.onVariants { variant ->
+        if (!variant.name.contains("release", ignoreCase = true)) return@onVariants
+        val capitalized = variant.name.replaceFirstChar { it.uppercase() }
+        tasks.matching { t -> t.name == "merge${capitalized}Assets" }.configureEach {
+            doLast {
+                val out = file("$buildDir/intermediates/assets/${variant.name}/out")
+                delete(fileTree(out) { include("flutter_assets/assets/page_fonts/**") })
+            }
+        }
+    }
 }
 
 dependencies {

@@ -30,6 +30,7 @@ class Auth extends ChangeNotifier {
 
   Future<void> register(String email, String password) => _run(() => api.register(email, password));
   Future<void> login(String email, String password) => _run(() => api.login(email, password));
+  Future<void> ssoLogin() => _run(() => api.loginWithSso());
 
   Future<void> _run(Future<Map<String, dynamic>> Function() action) async {
     _busy = true;
