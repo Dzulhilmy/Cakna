@@ -130,7 +130,7 @@ class QuranRef {
 /// (`quranRef`), a fixed dhikr (`arabic`), or morning/evening variants
 /// (`arabicPagi`/`arabicPetang`).
 class MathuratItem {
-  final int position; // 1..28
+  final int position; // 1..46
   final QuranRef? quranRef;
   final String? arabic;
   final String? arabicPagi;

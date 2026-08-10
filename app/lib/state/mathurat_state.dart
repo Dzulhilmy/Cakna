@@ -8,20 +8,21 @@ String _todayKey() {
 }
 
 /// Daily-reset Al-Ma'thurat progress: four independent count arrays
-/// (sughra/kubra × pagi/petang), each indexed by the original 0..27 item index.
+/// (sughra/kubra × pagi/petang), each indexed by the original 0..45 item index.
 /// Resets when the stored date != today. Persisted as JSON in prefs.
 class MathuratState extends ChangeNotifier {
   final SharedPreferences _prefs;
   static const _key = 'mathurat_progress';
+  static const _size = 46;
 
   String _date = _todayKey();
   String version = 's'; // 's' sughra | 'k' kubra
   bool showMeaning = true;
   final Map<String, List<int>> _counts = {
-    's_pagi': List.filled(28, 0),
-    's_petang': List.filled(28, 0),
-    'k_pagi': List.filled(28, 0),
-    'k_petang': List.filled(28, 0),
+    's_pagi': List.filled(_size, 0),
+    's_petang': List.filled(_size, 0),
+    'k_pagi': List.filled(_size, 0),
+    'k_petang': List.filled(_size, 0),
   };
 
   MathuratState(this._prefs) {
@@ -38,7 +39,7 @@ class MathuratState extends ChangeNotifier {
         if (j['d'] == _date) {
           for (final k in _counts.keys) {
             final arr = (j[k] as List?)?.cast<int>();
-            if (arr != null && arr.length == 28) _counts[k] = List.of(arr);
+            if (arr != null && arr.length == _size) _counts[k] = List.of(arr);
           }
         }
       } catch (_) {/* keep zeros */}
@@ -56,7 +57,7 @@ class MathuratState extends ChangeNotifier {
     if (today == _date) return;
     _date = today;
     for (final k in _counts.keys) {
-      _counts[k] = List.filled(28, 0);
+      _counts[k] = List.filled(_size, 0);
     }
     _persist();
     notifyListeners();
@@ -84,7 +85,7 @@ class MathuratState extends ChangeNotifier {
   }
 
   void resetActive(bool pagi) {
-    _counts[_activeKey(pagi)] = List.filled(28, 0);
+    _counts[_activeKey(pagi)] = List.filled(_size, 0);
     _persist();
     notifyListeners();
   }
