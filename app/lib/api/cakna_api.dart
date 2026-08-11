@@ -22,6 +22,15 @@ class CaknaApi {
     'CAKNA_API_BASE',
     defaultValue: 'https://cakna.qcxis.com/api',
   );
+
+  /// Converts a hub-server relative path (e.g. `/uploads/photo.jpg`) into a
+  /// fully-qualified URL using the same origin as the API base. Absolute URLs
+  /// are returned unchanged so callers don't need to pre-check.
+  static String resolveHubUrl(String path) {
+    if (path.isEmpty || !path.startsWith('/')) return path;
+    final origin = base.replaceFirst(RegExp(r'/api$'), '');
+    return '$origin$path';
+  }
   final SharedPreferences _prefs;
   CaknaApi(this._prefs);
 
@@ -140,5 +149,69 @@ class CaknaApi {
     final r = await http.delete(Uri.parse('$base/account'), headers: _headers());
     if (r.statusCode != 200 && r.statusCode != 204) _authFail(r);
     _tokenValue = null;
+  }
+
+  // ---- hub content (public, no auth) ----
+  /// Returns the site_content JSON from the Hub admin dashboard, or {} on failure.
+  Future<Map<String, dynamic>> hubSite() async {
+    final r = await http.get(Uri.parse('$base/hub/site'));
+    if (r.statusCode != 200) return {};
+    return (jsonDecode(r.body) as Map<String, dynamic>?) ?? {};
+  }
+
+  /// Returns the programs list from the Hub, or [] on failure.
+  Future<List<dynamic>> hubPrograms() async {
+    final r = await http.get(Uri.parse('$base/hub/programs'));
+    if (r.statusCode != 200) return [];
+    return (jsonDecode(r.body) as List<dynamic>?) ?? [];
+  }
+
+  // ---- hub authenticated endpoints (require Cakna session) ----
+
+  /// Submit a funding application. Throws [ApiException] on failure.
+  Future<Map<String, dynamic>> hubSubmitFunding(Map<String, dynamic> data) async {
+    final r = await http.post(
+      Uri.parse('$base/hub/funding'),
+      headers: _headers(json: true),
+      body: jsonEncode(data),
+    );
+    if (r.statusCode != 200) {
+      final body = jsonDecode(r.body) as Map<String, dynamic>? ?? {};
+      throw ApiException(r.statusCode, body['error']?.toString() ?? 'Ralat hantar borang');
+    }
+    return (jsonDecode(r.body) as Map<String, dynamic>?) ?? {};
+  }
+
+  /// Returns the signed-in user's own funding applications, newest first, or [] on failure.
+  Future<List<dynamic>> hubMyFunding() async {
+    final r = await http.get(Uri.parse('$base/hub/funding/mine'), headers: _headers());
+    if (r.statusCode != 200) return [];
+    return (jsonDecode(r.body) as List<dynamic>?) ?? [];
+  }
+
+  /// Returns all hub notifications, or [] on failure / not signed in.
+  Future<List<dynamic>> hubNotifications() async {
+    final r = await http.get(Uri.parse('$base/hub/notifications'), headers: _headers());
+    if (r.statusCode != 200) return [];
+    return (jsonDecode(r.body) as List<dynamic>?) ?? [];
+  }
+
+  /// Returns hub events, or [] on failure / not signed in.
+  Future<List<dynamic>> hubEvents() async {
+    final r = await http.get(Uri.parse('$base/hub/events'), headers: _headers());
+    if (r.statusCode != 200) return [];
+    return (jsonDecode(r.body) as List<dynamic>?) ?? [];
+  }
+
+  /// Returns notices for the signed-in user, or [] on failure.
+  Future<List<dynamic>> hubNotices() async {
+    final r = await http.get(Uri.parse('$base/hub/notices'), headers: _headers());
+    if (r.statusCode != 200) return [];
+    return (jsonDecode(r.body) as List<dynamic>?) ?? [];
+  }
+
+  /// Mark a notice as read. Silently ignores failures.
+  Future<void> hubMarkNoticeRead(String id) async {
+    await http.post(Uri.parse('$base/hub/notices/$id/read'), headers: _headers());
   }
 }
