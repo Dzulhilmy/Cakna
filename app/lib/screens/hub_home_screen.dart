@@ -58,8 +58,16 @@ class HubHomeScreen extends StatelessWidget {
                   _buildApplicationCard(context, appState.lastApp!),
                   const SizedBox(height: 16),
                 ],
+                if (auth.signedIn && hub.notices.isNotEmpty) ...[
+                  _buildNoticesSection(context, hub),
+                  const SizedBox(height: 16),
+                ],
                 if (auth.signedIn && hub.notifications.isNotEmpty) ...[
                   _buildNotificationsSection(hub.notifications),
+                  const SizedBox(height: 16),
+                ],
+                if (auth.signedIn && hub.events.isNotEmpty) ...[
+                  _buildEventsSection(hub.events),
                   const SizedBox(height: 16),
                 ],
                 const SizedBox(height: 8),
@@ -320,6 +328,281 @@ class HubHomeScreen extends StatelessWidget {
       ),
     );
   }
+
+  // ── notices section (personal workflow messages) ──────────────────────────
+
+  Widget _buildNoticesSection(BuildContext context, HubContent hub) {
+    final notices = hub.notices;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.mark_email_unread_outlined,
+                  size: 15, color: Color(0xFFD94F6A)),
+              const SizedBox(width: 6),
+              const Text(
+                'NOTIS SAYA',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF6B7280),
+                  letterSpacing: 0.8,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ...notices.take(5).map((n) {
+            final m = n as Map<String, dynamic>;
+            final id = m['id'] as String? ?? '';
+            final title = m['title'] as String? ?? '';
+            final body = m['body'] as String? ?? '';
+            final kind = m['kind'] as String? ?? 'info';
+            final readBy = (m['read_by'] as List?) ?? [];
+            final isUnread = readBy.isEmpty;
+            final (iconData, iconColor, bgColor) = switch (kind) {
+              'approved' => (
+                  Icons.check_circle_outline,
+                  const Color(0xFF10B981),
+                  const Color(0xFFF0FDF4)
+                ),
+              'rejected' || 'needs_revision' => (
+                  Icons.error_outline,
+                  const Color(0xFFF59E0B),
+                  const Color(0xFFFFFBEB)
+                ),
+              'approval_needed' => (
+                  Icons.pending_outlined,
+                  const Color(0xFF3B82F6),
+                  const Color(0xFFEFF6FF)
+                ),
+              _ => (
+                  Icons.info_outline,
+                  const Color(0xFF6B7280),
+                  const Color(0xFFF9FAFB)
+                ),
+            };
+            return GestureDetector(
+              onTap: () {
+                if (isUnread && id.isNotEmpty) {
+                  hub.markNoticeRead(context.read<Auth>().api, id);
+                }
+              },
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: isUnread ? bgColor : Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: isUnread
+                        ? iconColor.withValues(alpha: 0.25)
+                        : const Color(0xFFE5E7EB),
+                  ),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(7),
+                      decoration: BoxDecoration(
+                        color: iconColor.withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(iconData, size: 16, color: iconColor),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  title,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: isUnread
+                                        ? FontWeight.w600
+                                        : FontWeight.w500,
+                                    color: const Color(0xFF111827),
+                                  ),
+                                ),
+                              ),
+                              if (isUnread)
+                                Container(
+                                  width: 7,
+                                  height: 7,
+                                  decoration: BoxDecoration(
+                                    color: iconColor,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                            ],
+                          ),
+                          if (body.isNotEmpty) ...[
+                            const SizedBox(height: 3),
+                            Text(
+                              body,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFF6B7280),
+                                height: 1.4,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  // ── events section ────────────────────────────────────────────────────────
+
+  Widget _buildEventsSection(List<dynamic> events) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.calendar_month_outlined,
+                  size: 15, color: Color(0xFFD94F6A)),
+              const SizedBox(width: 6),
+              const Text(
+                'ACARA',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF6B7280),
+                  letterSpacing: 0.8,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ...events.take(3).map((e) {
+            final m = e as Map<String, dynamic>;
+            final title = m['title'] as String? ?? '';
+            final tarikh = m['tarikh'] as String? ?? '';
+            final lokasi = m['lokasi'] as String? ?? '';
+            final kluster = m['kluster'] as String? ?? '';
+            final anjuran = m['anjuran'] as String? ?? '';
+            return Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: const Color(0xFFE5E7EB)),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(7),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFD94F6A).withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.event_outlined,
+                        size: 16, color: Color(0xFFD94F6A)),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF111827),
+                          ),
+                        ),
+                        if (tarikh.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              const Icon(Icons.access_time,
+                                  size: 11, color: Color(0xFF9CA3AF)),
+                              const SizedBox(width: 4),
+                              Text(
+                                tarikh,
+                                style: const TextStyle(
+                                    fontSize: 11.5, color: Color(0xFF6B7280)),
+                              ),
+                              if (lokasi.isNotEmpty) ...[
+                                const SizedBox(width: 8),
+                                const Icon(Icons.place_outlined,
+                                    size: 11, color: Color(0xFF9CA3AF)),
+                                const SizedBox(width: 3),
+                                Expanded(
+                                  child: Text(
+                                    lokasi,
+                                    style: const TextStyle(
+                                        fontSize: 11.5,
+                                        color: Color(0xFF6B7280)),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                        if (anjuran.isNotEmpty || kluster.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Wrap(
+                            spacing: 6,
+                            children: [
+                              if (kluster.isNotEmpty)
+                                _eventChip(kluster,
+                                    const Color(0xFFEFF6FF),
+                                    const Color(0xFF3B82F6)),
+                              if (anjuran.isNotEmpty)
+                                _eventChip(anjuran,
+                                    const Color(0xFFF3F4F6),
+                                    const Color(0xFF6B7280)),
+                            ],
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _eventChip(String label, Color bg, Color fg) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Text(label,
+            style: TextStyle(
+                fontSize: 10.5, fontWeight: FontWeight.w500, color: fg)),
+      );
 
   // ── notifications section ─────────────────────────────────────────────────
 
