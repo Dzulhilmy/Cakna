@@ -14,6 +14,7 @@
 		HandHeart,
 		Heart,
 		ListChecks,
+		Users,
 		ListOrdered,
 		LogIn,
 		LogOut,
@@ -43,6 +44,7 @@
 				{ href: '/zikir', label: t('mod_panelZikir'), icon: HandHeart },
 				{ href: '/mathurat', label: t('mathurat'), icon: Sunrise },
 				{ href: '/yasin', label: t('p_yasin'), icon: BookHeart },
+				{ href: '/halaqah', label: 'Halaqah', icon: Users },
 				{ href: '/selawat', label: t('p_selawat'), icon: Heart }
 			]
 		},
