@@ -12,6 +12,7 @@
 		Droplet,
 		GraduationCap,
 		HandHeart,
+		Heart,
 		ListChecks,
 		ListOrdered,
 		LogIn,
@@ -41,7 +42,8 @@
 				{ href: '/qibla', label: t('mod_panelQiblat'), icon: Compass },
 				{ href: '/zikir', label: t('mod_panelZikir'), icon: HandHeart },
 				{ href: '/mathurat', label: t('mathurat'), icon: Sunrise },
-				{ href: '/yasin', label: t('p_yasin'), icon: BookHeart }
+				{ href: '/yasin', label: t('p_yasin'), icon: BookHeart },
+				{ href: '/selawat', label: t('p_selawat'), icon: Heart }
 			]
 		},
 		{
