@@ -3,7 +3,7 @@ import { Persisted } from './persisted.svelte';
 
 export interface Settings {
 	theme: 'light' | 'sepia' | 'dark';
-	fontSize: number; // 20..40 step 2
+	fontSize: number; // 20..60 step 2
 	qari: string;
 	showTrans: boolean;
 	page: number; // last-read page 1..604

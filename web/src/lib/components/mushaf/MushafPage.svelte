@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Ayah, PageBundle, SurahMeta } from '$lib/api/types';
 	import { toArabicNum } from '$lib/quran/meta';
-	import { RULE_NAMES, segmentTaj } from '$lib/quran/tajweed';
+	import { RULE_NAMES, segmentTaj, type TajSegment } from '$lib/quran/tajweed';
 	import { t } from '$lib/state/i18n.svelte';
 	import { player } from '$lib/state/player.svelte';
 	import { hls, notes, settings } from '$lib/state/stores.svelte';
@@ -28,7 +28,7 @@
 
 	type Item =
 		| { kind: 'band'; surah: SurahMeta }
-		| { kind: 'basmalah' }
+		| { kind: 'basmalah'; surah: number }
 		| { kind: 'run'; ayahs: Ayah[] };
 
 	const items = $derived.by(() => {
@@ -42,13 +42,49 @@
 				}
 				const sm = bundle.surahs.find((s) => s.number === a.surah)!;
 				out.push({ kind: 'band', surah: sm });
-				if (a.surah !== 1 && a.surah !== 9) out.push({ kind: 'basmalah' });
+				if (a.surah !== 1 && a.surah !== 9) out.push({ kind: 'basmalah', surah: a.surah });
 			}
 			run.push(a);
 		}
 		if (run.length) out.push({ kind: 'run', ayahs: run });
 		return out;
 	});
+
+	// The ayah that should be green: none while a Basmalah is being recited, so the
+	// gold Basmalah highlight and the green ayah highlight never show at once.
+	const greenG = $derived(player.basmalahSurah === null ? player.playingG : -1);
+
+	// Split an ayah into chunks so each WORD carries a 1-based index for word-by-word
+	// highlighting, while keeping the tajweed colour runs inside each word. Waqf marks
+	// (ۛ ۚ …) render but are NOT counted as words — matching Quran.com's word indices.
+	type Chunk =
+		| { kind: 'word'; w: number; segs: TajSegment[] }
+		| { kind: 'sep'; segs: TajSegment[] }
+		| { kind: 'space' };
+	function ayahChunks(ar: string, taj: number[] | undefined, tajOn: boolean): Chunk[] {
+		const out: Chunk[] = [];
+		let cur: TajSegment[] = [];
+		let w = 0;
+		const flush = () => {
+			if (!cur.length) return;
+			const text = cur.map((s) => s.text).join('');
+			if (/[ء-يٱ]/.test(text)) out.push({ kind: 'word', w: ++w, segs: cur });
+			else out.push({ kind: 'sep', segs: cur });
+			cur = [];
+		};
+		for (const seg of segmentTaj(ar, taj, tajOn)) {
+			const parts = seg.text.split(' ');
+			for (let i = 0; i < parts.length; i++) {
+				if (i > 0) {
+					flush();
+					out.push({ kind: 'space' });
+				}
+				if (parts[i]) cur.push({ text: parts[i], rule: seg.rule });
+			}
+		}
+		flush();
+		return out;
+	}
 
 	function surahMeaning(sm: SurahMeta): string {
 		return settings.value.uiLang === 'en' ? sm.name_en : sm.name_ms;
@@ -94,12 +130,9 @@
 	});
 </script>
 
+{#snippet tajRun(segs: TajSegment[])}{#each segs as sg, j (j)}{#if sg.rule !== null}<i class="tj t{sg.rule}">{sg.text}</i>{:else}{sg.text}{/if}{/each}{/snippet}
 {#snippet ayahInner(a: Ayah)}
-	<span class="at">
-		{#each segmentTaj(a.ar, a.taj, settings.value.tajweed) as seg, i (i)}
-			{#if seg.rule !== null}<i class="tj t{seg.rule}">{seg.text}</i>{:else}{seg.text}{/if}
-		{/each}
-	</span>
+	<span class="at">{#each ayahChunks(a.ar, a.taj, settings.value.tajweed) as chunk, i (i)}{#if chunk.kind === 'space'}{' '}{:else if chunk.kind === 'word'}<span class="wd" class:wnow={player.playingG === a.global && player.currentWord === chunk.w}>{@render tajRun(chunk.segs)}</span>{:else}{@render tajRun(chunk.segs)}{/if}{/each}</span>
 	{#if a.sajdah}<span class="sjd" title={t('sajdah')}>&#x06E9;</span>{/if}
 	{#if notes.value[String(a.global)]}<span class="note-flag">&#x270E;</span>{/if}
 	<span class="mrk">{toArabicNum(a.ayah)}</span>
@@ -116,10 +149,16 @@
 				<small dir="ltr">{item.surah.number}. {item.surah.name_translit} — {surahMeaning(item.surah)}</small>
 			</div>
 		{:else if item.kind === 'basmalah'}
-			<div class="basmalah font-arabic" dir="rtl">{BASMALAH}</div>
+			<div
+				class="basmalah font-arabic"
+				class:reciting={player.basmalahSurah === item.surah}
+				dir="rtl"
+			>
+				{BASMALAH}
+			</div>
 		{:else if settings.value.inlineTrans}
 			{#each item.ayahs as a (a.global)}
-				<div class="ay-block" class:playing={player.playingG === a.global}>
+				<div class="ay-block" class:playing={greenG === a.global}>
 					<span
 						id="g{a.global}"
 						role="button"
@@ -129,7 +168,7 @@
 						class:hl1={hls.value[String(a.global)] === 1}
 						class:hl2={hls.value[String(a.global)] === 2}
 						class:hl3={hls.value[String(a.global)] === 3}
-						class:playing={player.playingG === a.global}
+						class:playing={greenG === a.global}
 						dir="rtl"
 						use:longpress={() => onactions(a.global)}
 						onclick={(e) => handleTap(e, a)}
@@ -154,7 +193,7 @@
 						class:hl1={hls.value[String(a.global)] === 1}
 						class:hl2={hls.value[String(a.global)] === 2}
 						class:hl3={hls.value[String(a.global)] === 3}
-						class:playing={player.playingG === a.global}
+						class:playing={greenG === a.global}
 						use:longpress={() => onactions(a.global)}
 						onclick={(e) => handleTap(e, a)}
 						onkeydown={(e) => e.key === 'Enter' && player.toggle(a.global)}
@@ -192,6 +231,14 @@
 		text-align: center;
 		font-size: calc(var(--arabic-size) * 1.1);
 		margin: 6px 0 10px;
+		border-radius: 10px;
+		transition: background 0.2s;
+	}
+	/* Distinct GOLD highlight while the reciter is on the Basmalah (vs the GREEN
+	   ayah highlight) — so it's clear the reciter is on the Basmalah, not an ayah. */
+	.basmalah.reciting {
+		background: rgba(199, 162, 75, 0.25);
+		box-shadow: 0 0 0 6px rgba(199, 162, 75, 0.25);
 	}
 	.ay {
 		border-radius: 8px;
@@ -203,6 +250,15 @@
 	.ay.playing {
 		background: var(--playing);
 		box-shadow: 0 0 0 4px var(--playing);
+	}
+	/* Word-by-word: the exact word the reciter is on (Alafasy), a distinct amber
+	   so it reads clearly against the green playing-ayah background. */
+	.wd {
+		border-radius: 5px;
+		transition: background 0.1s;
+	}
+	.wnow {
+		background: rgba(224, 168, 74, 0.6);
 	}
 	.mushaf.hide-mode :global(.ay:not(.revealed) .at) {
 		filter: blur(7px);

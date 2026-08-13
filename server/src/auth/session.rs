@@ -70,6 +70,10 @@ pub async fn destroy(st: &AppState, token: &str) -> Result<(), AppError> {
 pub struct AuthUser {
     pub id: Uuid,
     pub email: String,
+    pub name: Option<String>,
+    /// The `users.is_admin` column only. The *effective* admin check is this OR
+    /// membership of the ADMIN_EMAILS allowlist — see `AppState::is_admin`.
+    pub is_admin_flag: bool,
 }
 
 #[axum::async_trait]
@@ -79,8 +83,8 @@ impl FromRequestParts<AppState> for AuthUser {
     async fn from_request_parts(parts: &mut Parts, st: &AppState) -> Result<Self, Self::Rejection> {
         let token = cookie_value(&parts.headers).ok_or(AppError::Unauthorized)?;
         let token_hash = hash_token(&token);
-        let row = sqlx::query_as::<_, (Uuid, String, OffsetDateTime)>(
-            "SELECT u.id, u.email::text, s.expires_at FROM sessions s \
+        let row = sqlx::query_as::<_, (Uuid, String, Option<String>, bool, OffsetDateTime)>(
+            "SELECT u.id, u.email::text, u.name, u.is_admin, s.expires_at FROM sessions s \
              JOIN users u ON u.id = s.user_id \
              WHERE s.token_hash = $1 AND s.expires_at > now()",
         )
@@ -89,7 +93,7 @@ impl FromRequestParts<AppState> for AuthUser {
         .await?
         .ok_or(AppError::Unauthorized)?;
 
-        let (id, email, expires_at) = row;
+        let (id, email, name, is_admin_flag, expires_at) = row;
         let ttl = Duration::days(st.cfg.session_ttl_days);
         if expires_at - OffsetDateTime::now_utc() < ttl / 2 {
             sqlx::query("UPDATE sessions SET expires_at = now() + $2 WHERE token_hash = $1")
@@ -98,7 +102,7 @@ impl FromRequestParts<AppState> for AuthUser {
                 .execute(&st.pool)
                 .await?;
         }
-        Ok(AuthUser { id, email })
+        Ok(AuthUser { id, email, name, is_admin_flag })
     }
 }
 

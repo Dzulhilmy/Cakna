@@ -144,11 +144,13 @@ class QuranRepo {
           if (_stripHarakat(s.name).contains(bare)) s
       ].take(limit).toList();
     }
-    String norm(String s) => s.toLowerCase().replaceAll(RegExp(r"[-'’\s]"), '');
+    String norm(String s) => s.toLowerCase().replaceAll(RegExp(r"[-''\s]"), '');
     final query = norm(raw);
     return [
       for (final s in all)
-        if (norm(s.nameTrans).contains(query) || norm(s.nameEn).contains(query)) s
+        if (norm(s.nameTrans).contains(query) ||
+            norm(s.nameEn).contains(query) ||
+            norm(s.nameMs).contains(query)) s
     ].take(limit).toList();
   }
 

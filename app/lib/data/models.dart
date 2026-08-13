@@ -3,8 +3,9 @@
 class Surah {
   final int id; // 1..114
   final String name; // Arabic
-  final String nameTrans; // latin
-  final String nameEn; // english meaning
+  final String nameTrans; // latin transliteration
+  final String nameEn; // English meaning
+  final String nameMs; // Malay meaning
   final String type; // Mekah / Madinah
   final int order; // revelation order
   final bool bismillah;
@@ -15,6 +16,7 @@ class Surah {
     required this.name,
     required this.nameTrans,
     required this.nameEn,
+    required this.nameMs,
     required this.type,
     required this.order,
     required this.bismillah,
@@ -26,6 +28,7 @@ class Surah {
         name: r['name'] as String,
         nameTrans: r['name_trans'] as String,
         nameEn: (r['name_en'] as String).trim(),
+        nameMs: ((r['name_ms'] ?? '') as String).trim(),
         type: r['type'] as String,
         order: r['order'] as int,
         bismillah: (r['bismillah'] as int) == 1,

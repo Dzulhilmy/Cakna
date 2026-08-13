@@ -14,7 +14,7 @@ import 'package:sqflite/sqflite.dart';
 /// runtime-loaded page fonts have no unload API; worst case (paging the whole
 /// mushaf in one session) is ~91 MB, an accepted ceiling.
 class CaknaDb {
-  static const _assetVersion = 2; // bump when the bundled DBs change (v2: juz fix)
+  static const _assetVersion = 3; // bump when the bundled DBs change (v3: name_ms, text/translation reseed from extracted JSON)
   Database? _quran;
   Database? _timing;
 

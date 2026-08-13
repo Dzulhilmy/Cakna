@@ -34,6 +34,23 @@ async fn spawn() -> Option<(String, PgPool)> {
         session_ttl_days: 30,
         cookie_secure: false,
         static_dir: None,
+        // No allowlist in tests: admin comes only from the users.is_admin column,
+        // so a test can never be granted admin by a stray ADMIN_EMAILS in the env.
+        admin_emails: Default::default(),
+        livekit: cakna::config::LiveKit {
+            url: "ws://localhost:7880".into(),
+            api_url: "http://localhost:7880".into(),
+            api_key: String::new(),   // unconfigured in tests
+            api_secret: String::new(),
+            token_ttl_minutes: 60,
+        },
+        qcxis: cakna::config::Qcxis {
+            issuer: "https://qcxis.invalid".into(),
+            client_id: String::new(),   // unconfigured: SSO routes short-circuit
+            client_secret: String::new(),
+            redirect_uri: "http://localhost/auth/sso/callback".into(),
+            scope: "openid profile email".into(),
+        },
     };
     let content_version = AppState::load_content_version(&pool).await;
     let st = AppState::new(pool.clone(), cfg, content_version);
@@ -257,4 +274,52 @@ async fn auth_and_sync_flow() {
     assert_eq!(r.status(), 200);
     c2.post(format!("{base}/api/auth/logout")).send().await.unwrap();
     assert_eq!(c2.get(format!("{base}/api/auth/me")).send().await.unwrap().status(), 401);
+}
+
+/// A migrated cakna.org account arrives with a Node scrypt password hash. It must
+/// be able to log in, and doing so must transparently upgrade the stored hash to
+/// Argon2id. Mirrors the fixture in `auth::password` (password `test-password-123`).
+#[tokio::test]
+async fn legacy_scrypt_login_rehashes() {
+    let Some((base, pool)) = spawn().await else { return };
+    let c = client();
+    let email = "legacy-migrated@example.com";
+    // The exact stored form from legacy/server/server.mjs (<saltHex>:<hashHex>).
+    let legacy_hash = "0123456789abcdef0123456789abcdef:adc5010e087f548f339d088567e44bce910a436f02a07205624fb707b76d10c28f0761563ae311b011f41b0c5859959e6a2147ed0a92599d589b59fb0917c2ee";
+    sqlx::query("INSERT INTO users (email, password_hash, login_method) VALUES ($1::citext, $2, 'email')")
+        .bind(email)
+        .bind(legacy_hash)
+        .execute(&pool)
+        .await
+        .unwrap();
+
+    // Wrong password against the legacy hash → 401.
+    let wrong = c
+        .post(format!("{base}/api/auth/login"))
+        .json(&serde_json::json!({"email": email, "password": "not-it"}))
+        .send().await.unwrap();
+    assert_eq!(wrong.status(), 401);
+
+    // Correct password → 200, and the stored hash is still the legacy one up to
+    // this point (verified below only after the successful login rehashes it).
+    let ok = c
+        .post(format!("{base}/api/auth/login"))
+        .json(&serde_json::json!({"email": email, "password": "test-password-123"}))
+        .send().await.unwrap();
+    assert_eq!(ok.status(), 200, "legacy scrypt password must verify");
+
+    // The successful login must have rehashed to Argon2id.
+    let stored: String = sqlx::query_scalar("SELECT password_hash FROM users WHERE email = $1::citext")
+        .bind(email)
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    assert!(stored.starts_with("$argon2"), "hash must be upgraded to argon2, got: {}", &stored[..stored.len().min(12)]);
+
+    // And the account still logs in with the same password after the upgrade.
+    let again = client()
+        .post(format!("{base}/api/auth/login"))
+        .json(&serde_json::json!({"email": email, "password": "test-password-123"}))
+        .send().await.unwrap();
+    assert_eq!(again.status(), 200, "login must still work post-rehash");
 }

@@ -186,7 +186,7 @@
 					{#if pagePlaying}<Square size={18} fill="currentColor" />{:else}<Play size={20} />{/if}
 				</Button>
 				<Button variant="ghost" size="icon" class="h-11 w-11" onclick={() => (settingsOpen = true)}>
-					<Settings2 size={19} />
+					<Settings2 class="size-5" />
 				</Button>
 				<Button variant="ghost" size="icon" class="h-11 w-11" disabled={p >= 604} onclick={() => go(p + 1)}>
 					<ChevronRight size={22} />

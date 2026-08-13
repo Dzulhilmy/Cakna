@@ -27,11 +27,47 @@ services:
       COOKIE_SECURE: "true"
       STATIC_DIR: /app/static
       RUST_LOG: cakna=info,tower_http=info
+      ADMIN_EMAILS: ${ADMIN_EMAILS:-}
+      # QCXIS SSO — empty disables the flow; the login page says so plainly.
+      QCXIS_CLIENT_ID: ${QCXIS_CLIENT_ID:-}
+      QCXIS_CLIENT_SECRET: ${QCXIS_CLIENT_SECRET:-}
+      QCXIS_ISSUER: ${QCXIS_ISSUER:-https://qcxis.com}
+      QCXIS_REDIRECT_URI: ${QCXIS_REDIRECT_URI:-}
+      # Halaqah audio. LIVEKIT_URL is handed to the BROWSER, so it must be the
+      # public wss:// address — not the internal service name. LIVEKIT_API_URL is
+      # server-to-server only.
+      LIVEKIT_URL: ${LIVEKIT_URL:-}
+      LIVEKIT_API_URL: ${LIVEKIT_API_URL:-http://host.docker.internal:7880}
+      LIVEKIT_API_KEY: ${LIVEKIT_API_KEY:-}
+      LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET:-}
+      # Cakna Hub proxy — leave blank to disable; set to http://hub-server:3002 when
+      # docker-compose.hub.yml is running alongside this file.
+      HUB_URL: ${HUB_URL:-}
+      HUB_INTERNAL_SECRET: ${HUB_INTERNAL_SECRET:-}
     volumes:
       - ../web/build:/app/static:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       db:
         condition: service_healthy
+
+  # LiveKit SFU — carries halaqah audio.
+  #
+  # network_mode: host is deliberate. WebRTC needs a wide UDP range plus TURN on
+  # 3478; publishing that many ports through Docker's NAT is slow to start and
+  # rewrites the source addresses LiveKit relies on for ICE. Host networking also
+  # lets use_external_ip discover the real public address.
+  livekit:
+    image: livekit/livekit-server:v1.13.4
+    restart: unless-stopped
+    command: --config /etc/livekit.yaml
+    network_mode: host
+    environment:
+      # "<key>: <secret>" — read at boot, never baked into the image.
+      LIVEKIT_KEYS: "${LIVEKIT_API_KEY}: ${LIVEKIT_API_SECRET}"
+    volumes:
+      - ./livekit.yaml:/etc/livekit.yaml:ro
 
   caddy:
     image: caddy:2-alpine
@@ -39,10 +75,17 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:-cakna.qcxis.com}
+      # Separate hostname for LiveKit signalling; needs its own DNS A record.
+      LIVEKIT_DOMAIN: ${LIVEKIT_DOMAIN:-live.cakna.qcxis.com}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
+    # LiveKit is on host networking, not the compose network.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       - api
 

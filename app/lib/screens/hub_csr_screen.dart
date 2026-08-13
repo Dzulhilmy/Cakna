@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../api/cakna_api.dart';
 import '../state/hub_content.dart';
+import '../widgets/hub_custom_sections.dart';
 
 const _kFallbackStories = [
   _Story(
@@ -71,6 +73,12 @@ class HubCsrScreen extends StatelessWidget {
                     _StoryCard(story: s),
                     const SizedBox(height: 12),
                   ],
+                  const SizedBox(height: 8),
+                  _buildCta(hub),
+                  const SizedBox(height: 8),
+                  HubCustomSections(
+                    sections: hub.mapList(['customSections', 'csr']),
+                  ),
                   const SizedBox(height: 32),
                 ],
               ),
@@ -81,7 +89,71 @@ class HubCsrScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildCta(HubContent hub) {
+    final heading = hub.s(['csrPage', 'ctaHeading'], '');
+    final body = hub.s(['csrPage', 'ctaText'], '');
+    final label = hub.s(['csrPage', 'ctaLabel'], '');
+    final href = hub.s(['csrPage', 'ctaHref'], '');
+    if (heading.isEmpty && label.isEmpty) return const SizedBox.shrink();
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFD94F6A), Color(0xFF9E2A42)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (heading.isNotEmpty)
+            Text(heading,
+                style: const TextStyle(
+                    fontFamily: 'Lora',
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    height: 1.3)),
+          if (body.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(body,
+                style: const TextStyle(
+                    fontSize: 13, color: Colors.white70, height: 1.5)),
+          ],
+          if (label.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            GestureDetector(
+              onTap: () async {
+                final uri = Uri.tryParse(href);
+                if (uri != null) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                }
+              },
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Text(label,
+                    style: const TextStyle(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFFD94F6A))),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   Widget _buildHeader(BuildContext context, HubContent hub) {
+    final eyebrow = hub.s(['csrPage', 'eyebrow'], 'CSR Stories');
     final heading = hub.s(['csrPage', 'heading'], 'Berita CSR');
     final subtext =
         hub.s(['csrPage', 'subtext'], 'Kisah-kisah impak komuniti HOME Cakna');
@@ -102,6 +174,15 @@ class HubCsrScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (eyebrow.isNotEmpty) ...[
+            Text(eyebrow,
+                style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white60,
+                    letterSpacing: 0.8)),
+            const SizedBox(height: 6),
+          ],
           Text(heading,
               style: const TextStyle(
                   fontFamily: 'Lora',

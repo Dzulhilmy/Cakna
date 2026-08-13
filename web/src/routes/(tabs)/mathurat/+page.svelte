@@ -15,6 +15,7 @@
 	import { mathuratState, todayKey } from '$lib/state/stores.svelte';
 	import type { MathuratState, MathuratTetapan } from '$lib/state/stores.svelte';
 	import { solat } from '$lib/state/solat.svelte';
+	import { halaqah } from '$lib/halaqah/store.svelte';
 	import { nowInTz, prayerTimes, tzOffset } from '$lib/utils/solar';
 
 	/* ---------- senarai item mengikut versi ---------- */
@@ -135,6 +136,16 @@
 	const vIdx = $derived(loaded ? st().idx[version] : 0);
 	const item = $derived(list[vIdx]);
 	const done = $derived(vCounts[vIdx] ?? 0);
+
+	/* When the mic-holder is reading this page during a halaqah, broadcast which
+	   wirid item they are on so the room renders it in place — the same way it
+	   renders a shared mushaf page. Read-only for everyone else: their own
+	   progress is never touched by what the reciter is doing. */
+	$effect(() => {
+		const sess = halaqah.session;
+		if (!loaded || !sess?.connected || !sess.canSpeak || !sess.sharing) return;
+		void sess.setShare({ kind: 'mathurat', version, mode, idx: vIdx });
+	});
 	const baki = $derived(item.reps - done);
 	const arText = $derived(pickText(item, version, mode, 'ar'));
 	const bmText = $derived(pickText(item, version, mode, 'bm'));
@@ -146,6 +157,19 @@
 	const pct = $derived(Math.round((totalDone / total) * 100));
 	const sesiSelesai = $derived(totalDone === total);
 	const senaraiAyat = $derived(pecahAyat(arText));
+
+	/* ---------- petunjuk "ulang 3 kali" (Doa Rabitah) ----------
+	   Frasa فَوَثِّقِ اللَّهُمَّ رَابِطَتَهَا dibaca tiga kali. Teks induk sudah
+	   membawa penanda ﴿٣×﴾; di sini kita serlahkan frasa itu dan papar kad
+	   peringatan. (Dahulu sebuah skrip vanilla disuntik ke dalam shell SPA —
+	   mathurat-hint.js — dengan MutationObserver + CSS Custom Highlight API;
+	   dalam Svelte ia cukup diisytiharkan begini.) */
+	const FRASA_3X = 'فَوَثِّقِ اللَّهُمَّ رَابِطَتَهَا';
+	const bahagian3x = $derived.by(() => {
+		const i = arText.indexOf(FRASA_3X);
+		if (i < 0) return null;
+		return { pra: arText.slice(0, i), frasa: FRASA_3X, pasca: arText.slice(i + FRASA_3X.length) };
+	});
 
 	/* ---------- streak & rekod ---------- */
 	const kiraStreak = (rekod: MathuratState['rekod']) => {
@@ -383,7 +407,7 @@
 		<div class="mt-wrap">
 			<div class="mt-atas">
 				<p class="mt-eyebrow">Cakna · Al-Ma'thurat</p>
-				<button class="mt-ikon" aria-label="Tetapan" onclick={() => bukaTetapan('home')}>⚙</button>
+				<button class="mt-ikon mt-ikon-lg" aria-label="Tetapan" onclick={() => bukaTetapan('home')}>⚙</button>
 			</div>
 			<h1 class="mt-arab mt-tajuk-arab">الْمَأْثُورَات</h1>
 			<p class="mt-subtajuk">
@@ -614,8 +638,20 @@
 				{/if}
 				{#key `ar-${version}-${vIdx}`}
 					<p class="mt-arab mt-fadeup" style="font-size:{arText.length > 400 ? Math.round(tetapan.arSaiz * 0.82) : tetapan.arSaiz}px; text-align:{JAJAR[tetapan.jajarAr]}; margin:0">
-						{arText}
+						{#if bahagian3x}{bahagian3x.pra}<mark class="mt-3x">{bahagian3x.frasa}</mark>{bahagian3x.pasca}{:else}{arText}{/if}
 					</p>
+					{#if bahagian3x}
+						<div class="mt-3x-kad" aria-label="Bahagian ini dibaca tiga kali">
+							<div class="mt-3x-kepala">
+								<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+									<path d="M17 2.1 21 6l-4 3.9" /><path d="M3 12.9V11a4 4 0 0 1 4-4h14" />
+									<path d="M7 21.9 3 18l4-3.9" /><path d="M21 11.1V13a4 4 0 0 1-4 4H3" />
+								</svg>
+								<span>Ulang 3 kali</span>
+							</div>
+							<div class="mt-arab mt-3x-frasa" dir="rtl">{FRASA_3X}</div>
+						</div>
+					{/if}
 				{/key}
 				{#if tetapan.paparRumi && rumiText}
 					{#key `rm-${version}-${vIdx}`}
@@ -758,11 +794,39 @@
 		direction: rtl;
 		line-height: 2.1;
 	}
+	/* petunjuk "ulang 3 kali" — frasa diserlah + kad peringatan */
+	.mt-3x { background: #fbe7b0; color: inherit; border-radius: 3px; padding: 0 2px; }
+	.mt-3x-kad {
+		margin: 12px auto 6px;
+		max-width: 600px;
+		background: #fbf1d6;
+		border: 1px solid #e9d9a8;
+		border-radius: 12px;
+		padding: 11px 16px 13px;
+		text-align: center;
+	}
+	.mt-3x-kepala {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
+		color: #8a6522;
+		font: 600 12.5px/1 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+		letter-spacing: 0.02em;
+	}
+	.mt-3x-frasa { margin-top: 7px; font-size: 21px; color: #0b3d2e; line-height: 1.9; }
+	:global(.dark) .mt-3x { background: #6b5518; }
+	:global(.dark) .mt-3x-kad { background: #2a2416; border-color: #4a3d22; }
+	:global(.dark) .mt-3x-frasa { color: var(--mt-emerald); }
 	.mt-memuat { display: grid; place-items: center; min-height: 40vh; color: var(--mt-ink-soft); }
-	.mt-wrap { max-width: 480px; margin: 0 auto; padding: 24px 24px 40px; display: flex; flex-direction: column; }
+	/* The trailing padding clears the minimised halaqah bar (0px when absent),
+	   otherwise the translation runs underneath it. */
+	.mt-wrap { max-width: 480px; margin: 0 auto; padding: 24px 24px calc(40px + var(--halaqah-h, 0px)); display: flex; flex-direction: column; }
 	.mt-atas { display: flex; align-items: center; justify-content: space-between; }
 	.mt-eyebrow { letter-spacing: 0.22em; font-size: 11px; font-weight: 600; color: var(--mt-bronze); text-transform: uppercase; margin: 0; }
-	.mt-ikon { background: var(--mt-white); border: 1px solid var(--mt-mist); border-radius: 99px; width: 38px; height: 38px; font-size: 15px; cursor: pointer; color: var(--mt-ink-soft); box-shadow: 0 3px 10px rgba(13, 59, 51, 0.08); flex-shrink: 0; }
+	.mt-ikon { background: var(--mt-white); border: 1px solid var(--mt-mist); border-radius: 99px; width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center; font-size: 20px; line-height: 1; cursor: pointer; color: var(--mt-ink-soft); box-shadow: 0 3px 10px rgba(13, 59, 51, 0.08); flex-shrink: 0; }
+	/* Settings gear only (not the ✕ close buttons that also use .mt-ikon): a larger, more prominent tap target. */
+	.mt-ikon-lg { width: 44px; height: 44px; font-size: 24px; }
 	.mt-tajuk-arab { font-size: 54px; text-align: center; margin: 30px 0 4px; color: var(--mt-emerald-deep); line-height: 1.4; font-weight: 400; }
 	.mt-subtajuk { text-align: center; margin: 0; color: var(--mt-ink-soft); font-size: 14px; }
 	.mt-segmen { margin-top: 26px; display: flex; background: var(--mt-mist); border-radius: 99px; padding: 4px; }
@@ -804,10 +868,11 @@
 	.mt-cip-info { width: 30px; padding: 6px 0; color: var(--mt-bronze); font-weight: 700; }
 	.mt-titik { width: 10px; height: 10px; border-radius: 99px; background: var(--mt-mist); transition: background 0.25s; }
 	.mt-titik.isi { background: var(--mt-bronze); }
-	.mt-nav { position: fixed; bottom: 148px; left: 22px; right: 22px; display: flex; justify-content: space-between; pointer-events: none; z-index: 20; }
+	/* Lifted clear of the minimised halaqah bar, which sits just above the tab bar. */
+	.mt-nav { position: fixed; bottom: calc(148px + var(--halaqah-h, 0px)); left: 22px; right: 22px; display: flex; justify-content: space-between; pointer-events: none; z-index: 20; }
 	.mt-nav button { pointer-events: auto; background: var(--mt-white); border: 1px solid var(--mt-mist); border-radius: 99px; width: 48px; height: 48px; font-size: 18px; cursor: pointer; color: var(--mt-ink); box-shadow: 0 4px 14px rgba(13, 59, 51, 0.1); }
 	.mt-nav button:disabled { color: var(--mt-mist); cursor: default; }
-	.mt-tasbih-wrap { position: fixed; bottom: 96px; left: 0; right: 0; display: flex; justify-content: center; pointer-events: none; z-index: 20; }
+	.mt-tasbih-wrap { position: fixed; bottom: calc(96px + var(--halaqah-h, 0px)); left: 0; right: 0; display: flex; justify-content: center; pointer-events: none; z-index: 20; }
 	.mt-tasbih { pointer-events: auto; border-radius: 50%; border: none; position: relative; background: var(--mt-emerald); color: #fff; cursor: pointer; box-shadow: 0 14px 34px rgba(10, 71, 62, 0.4); }
 	.mt-tasbih.habis { background: var(--mt-bronze); }
 	.mt-tasbih.denyut { animation: mt-tap-pulse 0.28s ease; }

@@ -1,6 +1,59 @@
-# Single proxy target: the Rust API serves both /api and the SPA static build.
-# (Never split routes across handle blocks here — one reverse_proxy, no footguns.)
-cakna.qcxis.com {
+{$DOMAIN:cakna.qcxis.com} {
 	encode gzip
-	reverse_proxy api:8080
+
+	# REST API + SSO flow → Cakna prayer app backend
+	handle /api/* {
+		reverse_proxy api:8080
+	}
+
+	# Media uploads — served from the hub_uploads Docker volume via hub-server
+	handle /uploads/* {
+		reverse_proxy hub-server:3002
+	}
+
+	handle /auth/sso/* {
+		reverse_proxy api:8080
+	}
+
+	# Hub web app: public website, hub partition, auth login, admin, notifications
+	@hub {
+		path /
+		path /_hub/*
+		path /favicon.ico
+		path /hub
+		path /hub/*
+		path /auth/login
+		path /logout
+		path /notifications
+		path /notifications/*
+		path /core
+		path /core/*
+		path /society
+		path /society/*
+		path /about
+		path /about/*
+		path /csr-stories
+		path /csr-stories/*
+		path /setem
+		path /docs
+		path /docs/*
+	}
+	handle @hub {
+		reverse_proxy hub-svelte:3000
+	}
+
+	# LiveKit signalling — LIVEKIT_URL=wss://cakna.org so the client appends /rtc.
+	# Must sit before the catch-all or the request falls through to the Rust API.
+	handle /rtc* {
+		reverse_proxy 172.17.0.1:7880
+	}
+
+	# Everything else → prayer app SPA (/menu, /mathurat, /read/*, /halaqah/*, etc.)
+	handle {
+		reverse_proxy api:8080
+	}
+}
+
+{$LIVEKIT_DOMAIN:live.cakna.qcxis.com} {
+	reverse_proxy 172.17.0.1:7880
 }

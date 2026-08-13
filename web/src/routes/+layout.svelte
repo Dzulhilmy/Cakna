@@ -3,6 +3,7 @@
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { toast } from 'svelte-sonner';
 	import MiniPlayer from '$lib/components/chrome/MiniPlayer.svelte';
+	import HalaqahBar from '$lib/components/chrome/HalaqahBar.svelte';
 	import OnboardingOverlay from '$lib/components/chrome/OnboardingOverlay.svelte';
 	import { t } from '$lib/state/i18n.svelte';
 	import { auth } from '$lib/state/auth.svelte';
@@ -43,3 +44,5 @@
 {@render children()}
 
 <MiniPlayer />
+<!-- Minimised halaqah. Lives at the root so the call survives navigation. -->
+<HalaqahBar />

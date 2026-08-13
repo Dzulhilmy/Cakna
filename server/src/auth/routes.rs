@@ -42,7 +42,8 @@ pub async fn register(
     }
     let hash = password::hash(&creds.password)?;
     let id = match sqlx::query_scalar::<_, Uuid>(
-        "INSERT INTO users (email, password_hash) VALUES ($1::citext, $2) RETURNING id",
+        "INSERT INTO users (email, password_hash, login_method, last_login) \
+         VALUES ($1::citext, $2, 'email', now()) RETURNING id",
     )
     .bind(&email)
     .bind(&hash)
@@ -64,7 +65,9 @@ pub async fn login(
     Json(creds): Json<Credentials>,
 ) -> Result<Response, AppError> {
     let email = creds.email.trim().to_lowercase();
-    let row = sqlx::query_as::<_, (Uuid, String)>(
+    // password_hash is nullable since migration 0007: QCXIS SSO accounts have no
+    // local password and must not be loggable-into via this route.
+    let row = sqlx::query_as::<_, (Uuid, Option<String>)>(
         "SELECT id, password_hash FROM users WHERE email = $1::citext",
     )
     .bind(&email)
@@ -72,10 +75,18 @@ pub async fn login(
     .await?;
 
     // Verify against a dummy hash on miss so timing doesn't reveal account existence.
+    // An SSO-only account (password_hash IS NULL) takes the same path as a miss, so
+    // it is indistinguishable from "no such user" to an attacker.
+    //
+    // Caveat: a not-yet-migrated legacy account runs the scrypt branch instead of
+    // Argon2id, whose different KDF latency is a (weak) oracle that the account
+    // exists with a legacy password. It is self-healing — the first successful
+    // login below rehashes it to Argon2id — and accepted for this small, private
+    // deployment. Closing it fully would mean running both KDFs on every attempt.
     const DUMMY: &str = "$argon2id$v=19$m=19456,t=2,p=1$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     let ok = match &row {
-        Some((_, hash)) => password::verify(&creds.password, hash),
-        None => {
+        Some((_, Some(hash))) => password::verify(&creds.password, hash),
+        Some((_, None)) | None => {
             password::verify(&creds.password, DUMMY);
             false
         }
@@ -83,7 +94,29 @@ pub async fn login(
     if !ok {
         return Err(AppError::Unauthorized);
     }
-    let (id, _) = row.unwrap();
+    let (id, stored_hash) = row.unwrap();
+    // Transparent upgrade: a migrated cakna.org account still on a legacy scrypt
+    // hash is rehashed to Argon2id and re-stored on this, its first sign-in here.
+    // Best-effort — a failed rehash must not fail an otherwise valid login.
+    if stored_hash.as_deref().is_some_and(password::needs_rehash) {
+        match password::hash(&creds.password) {
+            Ok(new_hash) => {
+                if let Err(e) = sqlx::query("UPDATE users SET password_hash = $1 WHERE id = $2")
+                    .bind(&new_hash)
+                    .bind(id)
+                    .execute(&st.pool)
+                    .await
+                {
+                    tracing::warn!("password rehash for {id}: {e}");
+                }
+            }
+            Err(e) => tracing::warn!("password rehash (hashing) for {id}: {e}"),
+        }
+    }
+    sqlx::query("UPDATE users SET last_login = now() WHERE id = $1")
+        .bind(id)
+        .execute(&st.pool)
+        .await?;
     let token = session::create(&st, id).await?;
     Ok(with_session_cookie(&st, &token, StatusCode::OK, user_json(id, &email)))
 }
@@ -137,9 +170,14 @@ pub async fn me(
             .bind(user.id)
             .fetch_one(&st.pool)
             .await?;
+    let is_admin = st.is_admin(&user);
     Ok(Json(json!({
         "id": user.id,
         "email": user.email,
+        "name": user.name,
+        // Effective admin (flag OR ADMIN_EMAILS), so the client can show the
+        // admin entry point without a second round trip.
+        "is_admin": is_admin,
         "created_at": created.format(&time::format_description::well_known::Rfc3339)
             .map_err(|e| AppError::Internal(e.to_string()))?,
     })))

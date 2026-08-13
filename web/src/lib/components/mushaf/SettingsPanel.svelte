@@ -68,7 +68,7 @@
 		<Slider
 			type="single"
 			min={20}
-			max={40}
+			max={60}
 			step={2}
 			bind:value={fontValue}
 			onValueCommit={(v: number) => (s.value.fontSize = v)}
@@ -142,17 +142,6 @@
 				{/each}
 			</Select.Content>
 		</Select.Root>
-	</div>
-
-	<div class="flex items-center justify-between">
-		<Label>{t('flip')}</Label>
-		<Switch
-			checked={s.value.autoFlip}
-			onCheckedChange={(v: boolean) => {
-				s.value.autoFlip = v;
-				toast(t(v ? 't_flip_on' : 't_flip_off'));
-			}}
-		/>
 	</div>
 
 	<Separator />

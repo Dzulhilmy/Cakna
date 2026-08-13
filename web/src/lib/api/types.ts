@@ -71,6 +71,9 @@ export interface SearchResult {
 export interface User {
 	id: string;
 	email: string;
+	name?: string | null;
+	/** Effective admin: the `users.is_admin` flag OR the ADMIN_EMAILS allowlist. */
+	is_admin?: boolean;
 	created_at?: string;
 }
 

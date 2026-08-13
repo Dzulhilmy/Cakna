@@ -9,7 +9,7 @@ import 'data/mathurat_repo.dart';
 import 'data/quran_repo.dart';
 import 'data/timing_repo.dart';
 import 'data/user_db.dart';
-import 'screens/app_shell.dart';
+import 'screens/hub_shell.dart';
 import 'screens/onboarding_screen.dart';
 import 'services/location_service.dart';
 import 'services/notification_service.dart';
@@ -194,7 +194,7 @@ class _CaknaAppState extends State<CaknaApp> {
           themeMode: sel.$1,
           // required by the flutter_quill note editor
           localizationsDelegates: FlutterQuillLocalizations.localizationsDelegates,
-          home: sel.$2 ? const AppShell() : const OnboardingScreen(),
+          home: sel.$2 ? const HubShell() : const OnboardingScreen(),
         ),
       ),
     );

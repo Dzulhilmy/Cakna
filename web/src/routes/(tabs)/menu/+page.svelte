@@ -14,14 +14,15 @@
 		HandHeart,
 		Heart,
 		ListChecks,
-		Users,
 		ListOrdered,
 		LogIn,
 		LogOut,
 		Moon,
 		Percent,
+		Radio,
 		Search,
 		Settings,
+		ShieldCheck,
 		Star,
 		Sunrise,
 		Target,
@@ -44,7 +45,7 @@
 				{ href: '/zikir', label: t('mod_panelZikir'), icon: HandHeart },
 				{ href: '/mathurat', label: t('mathurat'), icon: Sunrise },
 				{ href: '/yasin', label: t('p_yasin'), icon: BookHeart },
-				{ href: '/halaqah', label: 'Halaqah', icon: Users },
+				{ href: '/halaqah', label: en ? 'Halaqah' : 'Halaqah', icon: Radio },
 				{ href: '/selawat', label: t('p_selawat'), icon: Heart }
 			]
 		},
@@ -106,6 +107,24 @@
 	{/each}
 
 	<section class="mb-5">
+		<!-- Admin entry point. The SPA has no other route to the dashboard, so
+		     without this an admin has to know the /admin URL by heart.
+		     `is_admin` from /api/auth/me is the effective check (flag OR allowlist);
+		     the server re-checks it on both /admin and every /api/admin/* call. -->
+		{#if auth.user?.is_admin}
+			<a
+				href="/hub/admin"
+				data-sveltekit-reload
+				class="mb-2 flex items-center gap-3 rounded-2xl border border-primary/30 bg-primary/5 px-4 py-3.5 transition-colors hover:bg-primary/10"
+			>
+				<ShieldCheck size={19} class="shrink-0 text-primary" />
+				<span class="flex-1 text-[13.5px] font-medium">
+					{en ? 'Admin panel' : 'Panel Admin'}
+				</span>
+				<ChevronRight size={17} class="text-muted-foreground" />
+			</a>
+		{/if}
+
 		<a
 			href="/settings"
 			class="flex items-center gap-3 rounded-2xl border bg-card px-4 py-3.5 transition-colors hover:bg-accent"

@@ -15,6 +15,9 @@ pub struct AppState {
     pub http: reqwest::Client,
     /// Live Al-Ma'thurat session: in-memory presence + broadcast (not persisted).
     pub mathurat: MathuratHub,
+    /// Cached OIDC discovery document. Fetched once on the first SSO request;
+    /// safe to hold because the issuer is fixed at boot.
+    pub oidc: Arc<tokio::sync::RwLock<Option<crate::auth::sso::Discovery>>>,
 }
 
 impl AppState {
@@ -26,7 +29,17 @@ impl AppState {
             solat_cache: SolatCache::default(),
             http: reqwest::Client::new(),
             mathurat: MathuratHub::default(),
+            oidc: Arc::new(tokio::sync::RwLock::new(None)),
         }
+    }
+}
+
+impl AppState {
+    /// Effective admin check: the `users.is_admin` flag OR the ADMIN_EMAILS allowlist.
+    /// Kept in one place so the `/api/auth/me` payload and the admin guard (Phase 4)
+    /// can never disagree about who counts as an admin.
+    pub fn is_admin(&self, user: &crate::auth::session::AuthUser) -> bool {
+        user.is_admin_flag || self.cfg.admin_emails.contains(&user.email.to_lowercase())
     }
 }
 

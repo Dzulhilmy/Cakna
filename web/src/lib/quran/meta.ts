@@ -70,7 +70,35 @@ export function toArabicNum(n: number): string {
 		.join('');
 }
 
+/**
+ * Per-edition audio bitrate on cdn.islamic.network. Several editions are not
+ * published at 128 kbps, so a hardcoded /128/ path 403s for them — which is
+ * exactly what happened to Abdul Basit (Murattal), one of the three qaris this
+ * app offers. Verified live against the CDN on 2026-07-08; mirrors the table in
+ * app/lib/data/reciters.dart.
+ */
+const QARI_BITRATE: Record<string, number> = {
+	'ar.alafasy': 128,
+	'ar.abdulsamad': 64,
+	'ar.abdulbasitmurattal': 64,
+	'ar.abdurrahmaansudais': 64,
+	'ar.shaatree': 128,
+	'ar.hanirifai': 64,
+	'ar.husary': 128,
+	'ar.minshawimujawwad': 64,
+	'ar.minshawi': 128,
+	'ar.saoodshuraym': 64
+};
+
 export function audioUrl(qari: string, g: number): string {
-	// CDN is 1-based, same as our global index — no offset.
-	return `https://cdn.islamic.network/quran/audio/128/${qari}/${g}.mp3`;
+	// Alafasy streams from Quran.com so the audio matches the word-by-word timings:
+	// verses.quran.com serves per-ayah files split from that same recitation.
+	if (qari === 'ar.alafasy') {
+		const { s, a } = gToSA(g);
+		const key = `${String(s).padStart(3, '0')}${String(a).padStart(3, '0')}`;
+		return `https://verses.quran.com/Alafasy/mp3/${key}.mp3`;
+	}
+	// Other reciters: alquran.cloud CDN (1-based, same as our global index).
+	const bitrate = QARI_BITRATE[qari] ?? 128;
+	return `https://cdn.islamic.network/quran/audio/${bitrate}/${qari}/${g}.mp3`;
 }

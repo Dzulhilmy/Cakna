@@ -4,7 +4,9 @@ import '../api/cakna_api.dart';
 import '../state/auth.dart';
 import '../state/hub_application_state.dart';
 import '../state/hub_content.dart';
+import '../widgets/hub_custom_sections.dart';
 import 'app_shell.dart';
+import 'hub_docs_screen.dart';
 import 'hub_profile_screen.dart';
 
 // ─────────────────────────────────────────────────────────────── core data ─
@@ -71,6 +73,7 @@ class HubHomeScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                 ],
                 const SizedBox(height: 8),
+                _buildImpactHeader(hub),
                 _buildAboutSection(hub),
                 const SizedBox(height: 24),
                 _buildCoresSection(context, hub),
@@ -78,8 +81,13 @@ class HubHomeScreen extends StatelessWidget {
                 _buildGallerySection(hub),
                 _buildPartnersSection(hub),
                 _buildCtaSection(hub),
+                HubCustomSections(
+                  sections: hub.mapList(['customSections', 'home']),
+                ),
                 const SizedBox(height: 24),
                 _buildMoreCard(context),
+                const SizedBox(height: 12),
+                _buildDocsCard(context, hub),
                 const SizedBox(height: 20),
                 _buildContactCard(hub),
                 const SizedBox(height: 20),
@@ -97,20 +105,22 @@ class HubHomeScreen extends StatelessWidget {
     final eyebrow = hub.s(['hero', 'eyebrow'], 'HOME CAKNA');
     final heading = hub.s(['hero', 'heading'], 'Building a\nCompassionate\nCommunity');
     final subtext = hub.s(['hero', 'subtext'], 'One Touch, a Thousand Meanings.');
-    return Container(
-      padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 18, 20, 52),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFFC0324E), Color(0xFF7A1530)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(28),
-          bottomRight: Radius.circular(28),
-        ),
-      ),
-      child: Column(
+    // Mirror web's migrateImgs(hero, 'bgImages'): fall back to legacy hero.image string.
+    final bgImages = hub.strList(['hero', 'bgImages']).isNotEmpty
+        ? hub.strList(['hero', 'bgImages'])
+        : (hub.s(['hero', 'image'], '').isNotEmpty ? [hub.s(['hero', 'image'], '')] : <String>[]);
+    final overlayStr = hub.s(['hero', 'overlay'], 'medium');
+    final overlayAlpha = overlayStr == 'light' ? 0.3 : overlayStr == 'dark' ? 0.65 : 0.45;
+
+    const borderRadius = BorderRadius.only(
+      bottomLeft: Radius.circular(28),
+      bottomRight: Radius.circular(28),
+    );
+
+    final padding =
+        EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 18, 20, 52);
+
+    final content = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -191,11 +201,93 @@ class HubHomeScreen extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ],
+      );
+
+    if (bgImages.isEmpty) {
+      return Container(
+        padding: padding,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFFC0324E), Color(0xFF7A1530)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: borderRadius,
+        ),
+        child: content,
+      );
+    }
+
+    return ClipRRect(
+      borderRadius: borderRadius,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.network(
+              CaknaApi.resolveHubUrl(bgImages[0]),
+              fit: BoxFit.cover,
+              errorBuilder: (_, e, st) => Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFFC0324E), Color(0xFF7A1530)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: Container(
+              color: Color.fromRGBO(0, 0, 0, overlayAlpha),
+            ),
+          ),
+          Padding(
+            padding: padding,
+            child: content,
+          ),
+        ],
       ),
     );
   }
 
   // ── impact stats ──────────────────────────────────────────────────────────
+
+  Widget _buildImpactHeader(HubContent hub) {
+    final eyebrow = hub.s(['impact', 'eyebrow'], '');
+    final title = hub.s(['impact', 'title'], '');
+    final subtitle = hub.s(['impact', 'subtitle'], '');
+    if (eyebrow.isEmpty && title.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (eyebrow.isNotEmpty)
+            Text(eyebrow.toUpperCase(),
+                style: const TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFFD94F6A),
+                    letterSpacing: 1.2)),
+          if (title.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(title,
+                style: const TextStyle(
+                    fontFamily: 'Lora',
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF111827))),
+          ],
+          if (subtitle.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(subtitle,
+                style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280))),
+          ],
+        ],
+      ),
+    );
+  }
 
   Widget _buildStatsCard(HubContent hub) {
     final raw = hub.mapList(['impact', 'stats']);
@@ -880,6 +972,7 @@ class HubHomeScreen extends StatelessWidget {
   Widget _buildGallerySection(HubContent hub) {
     final eyebrow = hub.s(['homeGallery', 'eyebrow'], 'In Action');
     final title = hub.s(['homeGallery', 'title'], 'Our Programs & Activities');
+    final subtitle = hub.s(['homeGallery', 'subtitle'], '');
     final images = hub.strList(['homeGallery', 'images']);
     if (images.isEmpty) return const SizedBox.shrink();
 
@@ -904,6 +997,12 @@ class HubHomeScreen extends StatelessWidget {
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                       color: Color(0xFF111827))),
+              if (subtitle.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text(subtitle,
+                    style: const TextStyle(
+                        fontSize: 13, color: Color(0xFF6B7280))),
+              ],
             ],
           ),
         ),
@@ -952,6 +1051,7 @@ class HubHomeScreen extends StatelessWidget {
   Widget _buildPartnersSection(HubContent hub) {
     final eyebrow = hub.s(['partners', 'eyebrow'], 'In Collaboration With');
     final title = hub.s(['partners', 'title'], 'Program Partners');
+    final subtitle = hub.s(['partners', 'subtitle'], '');
     final logos = hub.strList(['partners', 'logos']);
     if (logos.isEmpty) return const SizedBox.shrink();
 
@@ -976,6 +1076,12 @@ class HubHomeScreen extends StatelessWidget {
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                       color: Color(0xFF111827))),
+              if (subtitle.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text(subtitle,
+                    style: const TextStyle(
+                        fontSize: 13, color: Color(0xFF6B7280))),
+              ],
             ],
           ),
         ),
@@ -1127,12 +1233,75 @@ class HubHomeScreen extends StatelessWidget {
     );
   }
 
+  // ── docs shortcut ─────────────────────────────────────────────────────────
+
+  Widget _buildDocsCard(BuildContext context, HubContent hub) {
+    final docs = hub.site['docs'] is Map
+        ? hub.site['docs'] as Map<String, dynamic>
+        : <String, dynamic>{};
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: InkWell(
+        onTap: () => Navigator.push(
+            context, MaterialPageRoute(builder: (_) => HubDocsScreen(docs: docs))),
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: const Color(0xFFE5E7EB)),
+          ),
+          child: const Row(
+            children: [
+              SizedBox(
+                width: 48,
+                height: 48,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Color(0xFFFFF1F3),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                  child: Center(
+                    child: Icon(Icons.menu_book_outlined,
+                        color: Color(0xFFD94F6A), size: 24),
+                  ),
+                ),
+              ),
+              SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Polisi & Panduan',
+                        style: TextStyle(
+                            fontFamily: 'Lora',
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF111827))),
+                    SizedBox(height: 3),
+                    Text('Polisi, SOP, Garis Panduan & Manual',
+                        style: TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+                  ],
+                ),
+              ),
+              SizedBox(width: 8),
+              Icon(Icons.chevron_right_rounded,
+                  color: Color(0xFFD1D5DB), size: 22),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   // ── contact / footer ──────────────────────────────────────────────────────
 
   Widget _buildContactCard(HubContent hub) {
     final phone = hub.s(['footer', 'phone'], '011-2111 0110');
     final email = hub.s(['footer', 'email'], 'info@home.edu.my');
     final tagline = hub.s(['footer', 'tagline'], '');
+    final copyright = hub.s(['footer', 'copyright'], '');
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
@@ -1179,6 +1348,14 @@ class HubHomeScreen extends StatelessWidget {
                       fontSize: 13,
                       fontWeight: FontWeight.w600)),
             ]),
+            if (copyright.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              const Divider(color: Colors.white12),
+              const SizedBox(height: 6),
+              Text(copyright,
+                  style: const TextStyle(
+                      fontSize: 11, color: Colors.white24)),
+            ],
           ],
         ),
       ),

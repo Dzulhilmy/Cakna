@@ -9,6 +9,10 @@ pub enum AppError {
     NotFound,
     #[error("unauthorized")]
     Unauthorized,
+    /// Authenticated, but not permitted — e.g. a signed-in non-admin hitting /api/admin/*.
+    /// Distinct from Unauthorized so clients can tell "log in" from "you cannot".
+    #[error("forbidden")]
+    Forbidden,
     #[error("{0}")]
     BadRequest(String),
     #[error("{0}")]
@@ -26,6 +30,7 @@ impl IntoResponse for AppError {
         let (status, msg) = match &self {
             AppError::NotFound => (StatusCode::NOT_FOUND, self.to_string()),
             AppError::Unauthorized => (StatusCode::UNAUTHORIZED, self.to_string()),
+            AppError::Forbidden => (StatusCode::FORBIDDEN, self.to_string()),
             AppError::BadRequest(m) => (StatusCode::BAD_REQUEST, m.clone()),
             AppError::Conflict(m) => (StatusCode::CONFLICT, m.clone()),
             AppError::Db(e) => {
