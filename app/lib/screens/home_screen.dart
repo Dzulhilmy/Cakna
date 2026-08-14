@@ -12,6 +12,7 @@ import '../state/user_data.dart';
 import '../theme.dart';
 import '../utils/hijri.dart';
 import '../utils/prayers.dart';
+import 'halaqah_screen.dart';
 import 'mathurat_screen.dart';
 import 'prayer_times_screen.dart';
 import 'progress_screen.dart';
@@ -121,12 +122,23 @@ class _Header extends StatelessWidget {
                   ],
                 ),
               ),
-              _RoundIconButton(
-                icon: app.themeMode == ThemeMode.dark
-                    ? Icons.light_mode_outlined
-                    : Icons.dark_mode_outlined,
-                onTap: () => app.themeMode =
-                    app.themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _RoundIconButton(
+                    icon: Icons.headphones_outlined,
+                    onTap: () => Navigator.push(
+                        context, MaterialPageRoute(builder: (_) => const HalaqahScreen())),
+                  ),
+                  const SizedBox(width: 8),
+                  _RoundIconButton(
+                    icon: app.themeMode == ThemeMode.dark
+                        ? Icons.light_mode_outlined
+                        : Icons.dark_mode_outlined,
+                    onTap: () => app.themeMode =
+                        app.themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark,
+                  ),
+                ],
               ),
             ],
           ),

@@ -3,7 +3,7 @@
 
 	let { images = [], overlay = 'medium' }: { images?: string[]; overlay?: string } = $props();
 	let currentIndex = $state(0);
-	const alpha = $derived(overlay === 'light' ? 0.3 : overlay === 'dark' ? 0.65 : 0.45);
+	const alpha = $derived(overlay === 'light' ? 0.15 : overlay === 'dark' ? 0.5 : 0.3);
 
 	onMount(() => {
 		if (images.length <= 1) return;

@@ -8,6 +8,7 @@ import '../state/app_state.dart';
 import '../state/audio_service.dart';
 import '../state/user_data.dart';
 import '../theme.dart';
+import '../widgets/halaqah_bar.dart';
 import '../widgets/mini_player.dart';
 import '../widgets/mushaf_page.dart';
 import '../widgets/translation_page.dart';
@@ -291,6 +292,7 @@ class _ReaderScreenState extends State<ReaderScreen> with WidgetsBindingObserver
               },
             ),
           ),
+          const HalaqahBar(),
           const MiniPlayer(),
         ],
       ),

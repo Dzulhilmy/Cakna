@@ -58,6 +58,7 @@ dependencies:
   flutter_quill: ^11.4.2
   flutter_web_auth_2: ^5.0.3
   url_launcher: ^6.3.2
+  livekit_client: ^2.3.0
 
 # quill_native_bridge_windows 0.0.x pins win32 ^5 while geolocator/share_plus
 # need ^6 — and release AOT compiles even the Windows implementation, so the

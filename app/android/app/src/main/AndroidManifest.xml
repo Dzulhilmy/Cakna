@@ -13,6 +13,9 @@
     <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
     <!-- Re-schedule azan after a device reboot / app update -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <!-- Halaqah real-time audio (LiveKit / WebRTC) -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
     <!-- Background recitation playback with lock-screen controls -->
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>

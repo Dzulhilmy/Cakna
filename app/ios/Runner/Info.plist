@@ -5,6 +5,8 @@
 		<!-- Allow cleartext HTTP to a local dev backend (localhost:8787) during
 		     development. NSAllowsLocalNetworking only affects local/link-local
 		     hosts; ATS still applies to internet hosts. -->
+		<key>NSMicrophoneUsageDescription</key>
+		<string>Mikrofon diperlukan untuk menyertai sesi halaqah audio.</string>
 		<key>NSAppTransportSecurity</key>
 		<dict>
 			<key>NSAllowsLocalNetworking</key>

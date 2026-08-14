@@ -214,4 +214,56 @@ class CaknaApi {
   Future<void> hubMarkNoticeRead(String id) async {
     await http.post(Uri.parse('$base/hub/notices/$id/read'), headers: _headers());
   }
+
+  // ---- halaqah ----
+
+  Future<List<dynamic>> halaqahRooms() async {
+    final r = await http.get(Uri.parse('$base/halaqah/rooms'), headers: _headers());
+    if (r.statusCode != 200) _authFail(r);
+    return (jsonDecode(r.body) as List<dynamic>?) ?? [];
+  }
+
+  Future<Map<String, dynamic>> halaqahJoin(String slug) async {
+    final r = await http.post(
+      Uri.parse('$base/halaqah/rooms/$slug/join'),
+      headers: _headers(),
+    );
+    if (r.statusCode != 200) _authFail(r);
+    return jsonDecode(r.body) as Map<String, dynamic>;
+  }
+
+  Future<void> halaqahSetSpeaker(String slug, String? userId) async {
+    final r = await http.post(
+      Uri.parse('$base/halaqah/rooms/$slug/speaker'),
+      headers: _headers(json: true),
+      body: jsonEncode({'user_id': userId}),
+    );
+    if (r.statusCode != 200) _authFail(r);
+  }
+
+  Future<void> halaqahSetPage(String slug, int page) async {
+    final r = await http.post(
+      Uri.parse('$base/halaqah/rooms/$slug/page'),
+      headers: _headers(json: true),
+      body: jsonEncode({'page': page}),
+    );
+    if (r.statusCode != 200) _authFail(r);
+  }
+
+  Future<void> halaqahSetShare(String slug, Map<String, dynamic>? share) async {
+    final r = await http.post(
+      Uri.parse('$base/halaqah/rooms/$slug/share'),
+      headers: _headers(json: true),
+      body: jsonEncode(share ?? {}),
+    );
+    if (r.statusCode != 200) _authFail(r);
+  }
+
+  Future<void> halaqahClose(String slug) async {
+    final r = await http.post(
+      Uri.parse('$base/halaqah/rooms/$slug/close'),
+      headers: _headers(),
+    );
+    if (r.statusCode != 200) _authFail(r);
+  }
 }

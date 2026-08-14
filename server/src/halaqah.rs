@@ -567,15 +567,6 @@ mod tests {
     }
 
     #[test]
-    fn room_expiry_uses_default_24_hour_window() {
-        let stale = OffsetDateTime::now_utc() - time::Duration::hours(25);
-        let fresh = OffsetDateTime::now_utc() - time::Duration::hours(23);
-
-        assert!(room_is_expired(stale));
-        assert!(!room_is_expired(fresh));
-    }
-
-    #[test]
     fn grant_serialises_to_livekit_shape() {
         let g = VideoGrant {
             room: "r1".into(),

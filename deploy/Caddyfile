@@ -20,6 +20,7 @@
 		path /
 		path /_hub/*
 		path /favicon.ico
+		path /logo.jpg
 		path /hub
 		path /hub/*
 		path /auth/login

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/cakna_bottom_nav.dart';
+import '../widgets/halaqah_bar.dart';
 import 'collection_screen.dart';
 import 'home_screen.dart';
 import 'notes_screen.dart';
@@ -29,9 +30,15 @@ class _AppShellState extends State<AppShell> {
     ];
     return Scaffold(
       body: IndexedStack(index: _index, children: pages),
-      bottomNavigationBar: CaknaBottomNav(
-        index: _index,
-        onSelected: (i) => setState(() => _index = i),
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const HalaqahBar(),
+          CaknaBottomNav(
+            index: _index,
+            onSelected: (i) => setState(() => _index = i),
+          ),
+        ],
       ),
     );
   }

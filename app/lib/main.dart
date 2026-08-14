@@ -18,6 +18,7 @@ import 'state/app_state.dart';
 import 'state/audio_downloads.dart';
 import 'state/audio_service.dart';
 import 'state/auth.dart';
+import 'state/halaqah_service.dart';
 import 'state/mathurat_state.dart';
 import 'state/sync_service.dart';
 import 'state/user_data.dart';
@@ -180,6 +181,9 @@ class _CaknaAppState extends State<CaknaApp> {
         ChangeNotifierProvider.value(value: widget.mathuratState),
         ChangeNotifierProvider.value(value: auth),
         ChangeNotifierProvider.value(value: sync),
+        ChangeNotifierProvider<HalaqahService>(
+          create: (ctx) => HalaqahService(ctx.read<Auth>().api),
+        ),
       ],
       // Selector, not Consumer: AppState notifies on every page turn
       // (lastPage/recentReads) and the app shell must only rebuild when the
