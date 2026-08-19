@@ -105,7 +105,7 @@
 						{creating ? 'Membuka…' : 'Buka'}
 					</button>
 				</div>
-				<p class="hint">Anda menjadi hos. Sesi tiada had masa — ia tamat bila anda tutup.</p>
+				<p class="hint">Anda menjadi hos. Sesi ditutup secara automatik selepas 5 jam — atau lebih awal jika anda tutup sendiri.</p>
 			</form>
 		{/if}
 
