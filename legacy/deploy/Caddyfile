@@ -1,0 +1,19 @@
+# Cakna reverse proxy with automatic HTTPS.
+# Caddy reads {$DOMAIN} from its environment (docker-compose sets it from deploy/.env).
+# It will fetch & renew a Let's Encrypt certificate for $DOMAIN automatically,
+# provided ports 80 and 443 are reachable and DNS for $DOMAIN points here.
+{$DOMAIN} {
+	encode gzip
+	reverse_proxy app:3000
+}
+
+# ── IP-only / no-domain testing (HTTP, no TLS) ───────────────────────────────
+# No domain yet and you just want to hit the EC2 public IP over http://?
+# Comment out the block above, uncomment the one below, and set COOKIE_SECURE=0
+# in deploy/.env (Secure cookies are NOT sent over plain HTTP, so login/SSO
+# would otherwise silently fail). Then: docker compose up -d
+#
+# :80 {
+# 	encode gzip
+# 	reverse_proxy app:3000
+# }

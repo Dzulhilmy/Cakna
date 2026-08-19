@@ -1,0 +1,233 @@
+
+===== host =====
+ip-172-31-41-11
+Linux ip-172-31-41-11 7.0.0-1006-aws #6-Ubuntu SMP PREEMPT Tue May 26 12:04:34 UTC 2026 x86_64 GNU/Linux
+
+ 07:33:16 up 1 day, 17:48,  1 user,  load average: 0.01, 0.05, 0.01
+public IP (as the host sees it): 56.69.195.145
+
+===== who is listening on 80 / 443 / 7880 / 5432 =====
+tcp   LISTEN 0      4096             0.0.0.0:80        0.0.0.0:*    users:(("docker-proxy",pid=19860,fd=8))                
+tcp   LISTEN 0      4096             0.0.0.0:443       0.0.0.0:*    users:(("docker-proxy",pid=19882,fd=8))                
+tcp   LISTEN 0      4096                [::]:80           [::]:*    users:(("docker-proxy",pid=19868,fd=8))                
+tcp   LISTEN 0      4096                [::]:443          [::]:*    users:(("docker-proxy",pid=19887,fd=8))                
+
+===== caddy =====
+(no caddy binary on PATH)
+inactive
+caddy service: not active/not a service
+
+===== docker =====
+Docker version 29.6.2, build dfc4efb
+(using: sudo docker)
+--- running containers ---
+cakna-app-1	cakna-app	3000/tcp	Up 39 hours
+cakna-caddy-1	caddy:2	0.0.0.0:80->80/tcp, [::]:80->80/tcp, 0.0.0.0:443->443/tcp, [::]:443->443/tcp, 443/udp, 2019/tcp	Up 41 hours
+cakna-postgres-1	postgres:16	5432/tcp	Up 42 hours (healthy)
+--- all containers ---
+cakna-app-1	cakna-app	Up 39 hours
+cakna-caddy-1	caddy:2	Up 41 hours
+cakna-postgres-1	postgres:16	Up 42 hours (healthy)
+--- compose projects ---
+NAME                STATUS              CONFIG FILES
+cakna               running(3)          /home/ubuntu/cakna/deploy/docker-compose.yml
+--- volumes ---
+DRIVER    VOLUME NAME
+local     cakna_caddy_config
+local     cakna_caddy_data
+local     cakna_pgdata
+--- images ---
+cakna-app:latest	399MB
+postgres:16	642MB
+caddy:2	88.7MB
+--- docker disk usage ---
+TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE
+Images          3         3         1.13GB    0B (0%)
+Containers      3         3         417.8kB   0B (0%)
+Local Volumes   3         3         73.73MB   0B (0%)
+Build Cache     47        0         484.7MB   84.45MB
+--- caddy container config (if any) ---
+### cakna-caddy-1 ###
+cakna.org {
+	encode gzip
+	reverse_proxy app:3000
+}
+
+===== how the legacy app runs =====
+(no matching systemd service)
+(no pm2)
+
+===== postgres =====
+(no psql client)
+inactive
+postgresql service: not active (may be in docker)
+(cannot list host databases — likely dockerised or different auth)
+
+===== app directories =====
+--- /home/ubuntu/cakna ---
+total 48
+drwxrwxr-x 6 ubuntu ubuntu 4096 Jul 22 14:00 .
+drwxr-x--- 5 ubuntu ubuntu 4096 Jul 24 07:26 ..
+-rw-r--r-- 1 ubuntu ubuntu  163 Jul 22 13:24 ._.dockerignore
+-rwxr-xr-x 1 ubuntu ubuntu  178 Jul 22 08:38 ._build
+-rwxr-xr-x 1 ubuntu ubuntu  163 Jul 22 13:25 ._deploy
+-rwxr-xr-x 1 ubuntu ubuntu  178 Jul  3 10:59 ._pwa
+-rwxr-xr-x 1 ubuntu ubuntu  163 Jul 22 13:25 ._server
+-rw-r--r-- 1 ubuntu ubuntu  985 Jul 22 13:24 .dockerignore
+drwxr-xr-x 3 ubuntu ubuntu 4096 Jul 22 08:38 build
+drwxr-xr-x 2 ubuntu ubuntu 4096 Jul 22 15:09 deploy
+drwxr-xr-x 3 ubuntu ubuntu 4096 Jul  3 10:59 pwa
+drwxr-xr-x 6 ubuntu ubuntu 4096 Jul 22 13:25 server
+
+===== env files present (KEY NAMES ONLY — no values) =====
+--- /home/ubuntu/cakna/deploy/.env ---
+POSTGRES_PASSWORD=<redacted>
+ADMIN_EMAILS=<redacted>
+COOKIE_SECURE=<redacted>
+SEED_DEMO=<redacted>
+QCXIS_ISSUER=<redacted>
+QCXIS_CLIENT_ID=<redacted>
+QCXIS_CLIENT_SECRET=<redacted>
+QCXIS_REDIRECT_URI=<redacted>
+DOMAIN=<redacted>
+
+===== legacy compose / deploy dir =====
+--- /home/ubuntu/cakna/deploy ---
+total 76
+drwxr-xr-x 2 ubuntu ubuntu  4096 Jul 22 15:09 .
+drwxrwxr-x 6 ubuntu ubuntu  4096 Jul 22 14:00 ..
+-rw-r--r-- 1 ubuntu ubuntu   163 Jul 22 13:24 ._.env.example
+-rw-r--r-- 1 ubuntu ubuntu   163 Jul 22 13:24 ._Caddyfile
+-rw-r--r-- 1 ubuntu ubuntu   163 Jul 22 13:25 ._DEPLOY-EC2.md
+-rw-r--r-- 1 ubuntu ubuntu   163 Jul 22 13:24 ._Dockerfile
+-rw-r--r-- 1 ubuntu ubuntu   163 Jul 22 13:24 ._docker-compose.yml
+-rwxr-xr-x 1 ubuntu ubuntu   163 Jul 22 13:24 ._entrypoint.sh
+-rw-rw-r-- 1 ubuntu ubuntu   273 Jul 22 15:09 .env
+-rw-r--r-- 1 ubuntu ubuntu  2607 Jul 22 13:24 .env.example
+-rw-r--r-- 1 ubuntu ubuntu    51 Jul 22 14:36 Caddyfile
+-rw-r--r-- 1 ubuntu ubuntu    45 Jul 22 14:34 Caddyfile.ip.bak
+-rw-r--r-- 1 ubuntu ubuntu 10669 Jul 22 13:25 DEPLOY-EC2.md
+-rw-r--r-- 1 ubuntu ubuntu  1984 Jul 22 13:24 Dockerfile
+-rw-r--r-- 1 ubuntu ubuntu  2715 Jul 22 13:24 docker-compose.yml
+-rwxr-xr-x 1 ubuntu ubuntu  4293 Jul 22 13:24 entrypoint.sh
+### /home/ubuntu/cakna/deploy/docker-compose.yml ###
+# ─────────────────────────────────────────────────────────────────────────────
+# Cakna — single-instance production stack: PostgreSQL + Node app + Caddy (TLS).
+# Run from this directory:   docker compose up -d --build
+# Values come from ./.env  (copy .env.example -> .env and fill it in).
+# ─────────────────────────────────────────────────────────────────────────────
+name: cakna
+
+services:
+  # PostgreSQL 16 — data persists in the named volume `pgdata`.
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: cakna
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in deploy/.env}
+      POSTGRES_DB: cakna
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cakna -d cakna"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # The Node app. Built from the repo root (context: ..) so the Dockerfile can
+  # COPY server/ build/ pwa/. Not published to the host — Caddy fronts it.
+  app:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    env_file:
+      - .env                       # QCXIS_*, ADMIN_EMAILS, SEED_DEMO, COOKIE_SECURE, ...
+    environment:
+      # DB host = the `postgres` service name on the compose network.
+      DATABASE_URL: postgres://cakna:${POSTGRES_PASSWORD}@postgres:5432/cakna
+      # Secure cookies: 1 for HTTPS (default). Override to 0 in .env ONLY for
+      # the HTTP/IP-only Caddy ":80" testing mode.
+      COOKIE_SECURE: "${COOKIE_SECURE:-1}"
+      # Internal port Caddy proxies to (keep 3000 to match the Caddyfile).
+      PORT: "3000"
+    expose:
+      - "3000"                     # internal only; NOT published to the host
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Caddy — terminates TLS and reverse-proxies to the app. Auto-provisions a
+  # Let's Encrypt certificate for $DOMAIN (needs ports 80+443 reachable + DNS).
+  caddy:
+    image: caddy:2
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN in deploy/.env}   # used by {$DOMAIN} in the Caddyfile
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data           # persists issued certificates
+      - caddy_config:/config
+### /home/ubuntu/cakna/deploy/Caddyfile ###
+cakna.org {
+	encode gzip
+	reverse_proxy app:3000
+}
+
+===== disk + memory (LiveKit needs headroom) =====
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/root       6.7G  6.6G  208K 100% /
+
+               total        used        free      shared  buff/cache   available
+Mem:           908Mi       477Mi       105Mi        31Mi       486Mi       431Mi
+Swap:          2.0Gi       147Mi       1.9Gi
+--- biggest consumers of / ---
+280K	/etc/vmware-tools
+568K	/etc/ssl
+624K	/etc/ssh
+984K	/var/backups
+1.4M	/etc/apparmor.d
+6.3M	/etc
+13M	/home
+13M	/home/ubuntu
+20M	/var/log
+38M	/usr/sbin
+131M	/usr/libexec
+201M	/usr/src
+308M	/usr/share
+432M	/usr/bin
+544M	/var/cache
+1.3G	/usr/lib
+1.7G	/var/lib
+2.3G	/var
+2.4G	/usr
+6.6G	/
+
+===== firewall (local) =====
+Status: inactive
+-P INPUT ACCEPT
+-P FORWARD DROP
+-P OUTPUT ACCEPT
+-N DOCKER
+-N DOCKER-BRIDGE
+-N DOCKER-CT
+-N DOCKER-FORWARD
+-N DOCKER-INTERNAL
+-N DOCKER-USER
+-A FORWARD -j DOCKER-USER
+-A FORWARD -j DOCKER-FORWARD
+-A DOCKER -d 172.18.0.4/32 ! -i br-1f560ce61ad7 -o br-1f560ce61ad7 -p tcp -m tcp --dport 443 -j ACCEPT
+-A DOCKER -d 172.18.0.4/32 ! -i br-1f560ce61ad7 -o br-1f560ce61ad7 -p tcp -m tcp --dport 80 -j ACCEPT
+-A DOCKER ! -i docker0 -o docker0 -j DROP
+-A DOCKER ! -i br-1f560ce61ad7 -o br-1f560ce61ad7 -j DROP
+-A DOCKER-BRIDGE -o docker0 -j DOCKER
+-A DOCKER-BRIDGE -o br-1f560ce61ad7 -j DOCKER
+-A DOCKER-CT -o docker0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A DOCKER-CT -o br-1f560ce61ad7 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A DOCKER-FORWARD -j DOCKER-CT
+
+===== DONE =====
+Send this output back. It contains no secrets or database contents.

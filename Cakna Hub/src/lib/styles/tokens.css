@@ -1,0 +1,44 @@
+/*
+ * Design tokens — source of truth for the Cakna visual system.
+ * The @theme block redefines the Tailwind rose-* ramp to match the
+ * brand pastels (200 = Pastel Pink #FFD1DC, 300 = Orchid Pink #F2BDCD).
+ * All rose-* utilities across the app pick up these values automatically.
+ */
+@theme {
+  --color-rose-50:  #fff5f8;
+  --color-rose-100: #ffe6ec;
+  --color-rose-200: #ffd1dc;
+  --color-rose-300: #f2bdcd;
+  --color-rose-400: #e38fa9;
+  --color-rose-500: #d06a8e;
+  --color-rose-600: #b34a6e;
+  --color-rose-700: #8e3557;
+  --color-rose-800: #6e2942;
+  --color-rose-900: #54202f;
+  --color-rose-950: #3a1520;
+}
+
+:root {
+  /* Semantic tokens — retheme the whole UI from here */
+  --background:   #fafafa;   /* zinc-50  */
+  --surface:      #ffffff;
+  --border:       #e4e4e7;   /* zinc-200 */
+  --foreground:   #18181b;   /* zinc-900 */
+  --muted:        #71717a;   /* zinc-500 */
+  --muted-foreground: #71717a;
+  --accent:       #b34a6e;   /* rose-600 */
+  --accent-soft:  #ffe6ec;   /* rose-100 */
+  --primary:      #22c55e;   /* emerald-500 */
+
+  /* Mushaf / Quran reader tokens */
+  --card:          #fffdf7;
+  --card-foreground: #22312b;
+  --font-arabic:   'Amiri Quran', 'Scheherazade New', serif;
+  --arabic-size:   26px;
+  --gold:          #c7a24b;
+  --gold-soft:     #e3cd96;
+  --playing:       #eaf4ec;
+  --hl-1:          rgba(240, 200, 60, 0.3);
+  --hl-2:          rgba(60, 180, 110, 0.25);
+  --hl-3:          rgba(80, 150, 230, 0.25);
+}

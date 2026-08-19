@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cakna · Panel Admin — Kemajuan Al-Ma'thurat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --emerald-deep:#0B3D2E;
+    --emerald:#155B44;
+    --emerald-lt:#1F7355;
+    --gold:#C7A24B;
+    --gold-dk:#B0873A;
+    --gold-soft:#E3CD96;
+    --bg:#F7F3E8;
+    --surface:#FFFDF7;
+    --surface-2:#FBF7EC;
+    --text:#22312B;
+    --text-soft:#5C6B63;
+    --border:#E4DCC8;
+    --border-2:#EFE8D6;
+    --amber:#C67A2E;
+    --shadow-sm:0 1px 2px rgba(11,61,46,.05), 0 6px 18px rgba(11,61,46,.05);
+    --shadow-md:0 2px 6px rgba(11,61,46,.06), 0 18px 40px rgba(11,61,46,.09);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:'Figtree',system-ui,-apple-system,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    font-size:14px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  ::selection{background:var(--gold-soft);color:var(--emerald-deep)}
+  h1,h2,h3,h4{font-weight:400;line-height:1.2}
+  .serif{font-family:'Marcellus',serif;font-weight:400}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  input{font-family:inherit}
+  svg{display:block}
+  a{color:inherit;text-decoration:none}
+
+  /* ============ APP SHELL ============ */
+  .app{display:grid;grid-template-columns:256px 1fr;min-height:100vh}
+
+  /* ============ SIDEBAR ============ */
+  .sidebar{
+    background:
+      radial-gradient(120% 70% at 100% 0%, rgba(199,162,75,.10), transparent 55%),
+      linear-gradient(180deg,#0B3D2E 0%,#0A3628 100%);
+    color:#EDE9DB;
+    display:flex;flex-direction:column;
+    position:sticky;top:0;height:100vh;
+    border-right:1px solid rgba(199,162,75,.16);
+  }
+  .brand{
+    display:flex;align-items:center;gap:12px;
+    padding:22px 20px 20px;
+    border-bottom:1px solid rgba(255,255,255,.07);
+  }
+  .brand-mark{
+    width:44px;height:44px;flex:none;display:grid;place-items:center;
+    color:var(--gold);
+    background:rgba(199,162,75,.08);
+    border:1px solid rgba(199,162,75,.28);
+    border-radius:13px;
+  }
+  .brand-mark svg{width:30px;height:30px}
+  .brand h1{font-family:'Marcellus',serif;font-size:21px;letter-spacing:.05em;color:#FBF7EC}
+  .brand p{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-soft);margin-top:2px}
+
+  .nav{flex:1;overflow-y:auto;padding:16px 12px}
+  .nav-label{
+    font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+    color:rgba(227,205,150,.62);
+    padding:12px 12px 8px;
+  }
+  .nav-item{
+    display:flex;align-items:center;gap:12px;width:100%;
+    padding:11px 12px;border-radius:11px;margin-bottom:2px;
+    color:rgba(237,233,219,.78);font-size:14px;font-weight:500;
+    letter-spacing:.01em;position:relative;
+    transition:background .18s,color .18s;
+  }
+  .nav-item svg{width:19px;height:19px;flex:none;opacity:.9}
+  .nav-item:hover{background:rgba(255,255,255,.055);color:#FBF7EC}
+  .nav-item.active{
+    background:linear-gradient(90deg,rgba(199,162,75,.20),rgba(199,162,75,.05));
+    color:#FBF7EC;
+  }
+  .nav-item.active::before{
+    content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;
+    background:var(--gold);border-radius:0 3px 3px 0;
+  }
+  .nav-item .badge{
+    margin-left:auto;font-size:10.5px;font-weight:700;
+    background:var(--gold);color:var(--emerald-deep);
+    border-radius:20px;padding:1px 8px;letter-spacing:.02em;
+  }
+  .nav-item.active .badge{background:var(--gold)}
+
+  .side-foot{
+    padding:14px 12px;border-top:1px solid rgba(255,255,255,.07);
+  }
+  .admin-card{
+    display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:12px;
+    background:rgba(255,255,255,.04);
+  }
+  .admin-card .av{
+    width:38px;height:38px;border-radius:11px;flex:none;
+    background:linear-gradient(135deg,var(--gold),var(--gold-dk));
+    color:var(--emerald-deep);display:grid;place-items:center;
+    font-family:'Marcellus',serif;font-size:16px;
+  }
+  .admin-card .nm{font-size:13px;font-weight:600;color:#FBF7EC}
+  .admin-card .rl{font-size:11px;color:rgba(227,205,150,.7)}
+  .admin-card .cog{margin-left:auto;color:rgba(237,233,219,.5)}
+
+  /* ============ MAIN ============ */
+  .main{min-width:0;display:flex;flex-direction:column}
+
+  .topbar{
+    display:flex;align-items:center;gap:20px;
+    padding:22px 34px 18px;
+    position:sticky;top:0;z-index:20;
+    background:linear-gradient(180deg,var(--bg) 78%,rgba(247,243,232,0));
+  }
+  .topbar .tt{flex:1;min-width:0}
+  .topbar h2{font-family:'Marcellus',serif;font-size:27px;letter-spacing:.01em}
+  .topbar .sub{color:var(--text-soft);font-size:13.5px;margin-top:3px}
+  .searchbox{
+    display:flex;align-items:center;gap:9px;
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:12px;padding:0 13px;height:42px;width:250px;
+    box-shadow:var(--shadow-sm);
+  }
+  .searchbox svg{width:17px;height:17px;color:var(--text-soft);flex:none}
+  .searchbox input{border:none;background:none;outline:none;font-size:13.5px;width:100%;color:var(--text)}
+  .searchbox input::placeholder{color:var(--text-soft)}
+  .date-pill{
+    display:flex;align-items:center;gap:8px;height:42px;padding:0 15px;
+    background:var(--surface);border:1px solid var(--border);border-radius:12px;
+    font-size:13px;font-weight:500;color:var(--text-soft);white-space:nowrap;
+    box-shadow:var(--shadow-sm);
+  }
+  .date-pill svg{width:16px;height:16px;color:var(--gold-dk)}
+  .icon-btn{
+    width:42px;height:42px;flex:none;display:grid;place-items:center;
+    background:var(--surface);border:1px solid var(--border);border-radius:12px;
+    color:var(--text-soft);box-shadow:var(--shadow-sm);position:relative;
+  }
+  .icon-btn svg{width:18px;height:18px}
+  .icon-btn .dot{position:absolute;top:10px;right:11px;width:7px;height:7px;border-radius:50%;background:var(--gold);border:1.5px solid var(--surface)}
+
+  .content{padding:6px 34px 40px;display:flex;flex-direction:column;gap:22px}
+
+  /* ============ KPI CARDS ============ */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .kpi{
+    background:var(--surface);border:1px solid var(--border);border-radius:17px;
+    padding:19px 20px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
+  }
+  .kpi::after{
+    content:"";position:absolute;right:-30px;top:-30px;width:110px;height:110px;border-radius:50%;
+    background:radial-gradient(circle,rgba(199,162,75,.07),transparent 70%);
+  }
+  .kpi .k-top{display:flex;align-items:center;gap:11px;margin-bottom:15px}
+  .kpi .k-ic{
+    width:40px;height:40px;border-radius:12px;flex:none;display:grid;place-items:center;
+    background:linear-gradient(135deg,rgba(21,91,68,.10),rgba(21,91,68,.04));
+    border:1px solid rgba(21,91,68,.14);color:var(--emerald);
+  }
+  .kpi .k-ic svg{width:20px;height:20px}
+  .kpi.gold .k-ic{
+    background:linear-gradient(135deg,rgba(199,162,75,.16),rgba(199,162,75,.05));
+    border-color:rgba(199,162,75,.32);color:var(--gold-dk);
+  }
+  .kpi .k-label{font-size:12px;color:var(--text-soft);letter-spacing:.02em;font-weight:500}
+  .kpi .k-num{font-family:'Marcellus',serif;font-size:31px;line-height:1;letter-spacing:.01em}
+  .kpi .k-foot{display:flex;align-items:center;gap:8px;margin-top:11px;font-size:12px;color:var(--text-soft)}
+  .delta{display:inline-flex;align-items:center;gap:3px;font-weight:700;font-size:11.5px;padding:2px 7px;border-radius:20px}
+  .delta svg{width:11px;height:11px}
+  .delta.up{color:#1c7a54;background:rgba(31,115,85,.11)}
+  .delta.flat{color:var(--text-soft);background:rgba(92,107,99,.09)}
+
+  /* ============ GRID ============ */
+  .grid{display:grid;grid-template-columns:1fr 340px;gap:22px;align-items:start}
+
+  .card{
+    background:var(--surface);border:1px solid var(--border);border-radius:18px;
+    box-shadow:var(--shadow-sm);overflow:hidden;
+  }
+  .card-head{
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    padding:18px 20px;border-bottom:1px solid var(--border-2);
+  }
+  .card-head h3{font-family:'Marcellus',serif;font-size:18px}
+  .card-head .ch-sub{font-size:12.5px;color:var(--text-soft);margin-top:2px}
+  .chips{display:flex;gap:7px;margin-left:auto;flex-wrap:wrap}
+  .chip{
+    font-size:12px;font-weight:600;padding:6px 13px;border-radius:20px;
+    border:1px solid var(--border);color:var(--text-soft);background:var(--surface);
+    transition:.15s;
+  }
+  .chip.on{background:var(--emerald);border-color:var(--emerald);color:#fff}
+  .chip:hover:not(.on){border-color:var(--gold);color:var(--gold-dk)}
+
+  /* ============ USERS TABLE ============ */
+  .table-scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;min-width:720px}
+  thead th{
+    text-align:left;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+    color:var(--text-soft);font-weight:700;padding:13px 18px;
+    background:var(--surface-2);border-bottom:1px solid var(--border-2);white-space:nowrap;
+  }
+  thead th:last-child{text-align:center;width:44px}
+  .u-row{border-bottom:1px solid var(--border-2);transition:background .14s}
+  .u-row td{padding:13px 18px;vertical-align:middle}
+  .u-row.clickable{cursor:pointer}
+  .u-row.clickable:hover{background:var(--surface-2)}
+  .u-row.selected{background:linear-gradient(90deg,rgba(199,162,75,.09),rgba(199,162,75,.02))}
+  .u-row.selected td:first-child{box-shadow:inset 3px 0 0 var(--gold)}
+
+  .u-cell{display:flex;align-items:center;gap:12px;min-width:180px}
+  .av{
+    width:40px;height:40px;border-radius:12px;flex:none;display:grid;place-items:center;
+    font-family:'Marcellus',serif;font-size:16px;color:#FBF7EC;letter-spacing:.02em;
+  }
+  .u-name{font-size:14px;font-weight:600;color:var(--text);line-height:1.25}
+  .u-mail{font-size:12px;color:var(--text-soft)}
+
+  .badge-login{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:8px;white-space:nowrap;
+  }
+  .badge-login svg{width:13px;height:13px}
+  .badge-login.sso{background:rgba(21,91,68,.10);color:var(--emerald);border:1px solid rgba(21,91,68,.18)}
+  .badge-login.email{background:rgba(92,107,99,.08);color:var(--text-soft);border:1px solid var(--border)}
+
+  .last-active{font-size:13px;color:var(--text);white-space:nowrap}
+  .last-active .lo{display:block;font-size:11px;color:var(--text-soft)}
+  .la-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  .la-dot.on{background:#2aa06e;box-shadow:0 0 0 3px rgba(42,160,110,.16)}
+  .la-dot.off{background:var(--border)}
+
+  .prog-cell{min-width:150px}
+  .prog-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+  .prog-top .pv{font-size:13px;font-weight:700;color:var(--text)}
+  .prog-top .pl{font-size:10.5px;color:var(--text-soft)}
+  .bar{height:6px;border-radius:4px;background:var(--border);overflow:hidden}
+  .bar > i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--emerald),var(--gold))}
+
+  .streak-cell{white-space:nowrap}
+  .streak{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--text)}
+  .streak svg{width:15px;height:15px;color:var(--gold-dk)}
+  .streak.zero{color:var(--text-soft)}
+  .streak.zero svg{color:var(--border)}
+  .streak small{font-weight:500;color:var(--text-soft);font-size:11px}
+
+  .chev{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;color:var(--text-soft);margin:0 auto;transition:.2s}
+  .chev svg{width:16px;height:16px}
+  .u-row.selected .chev{transform:rotate(180deg);color:var(--gold-dk);background:rgba(199,162,75,.12)}
+
+  /* ============ DETAIL PANEL ============ */
+  .detail-row > td{padding:0;background:var(--surface-2)}
+  .detail-wrap{display:none;padding:6px 20px 24px}
+  .detail-row.open .detail-wrap{display:block;animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+  .detail-head{display:flex;align-items:center;gap:11px;padding:14px 2px 16px}
+  .detail-head .dh-star{color:var(--gold)}
+  .detail-head .dh-star svg{width:20px;height:20px}
+  .detail-head h4{font-family:'Marcellus',serif;font-size:17px}
+  .detail-head .dh-sub{font-size:12px;color:var(--text-soft)}
+  .detail-head .dh-tag{
+    margin-left:auto;font-size:11px;font-weight:600;color:var(--emerald);
+    background:rgba(21,91,68,.09);border:1px solid rgba(21,91,68,.16);
+    padding:5px 11px;border-radius:20px;
+  }
+
+  .mode-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}
+  .mode-card{
+    background:var(--surface);border:1px solid var(--border);border-radius:15px;
+    padding:15px 16px 14px;display:flex;flex-direction:column;gap:12px;min-width:0;
+  }
+  .mode-card .mc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+  .mode-card .mc-mode{font-size:13.5px;font-weight:700;color:var(--text);line-height:1.2}
+  .mode-card .mc-sess{font-size:11.5px;color:var(--text-soft);margin-top:1px}
+  .mode-card .mc-items{
+    font-size:10px;font-weight:700;letter-spacing:.03em;color:var(--gold-dk);
+    background:rgba(199,162,75,.12);border-radius:6px;padding:3px 6px;white-space:nowrap;
+  }
+  .ring-wrap{display:flex;align-items:center;gap:13px}
+  .ring{position:relative;width:64px;height:64px;flex:none}
+  .ring svg{transform:rotate(-90deg)}
+  .ring .rv{
+    position:absolute;inset:0;display:grid;place-items:center;
+    font-family:'Marcellus',serif;font-size:17px;color:var(--text);
+  }
+  .ring .rv small{font-size:9px}
+  .mc-stats{display:flex;flex-direction:column;gap:5px;font-size:11.5px;flex:1;min-width:0}
+  .mc-stats .st{display:flex;justify-content:space-between;gap:6px}
+  .mc-stats .st span{color:var(--text-soft)}
+  .mc-stats .st b{color:var(--text);font-weight:700;font-variant-numeric:tabular-nums}
+  .status{font-size:11px;font-weight:700;padding:5px 0;border-radius:8px;text-align:center;letter-spacing:.02em}
+  .status.done{color:var(--emerald);background:rgba(21,91,68,.10)}
+  .status.prog{color:var(--gold-dk);background:rgba(199,162,75,.14)}
+  .status.idle{color:var(--text-soft);background:rgba(92,107,99,.08)}
+  .status.stall{color:var(--amber);background:rgba(198,122,46,.11)}
+
+  .detail-lower{display:grid;grid-template-columns:1fr 1.35fr;gap:13px;margin-top:13px}
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:15px;padding:16px}
+  .panel .p-lab{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-soft);font-weight:700;margin-bottom:12px}
+
+  .streak-big{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .streak-big .sb-flame{
+    width:46px;height:46px;border-radius:13px;flex:none;display:grid;place-items:center;
+    background:linear-gradient(135deg,rgba(199,162,75,.20),rgba(199,162,75,.06));
+    border:1px solid rgba(199,162,75,.3);color:var(--gold-dk);
+  }
+  .streak-big .sb-flame svg{width:24px;height:24px}
+  .streak-big .sb-n{font-family:'Marcellus',serif;font-size:30px;line-height:1}
+  .streak-big .sb-u{font-size:12px;color:var(--text-soft)}
+  .dots{display:flex;gap:5px;flex-wrap:wrap}
+  .dots i{width:17px;height:17px;border-radius:6px;flex:none;background:var(--border);position:relative}
+  .dots i.on{background:linear-gradient(135deg,var(--emerald),var(--emerald-lt))}
+  .dots i.today{box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--gold)}
+  .dots-cap{display:flex;justify-content:space-between;font-size:10.5px;color:var(--text-soft);margin-top:9px}
+
+  .meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+  .meta{padding:11px 13px;background:var(--surface-2);border:1px solid var(--border-2);border-radius:12px}
+  .meta .m-l{font-size:11px;color:var(--text-soft);display:flex;align-items:center;gap:6px}
+  .meta .m-l svg{width:13px;height:13px;color:var(--gold-dk)}
+  .meta .m-v{font-family:'Marcellus',serif;font-size:19px;margin-top:4px}
+  .meta .m-v small{font-family:'Figtree';font-size:12px;color:var(--text-soft);font-weight:500}
+
+  /* ============ RIGHT RAIL ============ */
+  .rail{display:flex;flex-direction:column;gap:22px}
+  .rail .card-head{padding:16px 18px}
+
+  .chart-body{padding:18px}
+  .bars{display:flex;align-items:flex-end;justify-content:space-between;gap:9px;height:132px}
+  .bcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;height:100%;justify-content:flex-end}
+  .bstack{width:60%;max-width:26px;display:flex;flex-direction:column-reverse;border-radius:5px;overflow:hidden;box-shadow:var(--shadow-sm)}
+  .bstack .bp{background:linear-gradient(180deg,var(--emerald-lt),var(--emerald))}
+  .bstack .be{background:linear-gradient(180deg,var(--gold-soft),var(--gold))}
+  .bcol .bd{font-size:10.5px;color:var(--text-soft);font-weight:600}
+  .bcol.peak .bd{color:var(--gold-dk)}
+  .legend{display:flex;gap:16px;padding:14px 18px 0;font-size:12px;color:var(--text-soft)}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle}
+  .legend .lp{background:var(--emerald)}
+  .legend .le{background:var(--gold)}
+
+  .split{padding:18px;display:flex;flex-direction:column;gap:16px}
+  .split-row .sr-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+  .split-row .sr-l{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
+  .split-row .sr-l svg{width:15px;height:15px}
+  .split-row .sr-n{font-size:12.5px;color:var(--text-soft)}
+  .split-row .sr-n b{color:var(--text);font-weight:700}
+  .split-row.sso .sr-l{color:var(--emerald)}
+  .split-row .track{height:9px;border-radius:5px;background:var(--border);overflow:hidden}
+  .split-row.sso .track > i{display:block;height:100%;background:linear-gradient(90deg,var(--emerald),var(--emerald-lt))}
+  .split-row.email .track > i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-dk),var(--gold))}
+
+  .rank{padding:8px 8px 14px}
+  .rank-item{display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:12px}
+  .rank-item:hover{background:var(--surface-2)}
+  .rank-item .rk{
+    width:24px;height:24px;border-radius:8px;flex:none;display:grid;place-items:center;
+    font-family:'Marcellus',serif;font-size:13px;color:var(--text-soft);
+    background:var(--surface-2);border:1px solid var(--border-2);
+  }
+  .rank-item:nth-child(1) .rk{background:linear-gradient(135deg,var(--gold),var(--gold-dk));color:#fff;border-color:transparent}
+  .rank-item .r-nm{font-size:13px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rank-item .r-st{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:700;color:var(--gold-dk)}
+  .rank-item .r-st svg{width:13px;height:13px}
+
+  .footer{padding:8px 34px 26px;color:var(--text-soft);font-size:11.5px;display:flex;gap:8px;align-items:center;justify-content:center}
+  .footer .fstar{color:var(--gold)}
+  .footer .fstar svg{width:14px;height:14px}
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width:1100px){
+    .grid{grid-template-columns:1fr}
+    .rail{flex-direction:row;flex-wrap:wrap}
+    .rail > .card{flex:1;min-width:280px}
+    .mode-grid{grid-template-columns:repeat(2,1fr)}
+    .detail-lower{grid-template-columns:1fr}
+  }
+  @media (max-width:900px){
+    .app{grid-template-columns:1fr}
+    .sidebar{position:relative;height:auto;flex-direction:row;align-items:center;overflow-x:auto}
+    .brand{border-bottom:none;border-right:1px solid rgba(255,255,255,.07);white-space:nowrap}
+    .nav{display:flex;flex:1;padding:10px;gap:4px;align-items:center}
+    .nav-label,.side-foot{display:none}
+    .nav-item{width:auto;margin-bottom:0;white-space:nowrap}
+    .nav-item .badge{display:none}
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .topbar{flex-wrap:wrap;padding:18px 20px 14px}
+    .content{padding:6px 20px 32px}
+    .footer{padding:8px 20px 24px}
+  }
+  @media (max-width:560px){
+    .kpis{grid-template-columns:1fr}
+    .searchbox{width:100%;order:5}
+    .topbar h2{font-size:23px}
+    .mode-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M22 2 l5.9 8.2 9.6 2.4 -6.2 7.7 .7 9.9 -10 -3.7 -10 3.7 .7 -9.9 -6.2 -7.7 9.6 -2.4 Z"/>
+          <circle cx="22" cy="18" r="5.5"/>
+          <path d="M13 36 h18 M16 41 h12" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Cakna</h1>
+        <p>Panel Admin</p>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-label">Menu</div>
+      <a class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M16 5.5a3 3 0 0 1 0 5.6M17.5 19a5.2 5.2 0 0 0-3-4.7"/></svg>
+        Pengguna
+        <span class="badge">1,248</span>
+      </a>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H19a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2z"/><path d="M4 17.5A1.5 1.5 0 0 1 5.5 16H20"/><path d="M12 7.5l1.2 1.7 2 .5-1.3 1.6.15 2-1.9-.75-1.9.75.15-2-1.3-1.6 2-.5z"/></svg>
+        Al-Ma'thurat
+      </a>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V4"/><path d="M4 20h16"/><path d="M8 20v-6M13 20V9M18 20v-9"/></svg>
+        Analitik
+      </a>
+      <div class="nav-label">Sistem</div>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M21.5 12h-3M5.5 12h-3M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1M18.7 18.7l-2.1-2.1M7.4 7.4 5.3 5.3"/></svg>
+        Tetapan
+      </a>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a4 4 0 0 1 4 4c0 3-4 4.5-4 8"/><circle cx="12" cy="12" r="9"/></svg>
+        Bantuan
+      </a>
+    </nav>
+
+    <div class="side-foot">
+      <div class="admin-card">
+        <div class="av">RA</div>
+        <div>
+          <div class="nm">Ridzuan Aziz</div>
+          <div class="rl">Pentadbir Sistem</div>
+        </div>
+        <div class="cog">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/><circle cx="5" cy="12" r="1.6"/></svg>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+    <header class="topbar">
+      <div class="tt">
+        <h2>Dashboard</h2>
+        <p class="sub">Pantau log masuk pengguna &amp; kemajuan bacaan Al-Ma'thurat secara terperinci</p>
+      </div>
+      <div class="searchbox">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+        <input type="text" placeholder="Cari pengguna, e-mel…">
+      </div>
+      <div class="date-pill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4.5" width="18" height="17" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg>
+        Rabu, 22 Julai 2026
+      </div>
+      <button class="icon-btn" title="Notifikasi">
+        <span class="dot"></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8.5a6 6 0 1 0-12 0c0 6-2.5 7.5-2.5 7.5h17S18 14.5 18 8.5"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+      </button>
+    </header>
+
+    <div class="content">
+
+      <!-- ===== KPI ROW ===== -->
+      <section class="kpis">
+        <div class="kpi">
+          <div class="k-top">
+            <div class="k-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M16 5.5a3 3 0 0 1 0 5.6M17.5 19a5.2 5.2 0 0 0-3-4.7"/></svg></div>
+            <div class="k-label">Jumlah Pengguna</div>
+          </div>
+          <div class="k-num">1,248</div>
+          <div class="k-foot"><span class="delta up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>6.4%</span> berbanding minggu lepas</div>
+        </div>
+
+        <div class="kpi">
+          <div class="k-top">
+            <div class="k-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-7 5 14 2.5-7H21"/></svg></div>
+            <div class="k-label">Aktif Hari Ini</div>
+          </div>
+          <div class="k-num">342</div>
+          <div class="k-foot"><span class="delta up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>27.4%</span> daripada semua pengguna</div>
+        </div>
+
+        <div class="kpi gold">
+          <div class="k-top">
+            <div class="k-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><path d="M12 3v4.5M12 16.5V21M3 12h4.5M16.5 12H21"/></svg></div>
+            <div class="k-label">Purata Kemajuan Ma'thurat</div>
+          </div>
+          <div class="k-num">68%</div>
+          <div class="k-foot"><span class="delta up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>3.1%</span> min. Sughra &amp; Kubra</div>
+        </div>
+
+        <div class="kpi gold">
+          <div class="k-top">
+            <div class="k-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2.5 21 6.5 17 10.5"/><path d="M21 6.5H7a4 4 0 0 0-4 4v.5"/><path d="M7 21.5 3 17.5 7 13.5"/><path d="M3 17.5h14a4 4 0 0 0 4-4V13"/></svg></div>
+            <div class="k-label">Sesi Wirid Minggu Ini</div>
+          </div>
+          <div class="k-num">2,914</div>
+          <div class="k-foot"><span class="delta up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>12.0%</span> Pagi 1,612 · Petang 1,302</div>
+        </div>
+      </section>
+
+      <!-- ===== MAIN GRID ===== -->
+      <section class="grid">
+
+        <!-- USERS TABLE -->
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h3>Pengguna &amp; Kemajuan Ma'thurat</h3>
+              <div class="ch-sub">Klik mana-mana baris untuk lihat butiran penuh Sughra / Kubra</div>
+            </div>
+            <div class="chips">
+              <button class="chip on">Semua</button>
+              <button class="chip">QCXIS SSO</button>
+              <button class="chip">E-mel</button>
+            </div>
+          </div>
+
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Pengguna</th>
+                  <th>Log Masuk</th>
+                  <th>Aktif Terakhir</th>
+                  <th>Kemajuan Ma'thurat</th>
+                  <th>Streak</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+
+                <!-- Row 1 -->
+                <tr class="u-row clickable">
+                  <td><div class="u-cell"><div class="av" style="background:linear-gradient(135deg,#155B44,#0B3D2E)">AF</div><div><div class="u-name">Ahmad Faiz Roslan</div><div class="u-mail">faiz.roslan@qcxis.com</div></div></div></td>
+                  <td><span class="badge-login sso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="m9 12 2 2 4-4"/></svg>QCXIS SSO</span></td>
+                  <td><div class="last-active"><span class="la-dot on"></span>2 min lalu<span class="lo">Wirid Pagi</span></div></td>
+                  <td><div class="prog-cell"><div class="prog-top"><span class="pv">94%</span><span class="pl">Sughra · Kubra</span></div><div class="bar"><i style="width:94%"></i></div></div></td>
+                  <td class="streak-cell"><span class="streak"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2c1 3 4 4 4 8a4 4 0 0 1-8 0c0-1 .5-2 1-2.5C9 9 12 6 12 2z"/><path d="M12 22a6 6 0 0 0 6-6c0-3-2-5-3.5-6.5.5 2-1 3.5-2.5 3.5s-2.5-1.5-2-3.5C8 11 6 13 6 16a6 6 0 0 0 6 6z" opacity=".55"/></svg>23 <small>hari</small></span></td>
+                  <td><div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div></td>
+                </tr>
+                <tr class="detail-row"><td colspan="6"></td></tr>
+
+                <!-- Row 2 — EXPANDED SHOWCASE (Nurul Aina) -->
+                <tr class="u-row clickable selected">
+                  <td><div class="u-cell"><div class="av" style="background:linear-gradient(135deg,#B0873A,#8A6522)">NA</div><div><div class="u-name">Nurul Aina Kamal</div><div class="u-mail">nurul.aina@qcxis.com</div></div></div></td>
+                  <td><span class="badge-login sso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="m9 12 2 2 4-4"/></svg>QCXIS SSO</span></td>
+                  <td><div class="last-active"><span class="la-dot on"></span>8 min lalu<span class="lo">Wirid Petang</span></div></td>
+                  <td><div class="prog-cell"><div class="prog-top"><span class="pv">78%</span><span class="pl">Sughra · Kubra</span></div><div class="bar"><i style="width:78%"></i></div></div></td>
+                  <td class="streak-cell"><span class="streak"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2c1 3 4 4 4 8a4 4 0 0 1-8 0c0-1 .5-2 1-2.5C9 9 12 6 12 2z"/><path d="M12 22a6 6 0 0 0 6-6c0-3-2-5-3.5-6.5.5 2-1 3.5-2.5 3.5s-2.5-1.5-2-3.5C8 11 6 13 6 16a6 6 0 0 0 6 6z" opacity=".55"/></svg>12 <small>hari</small></span></td>
+                  <td><div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div></td>
+                </tr>
+                <tr class="detail-row open">
+                  <td colspan="6">
+                    <div class="detail-wrap">
+                      <div class="detail-head">
+                        <span class="dh-star"><svg viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 2 l5.9 8.2 9.6 2.4 -6.2 7.7 .7 9.9 -10 -3.7 -10 3.7 .7 -9.9 -6.2 -7.7 9.6 -2.4 Z"/><circle cx="22" cy="18" r="5.5"/></svg></span>
+                        <div>
+                          <h4>Butiran Kemajuan Al-Ma'thurat</h4>
+                          <div class="dh-sub">Nurul Aina Kamal · pecahan mengikut mod &amp; sesi</div>
+                        </div>
+                        <div class="dh-tag">Sedang membaca sekarang</div>
+                      </div>
+
+                      <!-- 4 mode/session cards -->
+                      <div class="mode-grid">
+
+                        <!-- Sughra Pagi 100% -->
+                        <div class="mode-card">
+                          <div class="mc-top">
+                            <div><div class="mc-mode">Sughra</div><div class="mc-sess">Wirid Pagi</div></div>
+                            <span class="mc-items">32 item</span>
+                          </div>
+                          <div class="ring-wrap">
+                            <div class="ring">
+                              <svg width="64" height="64" viewBox="0 0 64 64">
+                                <circle cx="32" cy="32" r="26" fill="none" stroke="#E4DCC8" stroke-width="6"/>
+                                <circle cx="32" cy="32" r="26" fill="none" stroke="#C7A24B" stroke-width="6" stroke-linecap="round" stroke-dasharray="163.36" stroke-dashoffset="0"/>
+                              </svg>
+                              <div class="rv">100<small>%</small></div>
+                            </div>
+                            <div class="mc-stats">
+                              <div class="st"><span>Ulangan</span><b>70 / 70</b></div>
+                              <div class="st"><span>Item</span><b>32 / 32</b></div>
+                            </div>
+                          </div>
+                          <div class="status done">Selesai · 6:14 pagi</div>
+                        </div>
+
+                        <!-- Sughra Petang 62% -->
+                        <div class="mode-card">
+                          <div class="mc-top">
+                            <div><div class="mc-mode">Sughra</div><div class="mc-sess">Wirid Petang</div></div>
+                            <span class="mc-items">32 item</span>
+                          </div>
+                          <div class="ring-wrap">
+                            <div class="ring">
+                              <svg width="64" height="64" viewBox="0 0 64 64">
+                                <circle cx="32" cy="32" r="26" fill="none" stroke="#E4DCC8" stroke-width="6"/>
+                                <circle cx="32" cy="32" r="26" fill="none" stroke="#C7A24B" stroke-width="6" stroke-linecap="round" stroke-dasharray="163.36" stroke-dashoffset="62.08"/>
+                              </svg>
+                              <div class="rv">62<small>%</small></div>
+                            </div>
+                            <div class="mc-stats">
+                              <div class="st"><span>Ulangan</span><b>48 / 70</b></div>
+                              <div class="st"><span>Item</span><b>21 / 32</b></div>
+                            </div>
+                          </div>
+                          <div class="status prog">Sedang dibaca</div>
+                        </div>
+
+                        <!-- Kubra Pagi 0% -->
+                        <div class="mode-card">
+                          <div class="mc-top">
+                            <div><div class="mc-mode">Kubra</div><div class="mc-sess">Wirid Pagi</div></div>
+                            <span class="mc-items">46 item</span>
+                          </div>
+                          <div class="ring-wrap">
+                            <div class="ring">
+                              <svg width="64" height="64" viewBox="0 0 64 64">
+                                <circle cx="32" cy="32" r="26" fill="none" stroke="#E4DCC8" stroke-width="6"/>
+                                <circle cx="32" cy="32" r="26" fill="none" stroke="#C7A24B" stroke-width="6" stroke-linecap="round" stroke-dasharray="163.36" stroke-dashoffset="163.36"/>
+                              </svg>
+                              <div class="rv" style="color:var(--text-soft)">0<small>%</small></div>
+                            </div>
+                            <div class="mc-stats">
+                              <div class="st"><span>Ulangan</span><b>0 / 96</b></div>
+                              <div class="st"><span>Item</span><b>0 / 46</b></div>
+                            </div>
+                          </div>
+                          <div class="status idle">Belum mula</div>
+                        </div>
+
+                        <!-- Kubra Petang 24% -->
+                        <div class="mode-card">
+                          <div class="mc-top">
+                            <div><div class="mc-mode">Kubra</div><div class="mc-sess">Wirid Petang</div></div>
+                            <span class="mc-items">46 item</span>
+                          </div>
+                          <div class="ring-wrap">
+                            <div class="ring">
+                              <svg width="64" height="64" viewBox="0 0 64 64">
+                                <circle cx="32" cy="32" r="26" fill="none" stroke="#E4DCC8" stroke-width="6"/>
+                                <circle cx="32" cy="32" r="26" fill="none" stroke="#C7A24B" stroke-width="6" stroke-linecap="round" stroke-dasharray="163.36" stroke-dashoffset="124.16"/>
+                              </svg>
+                              <div class="rv">24<small>%</small></div>
+                            </div>
+                            <div class="mc-stats">
+                              <div class="st"><span>Ulangan</span><b>23 / 96</b></div>
+                              <div class="st"><span>Item</span><b>11 / 46</b></div>
+                            </div>
+                          </div>
+                          <div class="status stall">Tergendala 2 hari</div>
+                        </div>
+
+                      </div>
+
+                      <!-- streak + meta -->
+                      <div class="detail-lower">
+                        <div class="panel">
+                          <div class="p-lab">Konsistensi Harian</div>
+                          <div class="streak-big">
+                            <div class="sb-flame"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2c1 3 4 4 4 8a4 4 0 0 1-8 0c0-1 .5-2 1-2.5C9 9 12 6 12 2z"/><path d="M12 22a6 6 0 0 0 6-6c0-3-2-5-3.5-6.5.5 2-1 3.5-2.5 3.5s-2.5-1.5-2-3.5C8 11 6 13 6 16a6 6 0 0 0 6 6z" opacity=".5"/></svg></div>
+                            <div>
+                              <div class="sb-n">12 <span style="font-family:Figtree;font-size:14px;color:var(--text-soft)">hari berturut</span></div>
+                              <div class="sb-u">Rekod terbaik: 21 hari</div>
+                            </div>
+                          </div>
+                          <div class="dots">
+                            <i class="on" title="9 Julai"></i><i title="10 Julai"></i><i class="on" title="11 Julai"></i>
+                            <i class="on" title="12 Julai"></i><i class="on" title="13 Julai"></i><i class="on" title="14 Julai"></i>
+                            <i class="on" title="15 Julai"></i><i class="on" title="16 Julai"></i><i class="on" title="17 Julai"></i>
+                            <i class="on" title="18 Julai"></i><i class="on" title="19 Julai"></i><i class="on" title="20 Julai"></i>
+                            <i class="on" title="21 Julai"></i><i class="on today" title="Hari ini"></i>
+                          </div>
+                          <div class="dots-cap"><span>14 hari lepas</span><span>Hari ini</span></div>
+                        </div>
+
+                        <div class="panel">
+                          <div class="p-lab">Ringkasan Bulan Ini</div>
+                          <div class="meta-grid">
+                            <div class="meta">
+                              <div class="m-l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2.5 21 6.5 17 10.5M21 6.5H7a4 4 0 0 0-4 4M7 21.5 3 17.5 7 13.5M3 17.5h14a4 4 0 0 0 4-4"/></svg>Sesi selesai</div>
+                              <div class="m-v">41 <small>sesi</small></div>
+                            </div>
+                            <div class="meta">
+                              <div class="m-l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-7 5 14 2.5-7H21"/></svg>Purata / hari</div>
+                              <div class="m-v">1.4 <small>sesi</small></div>
+                            </div>
+                            <div class="meta">
+                              <div class="m-l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>Terakhir selesai</div>
+                              <div class="m-v" style="font-size:15px">Hari ini <small>· 6:14 pagi</small></div>
+                            </div>
+                            <div class="meta">
+                              <div class="m-l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-4 3 2 4-6"/></svg>Jumlah ulangan</div>
+                              <div class="m-v" style="font-size:16px">141 <small>/ 332</small></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 3 -->
+                <tr class="u-row clickable">
+                  <td><div class="u-cell"><div class="av" style="background:linear-gradient(135deg,#1F7355,#155B44)">MH</div><div><div class="u-name">Muhammad Haziq Azman</div><div class="u-mail">haziq.azman@gmail.com</div></div></div></td>
+                  <td><span class="badge-login email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg>E-mel</span></td>
+                  <td><div class="last-active"><span class="la-dot on"></span>41 min lalu<span class="lo">Wirid Pagi</span></div></td>
+                  <td><div class="prog-cell"><div class="prog-top"><span class="pv">66%</span><span class="pl">Sughra sahaja</span></div><div class="bar"><i style="width:66%"></i></div></div></td>
+                  <td class="streak-cell"><span class="streak"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2c1 3 4 4 4 8a4 4 0 0 1-8 0c0-1 .5-2 1-2.5C9 9 12 6 12 2z"/><path d="M12 22a6 6 0 0 0 6-6c0-3-2-5-3.5-6.5.5 2-1 3.5-2.5 3.5s-2.5-1.5-2-3.5C8 11 6 13 6 16a6 6 0 0 0 6 6z" opacity=".55"/></svg>5 <small>hari</small></span></td>
+                  <td><div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div></td>
+                </tr>
+                <tr class="detail-row"><td colspan="6"></td></tr>
+
+                <!-- Row 4 -->
+                <tr class="u-row clickable">
+                  <td><div class="u-cell"><div class="av" style="background:linear-gradient(135deg,#155B44,#0B3D2E)">SA</div><div><div class="u-name">Siti Aisyah Rahman</div><div class="u-mail">siti.aisyah@qcxis.com</div></div></div></td>
+                  <td><span class="badge-login sso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="m9 12 2 2 4-4"/></svg>QCXIS SSO</span></td>
+                  <td><div class="last-active"><span class="la-dot on"></span>1 jam lalu<span class="lo">Wirid Pagi</span></div></td>
+                  <td><div class="prog-cell"><div class="prog-top"><span class="pv">100%</span><span class="pl">Sughra · Kubra</span></div><div class="bar"><i style="width:100%"></i></div></div></td>
+                  <td class="streak-cell"><span class="streak"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2c1 3 4 4 4 8a4 4 0 0 1-8 0c0-1 .5-2 1-2.5C9 9 12 6 12 2z"/><path d="M12 22a6 6 0 0 0 6-6c0-3-2-5-3.5-6.5.5 2-1 3.5-2.5 3.5s-2.5-1.5-2-3.5C8 11 6 13 6 16a6 6 0 0 0 6 6z" opacity=".55"/></svg>47 <small>hari</small></span></td>
+                  <td><div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div></td>
+                </tr>
+                <tr class="detail-row"><td colspan="6"></td></tr>
+
+                <!-- Row 5 -->
+                <tr class="u-row clickable">
+                  <td><div class="u-cell"><div class="av" style="background:linear-gradient(135deg,#B0873A,#8A6522)">AH</div><div><div class="u-name">Amir Hakimi Zulkifli</div><div class="u-mail">amir.hakimi@qcxis.com</div></div></div></td>
+                  <td><span class="badge-login sso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="m9 12 2 2 4-4"/></svg>QCXIS SSO</span></td>
+                  <td><div class="last-active"><span class="la-dot on"></span>2 jam lalu<span class="lo">Wirid Petang</span></div></td>
+                  <td><div class="prog-cell"><div class="prog-top"><span class="pv">52%</span><span class="pl">Sughra sahaja</span></div><div class="bar"><i style="width:52%"></i></div></div></td>
+                  <td class="streak-cell"><span class="streak"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2c1 3 4 4 4 8a4 4 0 0 1-8 0c0-1 .5-2 1-2.5C9 9 12 6 12 2z"/><path d="M12 22a6 6 0 0 0 6-6c0-3-2-5-3.5-6.5.5 2-1 3.5-2.5 3.5s-2.5-1.5-2-3.5C8 11 6 13 6 16a6 6 0 0 0 6 6z" opacity=".55"/></svg>3 <small>hari</small></span></td>
+                  <td><div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div></td>
+                </tr>
+                <tr class="detail-row"><td colspan="6"></td></tr>
+
+                <!-- Row 6 -->
+                <tr class="u-row clickable">
+                  <td><div class="u-cell"><div class="av" style="background:linear-gradient(135deg,#1F7355,#155B44)">FN</div><div><div class="u-name">Farah Nabilah Idris</div><div class="u-mail">farah.nabilah@outlook.com</div></div></div></td>
+                  <td><span class="badge-login email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg>E-mel</span></td>
+                  <td><div class="last-active"><span class="la-dot off"></span>3 jam lalu<span class="lo">Wirid Pagi</span></div></td>
+                  <td><div class="prog-cell"><div class="prog-top"><span class="pv">88%</span><span class="pl">Sughra · Kubra</span></div><div class="bar"><i style="width:88%"></i></div></div></td>
+                  <td class="streak-cell"><span class="streak"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2c1 3 4 4 4 8a4 4 0 0 1-8 0c0-1 .5-2 1-2.5C9 9 12 6 12 2z"/><path d="M12 22a6 6 0 0 0 6-6c0-3-2-5-3.5-6.5.5 2-1 3.5-2.5 3.5s-2.5-1.5-2-3.5C8 11 6 13 6 16a6 6 0 0 0 6 6z" opacity=".55"/></svg>19 <small>hari</small></span></td>
+                  <td><div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div></td>
+                </tr>
+                <tr class="detail-row"><td colspan="6"></td></tr>
+
+                <!-- Row 7 -->
+                <tr class="u-row clickable">
+                  <td><div class="u-cell"><div class="av" style="background:linear-gradient(135deg,#5C6B63,#3F4B45)">MD</div><div><div class="u-name">Muhammad Danish Halim</div><div class="u-mail">danish.halim@qcxis.com</div></div></div></td>
+                  <td><span class="badge-login sso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="m9 12 2 2 4-4"/></svg>QCXIS SSO</span></td>
+                  <td><div class="last-active"><span class="la-dot off"></span>5 jam lalu<span class="lo">Wirid Petang</span></div></td>
+                  <td><div class="prog-cell"><div class="prog-top"><span class="pv">34%</span><span class="pl">Sughra sahaja</span></div><div class="bar"><i style="width:34%"></i></div></div></td>
+                  <td class="streak-cell"><span class="streak zero"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2c1 3 4 4 4 8a4 4 0 0 1-8 0c0-1 .5-2 1-2.5C9 9 12 6 12 2z"/><path d="M12 22a6 6 0 0 0 6-6c0-3-2-5-3.5-6.5.5 2-1 3.5-2.5 3.5s-2.5-1.5-2-3.5C8 11 6 13 6 16a6 6 0 0 0 6 6z" opacity=".55"/></svg>0 <small>hari</small></span></td>
+                  <td><div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div></td>
+                </tr>
+                <tr class="detail-row"><td colspan="6"></td></tr>
+
+                <!-- Row 8 -->
+                <tr class="u-row clickable">
+                  <td><div class="u-cell"><div class="av" style="background:linear-gradient(135deg,#155B44,#0B3D2E)">AY</div><div><div class="u-name">Aisyah Humaira Yusof</div><div class="u-mail">humaira.yusof@qcxis.com</div></div></div></td>
+                  <td><span class="badge-login sso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="m9 12 2 2 4-4"/></svg>QCXIS SSO</span></td>
+                  <td><div class="last-active"><span class="la-dot off"></span>Semalam<span class="lo">Wirid Pagi</span></div></td>
+                  <td><div class="prog-cell"><div class="prog-top"><span class="pv">71%</span><span class="pl">Sughra · Kubra</span></div><div class="bar"><i style="width:71%"></i></div></div></td>
+                  <td class="streak-cell"><span class="streak"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2c1 3 4 4 4 8a4 4 0 0 1-8 0c0-1 .5-2 1-2.5C9 9 12 6 12 2z"/><path d="M12 22a6 6 0 0 0 6-6c0-3-2-5-3.5-6.5.5 2-1 3.5-2.5 3.5s-2.5-1.5-2-3.5C8 11 6 13 6 16a6 6 0 0 0 6 6z" opacity=".55"/></svg>8 <small>hari</small></span></td>
+                  <td><div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div></td>
+                </tr>
+                <tr class="detail-row"><td colspan="6"></td></tr>
+
+                <!-- Row 9 -->
+                <tr class="u-row clickable">
+                  <td><div class="u-cell"><div class="av" style="background:linear-gradient(135deg,#5C6B63,#3F4B45)">ZA</div><div><div class="u-name">Zulkarnain Abdullah</div><div class="u-mail">zul.abdullah@gmail.com</div></div></div></td>
+                  <td><span class="badge-login email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg>E-mel</span></td>
+                  <td><div class="last-active"><span class="la-dot off"></span>Semalam<span class="lo">Wirid Petang</span></div></td>
+                  <td><div class="prog-cell"><div class="prog-top"><span class="pv">45%</span><span class="pl">Sughra sahaja</span></div><div class="bar"><i style="width:45%"></i></div></div></td>
+                  <td class="streak-cell"><span class="streak"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2c1 3 4 4 4 8a4 4 0 0 1-8 0c0-1 .5-2 1-2.5C9 9 12 6 12 2z"/><path d="M12 22a6 6 0 0 0 6-6c0-3-2-5-3.5-6.5.5 2-1 3.5-2.5 3.5s-2.5-1.5-2-3.5C8 11 6 13 6 16a6 6 0 0 0 6 6z" opacity=".55"/></svg>2 <small>hari</small></span></td>
+                  <td><div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div></td>
+                </tr>
+                <tr class="detail-row"><td colspan="6"></td></tr>
+
+                <!-- Row 10 -->
+                <tr class="u-row clickable">
+                  <td><div class="u-cell"><div class="av" style="background:linear-gradient(135deg,#B0873A,#8A6522)">NB</div><div><div class="u-name">Nur Balqis Zainal</div><div class="u-mail">balqis.zainal@qcxis.com</div></div></div></td>
+                  <td><span class="badge-login sso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="m9 12 2 2 4-4"/></svg>QCXIS SSO</span></td>
+                  <td><div class="last-active"><span class="la-dot off"></span>2 hari lalu<span class="lo">Wirid Pagi</span></div></td>
+                  <td><div class="prog-cell"><div class="prog-top"><span class="pv">90%</span><span class="pl">Sughra · Kubra</span></div><div class="bar"><i style="width:90%"></i></div></div></td>
+                  <td class="streak-cell"><span class="streak"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2c1 3 4 4 4 8a4 4 0 0 1-8 0c0-1 .5-2 1-2.5C9 9 12 6 12 2z"/><path d="M12 22a6 6 0 0 0 6-6c0-3-2-5-3.5-6.5.5 2-1 3.5-2.5 3.5s-2.5-1.5-2-3.5C8 11 6 13 6 16a6 6 0 0 0 6 6z" opacity=".55"/></svg>15 <small>hari</small></span></td>
+                  <td><div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div></td>
+                </tr>
+                <tr class="detail-row"><td colspan="6"></td></tr>
+
+                <!-- Row 11 -->
+                <tr class="u-row clickable">
+                  <td><div class="u-cell"><div class="av" style="background:linear-gradient(135deg,#5C6B63,#3F4B45)">HI</div><div><div class="u-name">Hafiz Iqbal Ramli</div><div class="u-mail">hafiz.iqbal@qcxis.com</div></div></div></td>
+                  <td><span class="badge-login sso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="m9 12 2 2 4-4"/></svg>QCXIS SSO</span></td>
+                  <td><div class="last-active"><span class="la-dot off"></span>3 hari lalu<span class="lo">Tiada sesi</span></div></td>
+                  <td><div class="prog-cell"><div class="prog-top"><span class="pv">28%</span><span class="pl">Sughra sahaja</span></div><div class="bar"><i style="width:28%"></i></div></div></td>
+                  <td class="streak-cell"><span class="streak zero"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2c1 3 4 4 4 8a4 4 0 0 1-8 0c0-1 .5-2 1-2.5C9 9 12 6 12 2z"/><path d="M12 22a6 6 0 0 0 6-6c0-3-2-5-3.5-6.5.5 2-1 3.5-2.5 3.5s-2.5-1.5-2-3.5C8 11 6 13 6 16a6 6 0 0 0 6 6z" opacity=".55"/></svg>0 <small>hari</small></span></td>
+                  <td><div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div></td>
+                </tr>
+                <tr class="detail-row"><td colspan="6"></td></tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- RIGHT RAIL -->
+        <aside class="rail">
+
+          <!-- Weekly sessions chart -->
+          <div class="card">
+            <div class="card-head">
+              <div><h3>Sesi Wirid — 7 Hari</h3><div class="ch-sub">Pagi vs Petang</div></div>
+            </div>
+            <div class="legend"><span><i class="lp"></i>Wirid Pagi</span><span><i class="le"></i>Wirid Petang</span></div>
+            <div class="chart-body">
+              <div class="bars">
+                <div class="bcol"><div class="bstack"><div class="bp" style="height:48px"></div><div class="be" style="height:41px"></div></div><div class="bd">Isn</div></div>
+                <div class="bcol"><div class="bstack"><div class="bp" style="height:53px"></div><div class="be" style="height:44px"></div></div><div class="bd">Sel</div></div>
+                <div class="bcol"><div class="bstack"><div class="bp" style="height:47px"></div><div class="be" style="height:39px"></div></div><div class="bd">Rab</div></div>
+                <div class="bcol"><div class="bstack"><div class="bp" style="height:55px"></div><div class="be" style="height:47px"></div></div><div class="bd">Kha</div></div>
+                <div class="bcol peak"><div class="bstack"><div class="bp" style="height:60px"></div><div class="be" style="height:50px"></div></div><div class="bd">Jum</div></div>
+                <div class="bcol"><div class="bstack"><div class="bp" style="height:44px"></div><div class="be" style="height:34px"></div></div><div class="bd">Sab</div></div>
+                <div class="bcol"><div class="bstack"><div class="bp" style="height:40px"></div><div class="be" style="height:32px"></div></div><div class="bd">Ahd</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Login methods -->
+          <div class="card">
+            <div class="card-head">
+              <div><h3>Kaedah Log Masuk</h3><div class="ch-sub">1,248 pengguna berdaftar</div></div>
+            </div>
+            <div class="split">
+              <div class="split-row sso">
+                <div class="sr-top"><span class="sr-l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="m9 12 2 2 4-4"/></svg>QCXIS SSO</span><span class="sr-n"><b>848</b> · 68%</span></div>
+                <div class="track"><i style="width:68%"></i></div>
+              </div>
+              <div class="split-row email">
+                <div class="sr-top"><span class="sr-l" style="color:var(--gold-dk)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg>E-mel &amp; Kata Laluan</span><span class="sr-n"><b>400</b> · 32%</span></div>
+                <div class="track"><i style="width:32%"></i></div>
+              </div>
+              <div style="font-size:11.5px;color:var(--text-soft);display:flex;gap:7px;align-items:center;padding-top:2px;border-top:1px dashed var(--border);margin-top:2px;padding-top:12px">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--emerald)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>
+                Peralihan SSO naik <b style="color:var(--emerald)">+142</b> pengguna bulan ini
+              </div>
+            </div>
+          </div>
+
+          <!-- Streak leaderboard -->
+          <div class="card">
+            <div class="card-head">
+              <div><h3>Ranking Streak Tertinggi</h3><div class="ch-sub">Hari berturut terpanjang</div></div>
+            </div>
+            <div class="rank">
+              <div class="rank-item">
+                <div class="rk">1</div>
+                <div class="av" style="width:30px;height:30px;border-radius:9px;font-size:12px;background:linear-gradient(135deg,#155B44,#0B3D2E)">SA</div>
+                <div class="r-nm">Siti Aisyah Rahman</div>
+                <div class="r-st"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2c1 3 4 4 4 8a4 4 0 0 1-8 0c0-1 .5-2 1-2.5C9 9 12 6 12 2z"/></svg>47</div>
+              </div>
+              <div class="rank-item">
+                <div class="rk">2</div>
+                <div class="av" style="width:30px;height:30px;border-radius:9px;font-size:12px;background:linear-gradient(135deg,#155B44,#0B3D2E)">AF</div>
+                <div class="r-nm">Ahmad Faiz Roslan</div>
+                <div class="r-st"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2c1 3 4 4 4 8a4 4 0 0 1-8 0c0-1 .5-2 1-2.5C9 9 12 6 12 2z"/></svg>23</div>
+              </div>
+              <div class="rank-item">
+                <div class="rk">3</div>
+                <div class="av" style="width:30px;height:30px;border-radius:9px;font-size:12px;background:linear-gradient(135deg,#1F7355,#155B44)">FN</div>
+                <div class="r-nm">Farah Nabilah Idris</div>
+                <div class="r-st"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2c1 3 4 4 4 8a4 4 0 0 1-8 0c0-1 .5-2 1-2.5C9 9 12 6 12 2z"/></svg>19</div>
+              </div>
+              <div class="rank-item">
+                <div class="rk">4</div>
+                <div class="av" style="width:30px;height:30px;border-radius:9px;font-size:12px;background:linear-gradient(135deg,#B0873A,#8A6522)">NB</div>
+                <div class="r-nm">Nur Balqis Zainal</div>
+                <div class="r-st"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2c1 3 4 4 4 8a4 4 0 0 1-8 0c0-1 .5-2 1-2.5C9 9 12 6 12 2z"/></svg>15</div>
+              </div>
+            </div>
+          </div>
+
+        </aside>
+      </section>
+    </div>
+
+    <div class="footer">
+      <span class="fstar"><svg viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 l5.9 8.2 9.6 2.4 -6.2 7.7 .7 9.9 -10 -3.7 -10 3.7 .7 -9.9 -6.2 -7.7 9.6 -2.4 Z"/></svg></span>
+      Cakna · Panel Admin — Konsep reka bentuk (data contoh). Kemas kini terakhir: 22 Julai 2026, 8:30 pagi.
+    </div>
+  </main>
+</div>
+
+<script>
+  // Expand / collapse the Al-Ma'thurat detail panel for any row that has one.
+  document.querySelectorAll('tr.u-row.clickable').forEach(function(row){
+    row.addEventListener('click', function(){
+      var detail = row.nextElementSibling;
+      if(!detail || !detail.classList.contains('detail-row')) return;
+      var hasPanel = detail.querySelector('.detail-wrap');
+      if(!hasPanel) return; // only the showcased row has a full panel in this mockup
+      var open = detail.classList.toggle('open');
+      row.classList.toggle('selected', open);
+    });
+  });
+
+  // Filter chips (visual only)
+  document.querySelectorAll('.chip').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      document.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); });
+      chip.classList.add('on');
+    });
+  });
+</script>
+</body>
+</html>

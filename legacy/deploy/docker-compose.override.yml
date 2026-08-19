@@ -1,0 +1,10 @@
+# LOCAL-ONLY (2026-07-23). Publishes the app on :3100 so the stack can be
+# exercised on this machine without Caddy/TLS. Compose merges this over
+# docker-compose.yml automatically. Safe to delete.
+services:
+  app:
+    ports:
+      - "3100:3000"
+  postgres:
+    ports:
+      - "55432:5432"

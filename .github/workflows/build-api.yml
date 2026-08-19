@@ -1,0 +1,43 @@
+# Build the Rust API image for linux/amd64 and hand it back as a downloadable
+# artifact. GitHub's ubuntu runners are native amd64, so the Rust compile is fast
+# and needs no QEMU — which is the whole point: the cakna.org server (full disk,
+# ~900 MB RAM) cannot build it, and an arm64 Mac would have to emulate.
+#
+# Run it: GitHub → Actions → "Build API image" → Run workflow.
+# Then download the artifact, scp it to the server, and `docker load` it.
+# See deploy/cakna-org/README.md step 4.
+name: Build API image
+
+on:
+  workflow_dispatch: {}          # manual trigger — no build on every push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build linux/amd64 image, export as a tar
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/Dockerfile.api
+          platforms: linux/amd64
+          tags: cakna-api:amd64
+          push: false
+          load: false
+          outputs: type=docker,dest=/tmp/cakna-api-amd64.tar
+
+      - name: Compress
+        run: gzip -9 /tmp/cakna-api-amd64.tar
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cakna-api-amd64
+          path: /tmp/cakna-api-amd64.tar.gz
+          retention-days: 7
+          if-no-files-found: error

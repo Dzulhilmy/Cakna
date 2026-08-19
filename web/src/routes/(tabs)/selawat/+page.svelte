@@ -12,15 +12,16 @@
 	const displayList: DisplayItem[] = (() => {
 		const out: DisplayItem[] = [];
 		let baitCount = 0;
+		const visible = SELAWAT_NABI.filter((b) => b.id <= 10 || b.id >= 19);
 
-		for (let i = 0; i < SELAWAT_NABI.length; i++) {
-			const bait = SELAWAT_NABI[i];
+		for (let i = 0; i < visible.length; i++) {
+			const bait = visible[i];
 			out.push({ ...bait, key: String(bait.id) });
 
 			if (bait.jenis === 'bait') {
 				baitCount++;
 				// After every 2 bait stanzas, insert the opening refrain if more bait stanzas follow
-				if (baitCount % 2 === 0 && SELAWAT_NABI[i + 1]?.jenis === 'bait') {
+				if (baitCount % 2 === 0 && visible[i + 1]?.jenis === 'bait') {
 					out.push({ ...openingRefrain, key: `chorus-${baitCount}a` });
 					out.push({ ...openingRefrain, key: `chorus-${baitCount}b` });
 				}

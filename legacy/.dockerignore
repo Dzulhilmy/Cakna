@@ -1,0 +1,30 @@
+# Docker build context is the repo root. Only server/, build/, and pwa/ get
+# COPY'd into the image (plus deploy/entrypoint.sh). Everything below is kept
+# out of the context to keep it small and the image lean.
+
+# Node deps — reinstalled inside the image via `npm ci`
+**/node_modules
+
+# Secrets / local env — provided at runtime by docker-compose, never baked in
+**/.env
+
+# Regenerated at container start by `node extract.mjs` (from pwa/index.html).
+# IMPORTANT: the OTHER server/data/*.json files (mathurat.json, i18n.json,
+# app_config.json, mengaji_drills.json) are hand-curated seed source and MUST
+# ship — do NOT add a blanket server/data/*.json rule here.
+server/data/ayahs.json
+server/data/surahs.json
+server/data/modules-raw.json
+
+# sync-frontend.mjs writes these backups at runtime; no need to ship them
+**/*.orig
+
+# VCS / OS / editor cruft
+.git
+.gitignore
+**/.DS_Store
+*.log
+
+# Large legacy artifacts the image doesn't use
+nur-al-quran-*.zip
+nur-al-quran-mushaf.html

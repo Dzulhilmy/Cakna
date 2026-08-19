@@ -1,0 +1,31 @@
+{
+  "name": "cakna-hub",
+  "version": "0.2.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+  },
+  "dependencies": {
+    "@lucide/svelte": "^1.31.0",
+    "@sveltejs/adapter-node": "^5.2.12",
+    "@sveltejs/kit": "^2.17.1",
+    "@sveltejs/vite-plugin-svelte": "^5.1.1",
+    "livekit-client": "^2.21.0",
+    "lucide-svelte": "^0.511.0",
+    "svelte": "^5.33.1",
+    "svelte-sonner": "^1.2.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.8",
+    "@types/node": "^22.15.29",
+    "svelte-check": "^4.1.5",
+    "tailwindcss": "^4.1.8",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
+  },
+  "type": "module"
+}

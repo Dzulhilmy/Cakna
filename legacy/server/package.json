@@ -1,0 +1,16 @@
+{
+  "name": "cakna-server",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "seed": "node seed.mjs",
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "express": "^4.19.2",
+    "jose": "^6.2.4",
+    "pg": "^8.12.0"
+  }
+}

@@ -1,0 +1,52 @@
+# Add-on for the EXISTING `cakna` compose project.
+# `name: cakna` joins the same network so hub-server can reach postgres by service name.
+#
+# One-time setup (run before first start):
+#   sudo docker compose -p cakna exec postgres createdb -U cakna cakna_hub 2>/dev/null || true
+#   echo "HUB_INTERNAL_SECRET=$(openssl rand -hex 32)" >> ~/cakna/deploy/.env
+#
+# Start:
+#   cd ~/cakna/deploy
+#   sudo docker compose -f docker-compose.yml -f docker-compose.halaqah.yml -f docker-compose.hub.yml up -d hub-server hub-svelte
+
+name: cakna
+
+services:
+  hub-server:
+    image: cakna-hub-server:latest
+    restart: unless-stopped
+    environment:
+      HUB_DATABASE_URL: postgres://cakna:${POSTGRES_PASSWORD}@postgres:5432/cakna_hub
+      HUB_PORT: "3002"
+      HUB_INTERNAL_SECRET: ${HUB_INTERNAL_SECRET}
+      CAKNA_API_URL: https://cakna.org
+      HUB_UPLOADS_DIR: /uploads
+      RUST_LOG: hub_server=info,tower_http=info
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
+    volumes:
+      - hub_uploads:/uploads
+    expose:
+      - "3002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  hub-svelte:
+    image: cakna-hub-svelte:latest
+    restart: unless-stopped
+    environment:
+      HUB_API_URL: http://hub-server:3002
+      HUB_INTERNAL_SECRET: ${HUB_INTERNAL_SECRET}
+      CAKNA_API_URL: https://cakna.org
+      CAKNA_LOGIN_URL: /login
+      NODE_ENV: production
+      PORT: "3000"
+      ORIGIN: https://cakna.org
+    expose:
+      - "3000"
+    depends_on:
+      - hub-server
+
+volumes:
+  hub_uploads:

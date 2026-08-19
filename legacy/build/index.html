@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ms">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="/favicon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<meta name="theme-color" content="#0B3D2E" />
+		<meta
+			name="description"
+			content="Cakna — Mushaf digital 604 halaman dengan tajwid berwarna, audio qari, terjemahan berbilang bahasa, waktu solat, kiblat, zikir & hafazan."
+		/>
+		<title>Cakna — Mushaf Digital</title>
+		<script>
+			// Prevent theme flash: apply saved theme before first paint.
+			try {
+				var s = JSON.parse(localStorage.getItem('cakna:settings') || '{}');
+				var t = s.theme === 'dark' || s.theme === 'sepia' ? s.theme : 'light';
+				document.documentElement.dataset.theme = t;
+				if (t === 'dark') document.documentElement.classList.add('dark');
+				if (s.fontSize) document.documentElement.style.setProperty('--arabic-size', s.fontSize + 'px');
+			} catch (e) {}
+		</script>
+		<link href="/_app/immutable/entry/start.CPqRTKKW.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/C-2rZcG2.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/BeRcFtxt.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/BuFlayix.js" rel="modulepreload">
+		<link href="/_app/immutable/entry/app.BLAH1AF8.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/DYl5dUZ5.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/xihTtKlq.js" rel="modulepreload">
+		<link href="/_app/immutable/nodes/0.fBIkQ0Dh.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/BEaaD-2u.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/Bj5suMnh.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/DXbgB2PK.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/DtI-zwcs.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/C9xdgkZJ.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/CqSS29jM.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/gq8zQY_12.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/c3qmQh4B2.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/Caw7m3YW.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/CLxKF1hN.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/RVSxgVWS.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/BozJ2KGZ.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/DI1FLi452.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/B0JydHz_2.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/DZKR-j092.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/DJLQYIhf2.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/CGhbo2j02.js" rel="modulepreload">
+		
+		<link href="/_app/immutable/assets/0.DSBPhXCK.css" rel="stylesheet">
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">
+			<script>
+				{
+					__sveltekit_nuol6j = {
+						base: ""
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("/_app/immutable/entry/start.CPqRTKKW.js"),
+						import("/_app/immutable/entry/app.BLAH1AF8.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element);
+					});
+				}
+			</script>
+		</div>
+	</body>
+</html>

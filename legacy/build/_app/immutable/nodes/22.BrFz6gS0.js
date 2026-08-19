@@ -1,0 +1,1 @@
+import{kt as e}from"../chunks/BeRcFtxt.js";import{m as t}from"../chunks/CqSS29jM.js";import{t as n}from"../chunks/gaw8GWTo2.js";var r=e({load:()=>i}),i=()=>{let e=t.value.page;n(302,`/read/${e>=1&&e<=604?e:1}`)};export{r as universal};

@@ -1,0 +1,47 @@
+# Single-hostname ("one vessel") Caddy config for cakna.org.
+#
+# Everything lives under cakna.org — no live.* or baru.* subdomains:
+#   cakna.org/rtc*  -> LiveKit signalling (WebSocket)   [proven: WS upgrade routes]
+#   cakna.org/*     -> the new Rust API + SvelteKit SPA
+#
+# This REPLACES the existing block in /home/ubuntu/cakna/deploy/Caddyfile, which
+# today is:
+#     cakna.org {
+#         encode gzip
+#         reverse_proxy app:3000        # <- legacy Express
+#     }
+#
+# So editing this file IS the cutover. Keep the old block commented right above
+# the new one (as below) — rollback is: uncomment the old block, delete the new,
+# `docker compose restart caddy`. The legacy container keeps running the whole
+# time, so rollback is instant.
+#
+# Back up first:
+#   cp ~/cakna/deploy/Caddyfile ~/cakna/deploy/Caddyfile.pre-halaqah.bak
+# Validate + apply:
+#   cd ~/cakna/deploy && docker compose exec caddy caddy validate --config /etc/caddy/Caddyfile
+#   cd ~/cakna/deploy && docker compose restart caddy
+
+# --- rollback target: the legacy site (leave commented) ---------------------
+# cakna.org {
+# 	encode gzip
+# 	reverse_proxy app:3000
+# }
+
+# --- live: new stack + halaqah audio, one hostname --------------------------
+cakna.org {
+	# LiveKit signalling first, so it wins over the SPA catch-all. No `encode`
+	# here — compressing an upgraded WebSocket buys nothing and can interfere.
+	# LiveKit runs with host networking (not on the compose net), so it is
+	# reached via host.docker.internal — which is why the caddy service gains
+	# `extra_hosts: host.docker.internal:host-gateway`.
+	handle /rtc* {
+		reverse_proxy host.docker.internal:7880
+	}
+
+	# Everything else: the Rust API serves both /api and the SPA build.
+	handle {
+		encode gzip
+		reverse_proxy api:8080
+	}
+}

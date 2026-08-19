@@ -1,0 +1,1 @@
+function a(t){return"RM "+Math.round(t).toLocaleString("en-US")}function e(t){const r=Math.abs(t);return r>=1e6?"RM "+(t/1e6).toFixed(1).replace(/\.0$/,"")+"M":r>=1e3?"RM "+Math.round(t/1e3)+"K":"RM "+Math.round(t)}export{e as a,a as f};

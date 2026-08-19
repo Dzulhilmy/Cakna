@@ -1,0 +1,162 @@
+[
+  {
+    "id": "assist--a-million-smiles",
+    "coreId": "assist",
+    "name": "Sejuta Senyuman",
+    "slug": "sejuta-senyuman",
+    "description": "",
+    "image": "",
+    "createdAt": "",
+    "updatedAt": "2026-07-31T07:42:01.068Z"
+  },
+  {
+    "id": "biz--mkt-blast",
+    "coreId": "biz",
+    "name": "MKT Blast",
+    "slug": "mkt-blast",
+    "description": "",
+    "image": "",
+    "createdAt": "",
+    "updatedAt": ""
+  },
+  {
+    "id": "biz--hsc",
+    "coreId": "biz",
+    "name": "HSC",
+    "slug": "hsc",
+    "description": "",
+    "image": "",
+    "createdAt": "",
+    "updatedAt": ""
+  },
+  {
+    "id": "circle--bmi",
+    "coreId": "circle",
+    "name": "BMI",
+    "slug": "bmi",
+    "description": "",
+    "image": "",
+    "createdAt": "",
+    "updatedAt": ""
+  },
+  {
+    "id": "circle--see-heart",
+    "coreId": "circle",
+    "name": "See-Heart",
+    "slug": "see-heart",
+    "description": "",
+    "image": "",
+    "createdAt": "",
+    "updatedAt": ""
+  },
+  {
+    "id": "digital--cakna-app",
+    "coreId": "digital",
+    "name": "Cakna App",
+    "slug": "cakna-app",
+    "description": "",
+    "image": "",
+    "createdAt": "",
+    "updatedAt": ""
+  },
+  {
+    "id": "digital--edu-app",
+    "coreId": "digital",
+    "name": "Edu App",
+    "slug": "edu-app",
+    "description": "",
+    "image": "",
+    "createdAt": "",
+    "updatedAt": ""
+  },
+  {
+    "id": "digital--biz-app",
+    "coreId": "digital",
+    "name": "Biz App",
+    "slug": "biz-app",
+    "description": "",
+    "image": "",
+    "createdAt": "",
+    "updatedAt": ""
+  },
+  {
+    "id": "edu--edu-maths",
+    "coreId": "edu",
+    "name": "Edu Maths",
+    "slug": "edu-maths",
+    "description": "",
+    "image": "",
+    "createdAt": "",
+    "updatedAt": ""
+  },
+  {
+    "id": "edu--edu-care",
+    "coreId": "edu",
+    "name": "Edu Care",
+    "slug": "edu-care",
+    "description": "",
+    "image": "",
+    "createdAt": "",
+    "updatedAt": ""
+  },
+  {
+    "id": "edu--edu-lab",
+    "coreId": "edu",
+    "name": "Edu Lab",
+    "slug": "edu-lab",
+    "description": "",
+    "image": "",
+    "createdAt": "",
+    "updatedAt": ""
+  },
+  {
+    "id": "future--leadership-program",
+    "coreId": "future",
+    "name": "Program Kepimpinan",
+    "slug": "program-kepimpinan",
+    "description": "",
+    "image": "",
+    "createdAt": "",
+    "updatedAt": "2026-07-31T07:42:31.081Z"
+  },
+  {
+    "id": "future--spm-seminar",
+    "coreId": "future",
+    "name": "Seminar SPM",
+    "slug": "seminar-spm",
+    "description": "",
+    "image": "",
+    "createdAt": "",
+    "updatedAt": "2026-07-31T07:42:40.162Z"
+  },
+  {
+    "id": "green--go-green",
+    "coreId": "green",
+    "name": "Go Green",
+    "slug": "go-green",
+    "description": "",
+    "image": "",
+    "createdAt": "",
+    "updatedAt": ""
+  },
+  {
+    "id": "green--green-cycle",
+    "coreId": "green",
+    "name": "Green Cycle",
+    "slug": "green-cycle",
+    "description": "",
+    "image": "",
+    "createdAt": "",
+    "updatedAt": ""
+  },
+  {
+    "id": "green--green-light",
+    "coreId": "green",
+    "name": "Green Light",
+    "slug": "green-light",
+    "description": "",
+    "image": "",
+    "createdAt": "",
+    "updatedAt": ""
+  }
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "b9dd9e73-f1cd-4e97-9bbe-7bd0f3ec6b3a",
+    "name": "HQ Admin",
+    "email": "admin@cakna.com",
+    "passwordHash": "a8c9b76a6ea69b3ded65c354ca2d7831:b045623bef177c06a28742c49d9220cf84155882b970212ff6b369209782eb8b77ecdb35211112caf453c4b14c917ded0468ad1a4c29b18a0cf4c65a41e54713",
+    "role": "admin",
+    "branch": "HQ",
+    "status": "active",
+    "createdAt": "2026-07-27T04:47:13.759Z"
+  },
+  {
+    "id": "2b1592b2-7c31-48d8-a1a2-4ca05ee7e7e6",
+    "name": "Team CAKNA",
+    "email": "reviewer@cakna.com",
+    "passwordHash": "e722d15dc1dad2dd7ce9e9341bbdb940:bbc41d0917a64a05baff82d1c92eb8a9c2f6a08c17d046f6e24b8f7b958d595e779e15935785690b0074923dd753ac0b8d3e77e08a9cb24f5777c9ede991ae60",
+    "role": "reviewer",
+    "branch": "HQ",
+    "status": "active",
+    "createdAt": "2026-07-27T04:47:13.759Z"
+  },
+  {
+    "id": "ffdc2574-0831-4f17-a59c-8f2647b3d510",
+    "name": "Aiman (Terengganu)",
+    "email": "franchisee@cakna.com",
+    "passwordHash": "7dddf5863fa8b079bd73455f4c257e05:2f1c5f0279330771bd08ef2443c2dda2850f81977cb1af5e8a0addfa10e8edbba6c66a208030b5102261f015386dd87f8474ce534e538769e279c5673f5bc7c0",
+    "role": "franchisee",
+    "branch": "Kuala Terengganu",
+    "status": "active",
+    "createdAt": "2026-07-27T04:47:13.759Z"
+  },
+  {
+    "id": "4695fa07-e94a-4f3a-bb1d-6dda7745874b",
+    "name": "Sofea (Kuantan)",
+    "email": "pending@cakna.com",
+    "passwordHash": "638ef01e96ae9f518e05a94035d9e842:a9b734bd62b659864acbc60e2c5bac974b9b6b977070d33fb27981ddc72731d6b76d2d9f07c1fd424e227532f0290692a4fe8bcf695af5fb7771601be7a649cf",
+    "role": "franchisee",
+    "branch": "Kuantan",
+    "status": "pending",
+    "createdAt": "2026-07-27T04:47:13.759Z"
+  }
+]

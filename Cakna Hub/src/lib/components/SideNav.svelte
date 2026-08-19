@@ -1,0 +1,228 @@
+<script lang="ts">
+	import {
+		Home,
+		BookOpen,
+		Clock,
+		BookMarked,
+		Radio,
+		HandHeart,
+		Heart,
+		Star,
+		Droplet,
+		Compass,
+		Moon,
+		Percent,
+		Search,
+		ListOrdered,
+		BookHeart,
+		GraduationCap,
+		Target,
+		Grid2X2,
+		X,
+		ChevronRight
+	} from 'lucide-svelte';
+	import MathuratPicker from './MathuratPicker.svelte';
+
+	let { active = 'home' }: { active?: string } = $props();
+
+	let moreOpen = $state(false);
+	let mathuratOpen = $state(false);
+
+	const mainNav = [
+		{ id: 'home', icon: Home, label: 'Home', href: '/hub' },
+		{ id: 'mushaf', icon: BookOpen, label: 'Mushaf Digital', href: '/mushaf' },
+		{ id: 'solat', icon: Clock, label: 'Waktu Solat', href: '/solat' },
+		{ id: 'mathurat', icon: BookMarked, label: "Al-Ma'thurat", href: '/mathurat' },
+		{ id: 'halaqah', icon: Radio, label: 'Halaqah', href: '/halaqah' }
+	];
+
+	const moreItems = [
+		{ label: 'Zikir & Tasbih', href: '/zikir', icon: HandHeart },
+		{ label: 'Selawat Nabi', href: '/selawat', icon: Heart },
+		{ label: 'Asmaul Husna', href: '/asma', icon: Star },
+		{ label: 'Doa Al-Quran', href: '/doa', icon: Droplet },
+		{ label: 'Kiblat', href: '/qibla', icon: Compass },
+		{ label: 'Rekod Puasa', href: '/puasa', icon: Moon },
+		{ label: 'Kalkulator Zakat', href: '/zakat', icon: Percent },
+		{ label: 'Cari Ayat', href: '/search', icon: Search },
+		{ label: 'Senarai Surah', href: '/surah', icon: ListOrdered },
+		{ label: 'Surah Yasin', href: '/yasin', icon: BookHeart },
+		{ label: 'Panduan Ibadah', href: '/ibadah', icon: GraduationCap },
+		{ label: 'Asas Mengaji', href: '/mengaji', icon: GraduationCap },
+		{ label: 'Khatam', href: '/khatam', icon: Target }
+	];
+</script>
+
+<!-- Backdrop overlays -->
+{#if moreOpen}
+	<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+	<div class="fixed inset-0 z-40" onclick={() => (moreOpen = false)}></div>
+{/if}
+{#if mathuratOpen}
+	<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+	<div class="fixed inset-0 z-40" onclick={() => (mathuratOpen = false)}></div>
+{/if}
+
+<!-- Pill sidebar -->
+<nav class="fixed left-4 top-1/2 z-50 flex -translate-y-1/2 flex-col items-center" aria-label="Main navigation">
+	<div
+		class="side-pill flex flex-col items-center gap-1 rounded-[2rem] px-2 py-3"
+	>
+		<!-- Logo -->
+		<div class="logo-btn mb-2 flex h-10 w-10 items-center justify-center rounded-full">
+			<svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+				<path d="M12 2C8 2 4 6 4 10c0 5 8 12 8 12s8-7 8-12c0-4-4-8-8-8z" fill="currentColor" opacity="0.9"/>
+				<path d="M12 6c-1.5 2-2 4-2 5.5C10 13.5 11 15 12 16c1-1 2-2.5 2-4.5C14 10 13.5 8 12 6z" fill="white" opacity="0.6"/>
+			</svg>
+		</div>
+
+		<!-- Nav items -->
+		{#each mainNav as item (item.id)}
+			{#if item.id === 'mathurat'}
+				<button
+					onclick={() => { mathuratOpen = !mathuratOpen; moreOpen = false; }}
+					class="nav-item relative flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200"
+					class:active={mathuratOpen || active === item.id}
+					aria-label={item.label}
+					title={item.label}
+				>
+					<item.icon size={20} strokeWidth={1.8} />
+					<span class="tooltip pointer-events-none absolute left-14 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium opacity-0 transition-opacity duration-150">
+						{item.label}
+					</span>
+				</button>
+			{:else}
+				<a
+					href={item.href}
+					class="nav-item relative flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200"
+					class:active={active === item.id}
+					aria-label={item.label}
+					title={item.label}
+				>
+					<item.icon size={20} strokeWidth={1.8} />
+					<span class="tooltip pointer-events-none absolute left-14 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium opacity-0 transition-opacity duration-150">
+						{item.label}
+					</span>
+				</a>
+			{/if}
+		{/each}
+
+		<!-- Divider -->
+		<div class="divider my-1 h-px w-8 rounded-full"></div>
+
+		<!-- More button -->
+		<button
+			onclick={() => (moreOpen = !moreOpen)}
+			class="nav-item flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200"
+			class:active={moreOpen}
+			aria-label="Lagi"
+			title="Lagi"
+		>
+			{#if moreOpen}
+				<X size={20} strokeWidth={1.8} />
+			{:else}
+				<Grid2X2 size={20} strokeWidth={1.8} />
+			{/if}
+		</button>
+	</div>
+</nav>
+
+<!-- Mathurat picker panel -->
+{#if mathuratOpen}
+	<div class="more-panel fixed left-20 top-1/2 z-50 w-64 -translate-y-1/2 overflow-hidden rounded-2xl">
+		<MathuratPicker onclose={() => (mathuratOpen = false)} />
+	</div>
+{/if}
+
+<!-- More panel -->
+{#if moreOpen}
+	<div
+		class="more-panel fixed left-20 top-1/2 z-50 w-56 -translate-y-1/2 overflow-hidden rounded-2xl"
+		style="max-height: min(480px, 85vh)"
+	>
+		<div class="flex items-center justify-between px-4 py-3">
+			<span class="text-xs font-semibold uppercase tracking-widest text-white/40">Lagi</span>
+		</div>
+		<div class="overflow-y-auto px-2 pb-3" style="max-height: calc(min(480px, 85vh) - 44px)">
+			{#each moreItems as item (item.href)}
+				<a
+					href={item.href}
+					class="more-item flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors duration-150"
+					onclick={() => (moreOpen = false)}
+				>
+					<span class="more-icon flex h-7 w-7 items-center justify-center rounded-lg">
+						<item.icon size={15} strokeWidth={1.8} />
+					</span>
+					<span class="text-sm font-medium text-white/80">{item.label}</span>
+					<ChevronRight size={14} class="ml-auto text-white/30" />
+				</a>
+			{/each}
+		</div>
+	</div>
+{/if}
+
+<style>
+	.side-pill {
+		background: rgba(15, 50, 35, 0.7);
+		backdrop-filter: blur(16px);
+		-webkit-backdrop-filter: blur(16px);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		box-shadow:
+			0 8px 32px rgba(0, 0, 0, 0.4),
+			inset 0 1px 0 rgba(255, 255, 255, 0.06);
+	}
+
+	.logo-btn {
+		background: rgba(45, 120, 80, 0.5);
+		color: rgba(255, 255, 255, 0.9);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.nav-item {
+		color: rgba(255, 255, 255, 0.5);
+	}
+
+	.nav-item:hover {
+		background: rgba(255, 255, 255, 0.08);
+		color: rgba(255, 255, 255, 0.85);
+	}
+
+	.nav-item.active {
+		background: rgba(255, 255, 255, 0.95);
+		color: #0f4a2e;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+	}
+
+	.nav-item:hover .tooltip {
+		opacity: 1;
+	}
+
+	.tooltip {
+		background: rgba(15, 50, 35, 0.9);
+		backdrop-filter: blur(8px);
+		color: rgba(255, 255, 255, 0.9);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+	}
+
+	.divider {
+		background: rgba(255, 255, 255, 0.08);
+	}
+
+	.more-panel {
+		background: rgba(12, 42, 28, 0.92);
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+	}
+
+	.more-item:hover {
+		background: rgba(255, 255, 255, 0.06);
+	}
+
+	.more-icon {
+		background: rgba(45, 120, 80, 0.3);
+		color: rgba(255, 255, 255, 0.6);
+	}
+</style>

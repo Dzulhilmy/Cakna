@@ -1,0 +1,48 @@
+# Docker build context is the REPO ROOT (see deploy/docker-compose.prod.yml: context: ..).
+#
+# deploy/Dockerfile.api only needs two things out of that context:
+#   COPY server/          -> the Rust crate (rebuilt inside the image)
+#   COPY data/extracted   -> seed content, CAKNA_DATA_DIR
+#
+# Everything else below is excluded so `docker compose build` on the server
+# does not tar ~7 GB of caches and app sources into the daemon.
+#
+# NOTE: web/build is NOT needed here — docker-compose.prod.yml bind-mounts it
+# at runtime (../web/build:/app/static:ro). Excluding it from the build context
+# does not affect that mount.
+
+# ── Rust build cache: 4.6 GB, and the image rebuilds it anyway ───────────────
+server/target
+
+# ── Flutter app: 2.4 GB, not part of the API image ──────────────────────────
+app
+
+# ── Web: node_modules 148 MB; build/ is bind-mounted, not copied ────────────
+web
+
+# ── Vendored third-party APKs (398 MB) and the legacy single-file PWA ───────
+Tilawah
+sample
+
+# ── The superseded Node/Express stack. Kept in the repo because it is still
+#    what serves production, but it has no place in the Rust image. ──────────
+legacy
+
+# ── Not used by the API image ───────────────────────────────────────────────
+brand
+tools
+docs
+data/frontend
+*.md
+
+# ── Secrets: deploy/.env is server-only and must never enter an image layer ─
+**/.env
+deploy/.env
+
+# ── VCS / OS / editor cruft ─────────────────────────────────────────────────
+.git
+.gitignore
+.claude
+**/.DS_Store
+**/node_modules
+*.log

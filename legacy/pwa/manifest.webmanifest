@@ -1,0 +1,28 @@
+{
+  "name": "Nur Al-Quran — Mushaf Digital",
+  "short_name": "Nur Al-Quran",
+  "description": "Mushaf digital 604 halaman dengan tajwid berwarna, audio qari, terjemahan berbilang bahasa, waktu solat, kiblat, zikir & hafazan. Berfungsi luar talian.",
+  "lang": "ms",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0B3D2E",
+  "theme_color": "#0B3D2E",
+  "categories": ["education", "lifestyle", "books"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Sambung bacaan",
+      "short_name": "Baca",
+      "description": "Terus ke halaman terakhir dibaca",
+      "url": "./",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

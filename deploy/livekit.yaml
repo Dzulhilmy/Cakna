@@ -1,0 +1,68 @@
+# LiveKit — production config for the halaqah audio rooms.
+#
+# Differs from the local dev container in the ways that matter for real users on
+# real networks. The dev setup advertises 127.0.0.1 and works only because every
+# participant is on the same Mac; across devices that address is meaningless.
+
+port: 7880
+
+rtc:
+  # Media over TCP, for clients that cannot use UDP at all.
+  tcp_port: 7881
+
+  # UDP media. A range rather than a single port so concurrent sessions do not
+  # contend. These must be open in the EC2 security group — see LIVEKIT-DEPLOY.md;
+  # without them every call silently falls back to TCP and quality suffers.
+  port_range_start: 50000
+  port_range_end: 50200
+
+  # Discover the public IP via STUN and advertise THAT as the ICE candidate.
+  # This is the single most important line here: with the dev setting
+  # (use_external_ip: false + node_ip: 127.0.0.1) two devices can never connect,
+  # because each is told to send media to its own loopback.
+  use_external_ip: true
+
+  # LiveKit validates the STUN result by having a packet sent back to it. That
+  # validation FAILS whenever the UDP range is not yet reachable — and on failure
+  # it silently falls back to the machine's local address (on EC2, the 172.31.x
+  # private IP), which breaks cross-device audio while looking healthy.
+  #
+  # If the log shows "could not validate external IP" followed by "failed to get
+  # external ip", set the address explicitly instead — deterministic, and the
+  # right choice for a server with a static/Elastic IP:
+  #
+  #   external_ip: 203.0.113.10
+  #
+  # See "nodeIP" under Verifying in LIVEKIT-DEPLOY.md.
+
+# Embedded TURN. Relays media for participants whose network blocks direct
+# peer-to-peer — corporate firewalls, some mobile carriers, symmetric NAT.
+# Typically a meaningful minority of real users; without it they join the room,
+# see everyone, and simply cannot be heard.
+turn:
+  enabled: true
+  # Plain UDP TURN. Covers most restrictive networks.
+  udp_port: 3478
+  # Ports TURN allocates when relaying a stream. These are SEPARATE from the rtc
+  # range above and must also be open, or TURN accepts the allocation request and
+  # then has nowhere to send the media. LiveKit defaults to 30000-40000; pinned
+  # narrower here so the firewall rule stays small and explicit.
+  relay_range_start: 30000
+  relay_range_end: 30200
+  # TURN over TLS on 5349 additionally covers networks that allow only TLS
+  # traffic. It needs a certificate, so it is off by default — see the
+  # "Hardening" section of LIVEKIT-DEPLOY.md to switch it on.
+  # domain: live.example.com
+  # tls_port: 5349
+  # cert_file: /etc/livekit/tls/cert.pem
+  # key_file: /etc/livekit/tls/key.pem
+
+# API credentials come from the LIVEKIT_KEYS environment variable
+# ("<key>: <secret>"), so no secret is baked into this file or the image.
+
+logging:
+  level: info
+  json: false
+
+# Single-node deployment: no Redis required. Adding a second LiveKit instance
+# later means adding Redis so they can share room state.

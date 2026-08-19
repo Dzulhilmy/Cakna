@@ -5,6 +5,7 @@
 	// salin/kongsi per ayat, info fadhilat), tetapan paparan dan skrin
 	// selesai. Progres kekal berasingan bagi Sughra (32) dan Kubra (46).
 	import { onMount } from 'svelte';
+	import { page } from '$app/state';
 	import PageHeader from '$lib/components/chrome/PageHeader.svelte';
 	import {
 		MASTER,
@@ -120,8 +121,19 @@
 
 	onMount(() => {
 		mathuratState.value = migrate();
+
+		// Quick-launch from menu sheet: apply version + mode and go straight to baca
+		const paramV = page.url.searchParams.get('v') as Versi | null;
+		const paramM = page.url.searchParams.get('m') as 'pagi' | 'petang' | null;
+		if (paramV === 'sughra' || paramV === 'kubra') st().version = paramV;
+		history.replaceState({}, '', '/mathurat');
+
 		loaded = true;
 		if (st().tetapan.autoWaktu) autoIkutWaktu();
+
+		if ((paramV === 'sughra' || paramV === 'kubra') && (paramM === 'pagi' || paramM === 'petang')) {
+			mulaSesi(paramM);
+		}
 	});
 
 	const st = () => mathuratState.value as MathuratState;
@@ -692,7 +704,7 @@
 						class:habis={baki === 0}
 						class:denyut={pulse > 0}
 						style="width:{ring}px; height:{ring}px"
-						aria-label="Kira ulangan, baki {baki}"
+						aria-label="Kira ulangan, {done} daripada {item.reps}"
 						onclick={tap}
 					>
 						<svg width={ring} height={ring} style="position:absolute; inset:0; transform:rotate(-90deg)">
@@ -704,8 +716,8 @@
 								stroke-linecap="round" style="transition: stroke-dashoffset .35s ease"
 							/>
 						</svg>
-						<span style="position:relative; font-size:{baki > 99 ? 28 : 36}px; font-weight:700">{baki === 0 ? '✓' : baki}</span>
-						<span class="mt-tasbih-tap">TAP</span>
+						<span style="position:relative; font-size:{done > 99 ? 28 : 36}px; font-weight:700">{baki === 0 ? '✓' : done}</span>
+						<span class="mt-tasbih-tap">/ {item.reps}</span>
 					</button>
 				{/key}
 			</div>

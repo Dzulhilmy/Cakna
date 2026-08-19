@@ -1,0 +1,82 @@
+# Add-on for the EXISTING `cakna` compose project already running on
+# 56.69.195.145 (/home/ubuntu/cakna/deploy/docker-compose.yml).
+#
+# `name: cakna` MUST match so these services join the same project and network —
+# that is what lets the existing Caddy reach the new api by service name, and
+# lets the new api reach the existing postgres by service name.
+#
+# Copy this file (and livekit.yaml) to /home/ubuntu/cakna/deploy/, then:
+#
+#   cd ~/cakna/deploy
+#   docker compose -f docker-compose.yml -f docker-compose.halaqah.yml up -d api livekit
+#
+# The legacy `app`, `postgres` and `caddy` services are left running untouched.
+name: cakna
+
+services:
+  # ── The new Rust API + SvelteKit SPA ───────────────────────────────────────
+  api:
+    # NOT built here: this box has ~900MB RAM and a full disk, and Dockerfile.api
+    # compiles Rust from source. Build for linux/amd64 elsewhere and load it:
+    #   docker save cakna-api:amd64 | gzip | ssh … 'gunzip | sudo docker load'
+    image: cakna-api:amd64
+    environment:
+      # A SEPARATE database inside the EXISTING postgres container. The legacy
+      # `cakna` database is never touched — create this one first with:
+      #   docker compose exec postgres createdb -U cakna cakna_rust
+      DATABASE_URL: postgres://cakna:${POSTGRES_PASSWORD}@postgres:5432/cakna_rust
+      PORT: "8080"
+      COOKIE_SECURE: "true"
+      STATIC_DIR: /app/static
+      RUST_LOG: cakna=info,tower_http=info
+      ADMIN_EMAILS: ${ADMIN_EMAILS:-}
+      # Reuse the legacy QCXIS client verbatim: same host + same callback path
+      # (https://cakna.org/auth/sso/callback), so NO re-registration is needed and
+      # all SSO users work immediately. These come from the existing deploy/.env.
+      QCXIS_CLIENT_ID: ${QCXIS_CLIENT_ID:-}
+      QCXIS_CLIENT_SECRET: ${QCXIS_CLIENT_SECRET:-}
+      QCXIS_ISSUER: ${QCXIS_ISSUER:-https://qcxis.com}
+      QCXIS_REDIRECT_URI: ${QCXIS_REDIRECT_URI:-https://cakna.org/auth/sso/callback}
+      # Handed to the BROWSER. One vessel: signalling is path-routed at
+      # cakna.org/rtc, so the public URL is the bare host (client appends /rtc).
+      LIVEKIT_URL: ${LIVEKIT_URL:-wss://cakna.org}
+      # Server-to-server. LiveKit uses host networking, so it is reached through
+      # the host gateway rather than by compose service name.
+      LIVEKIT_API_URL: http://host.docker.internal:7880
+      LIVEKIT_API_KEY: ${LIVEKIT_API_KEY:-}
+      LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET:-}
+    volumes:
+      # The compiled SvelteKit SPA. Deliberately NOT ../build — that is the
+      # legacy Node app's build directory and must not be disturbed.
+      - ../web-build:/app/static:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    expose:
+      - "8080"          # internal only; Caddy fronts it. Never published.
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ── LiveKit SFU — carries halaqah audio ────────────────────────────────────
+  #
+  # host networking is deliberate: WebRTC needs a wide UDP range plus TURN on
+  # 3478, and Docker's NAT rewrites the source addresses ICE depends on. It also
+  # lets use_external_ip discover the real public address.
+  livekit:
+    image: livekit/livekit-server:v1.13.4
+    command: --config /etc/livekit.yaml
+    network_mode: host
+    environment:
+      LIVEKIT_KEYS: "${LIVEKIT_API_KEY}: ${LIVEKIT_API_SECRET}"
+    volumes:
+      - ./livekit.yaml:/etc/livekit.yaml:ro
+    restart: unless-stopped
+
+  # ── Existing Caddy: one added capability ───────────────────────────────────
+  # Merged into the running caddy service. LiveKit is on host networking, so it
+  # is not on the compose network — Caddy needs the host gateway to proxy the
+  # wss:// endpoint to it. Ports/volumes stay exactly as the base file defines.
+  caddy:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

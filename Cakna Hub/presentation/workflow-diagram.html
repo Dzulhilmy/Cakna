@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cakna Hub — Aliran Kerja / Workflow</title>
+<style>
+  :root{
+    --emerald:#059669; --emerald-50:#ecfdf5; --emerald-700:#047857;
+    --amber:#d97706; --amber-50:#fffbeb; --amber-700:#b45309;
+    --sky:#0284c7; --sky-50:#f0f9ff; --sky-700:#0369a1;
+    --slate:#64748b; --slate-50:#f8fafc; --slate-700:#475569;
+    --rose:#e11d48; --rose-50:#fff1f2;
+    --z900:#18181b; --z700:#3f3f46; --z500:#71717a; --z400:#a1a1aa; --z300:#d4d4d8; --z200:#e4e4e7; --z100:#f4f4f5; --z50:#fafafa;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,"Noto Sans",sans-serif;
+    color:var(--z900); background:linear-gradient(180deg,#ffffff 0%,var(--z50) 100%);
+    -webkit-font-smoothing:antialiased;
+  }
+  .canvas{width:1600px; padding:46px 52px 40px; margin:0 auto;}
+
+  /* header */
+  .head{display:flex; align-items:flex-start; justify-content:space-between; gap:24px; padding-bottom:22px; border-bottom:1px solid var(--z200);}
+  .wordmark{font-size:34px; font-weight:800; letter-spacing:-0.02em; line-height:1;}
+  .wordmark span{color:var(--emerald);}
+  .subtitle{margin-top:9px; font-size:15px; color:var(--z500); font-weight:500;}
+  .subtitle b{color:var(--z700); font-weight:600;}
+  .head-right{text-align:right; padding-top:3px;}
+  .org{font-size:13.5px; color:var(--z500); font-weight:500;}
+  .pill{display:inline-block; margin-top:9px; padding:4px 11px; border-radius:999px; font-size:12px; font-weight:600; background:var(--emerald-50); color:var(--emerald-700); border:1px solid #a7f3d0;}
+
+  /* legend */
+  .legend{display:flex; align-items:center; gap:26px; margin:20px 0 26px; flex-wrap:wrap;}
+  .legend .lbl{font-size:12px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; color:var(--z400);}
+  .role{display:flex; align-items:center; gap:8px; font-size:13.5px; font-weight:600; color:var(--z700);}
+  .dot{width:11px; height:11px; border-radius:3px; flex:none;}
+  .dot.em{background:var(--emerald);} .dot.am{background:var(--amber);} .dot.sk{background:var(--sky);} .dot.sl{background:var(--slate);}
+
+  /* flow */
+  .flow{display:flex; align-items:stretch; gap:0;}
+  .phase{flex:1 1 0; display:flex; flex-direction:column; min-width:0;}
+  .phase-head{padding:0 4px 14px;}
+  .phase-kicker{font-size:11.5px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--emerald); display:flex; align-items:center; gap:7px;}
+  .phase-kicker .num{display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:6px; background:var(--emerald); color:#fff; font-size:12px; font-weight:800;}
+  .phase-title{margin-top:7px; font-size:15px; font-weight:700; color:var(--z900); line-height:1.25;}
+  .phase-title small{display:block; font-size:12.5px; font-weight:500; color:var(--z400); margin-top:1px;}
+
+  .stack{display:flex; flex-direction:column; gap:11px; padding:0 4px; flex:1;}
+
+  .card{position:relative; background:#fff; border:1px solid var(--z200); border-radius:14px; padding:13px 14px 13px 15px; box-shadow:0 1px 2px rgba(24,24,27,.04); overflow:hidden;}
+  .card::before{content:""; position:absolute; left:0; top:0; bottom:0; width:4px;}
+  .card.em::before{background:var(--emerald);} .card.am::before{background:var(--amber);} .card.sk::before{background:var(--sky);} .card.sl::before{background:var(--slate);}
+  .card-top{display:flex; align-items:center; gap:9px; margin-bottom:6px;}
+  .step-no{display:inline-flex; align-items:center; justify-content:center; width:23px; height:23px; border-radius:7px; font-size:12.5px; font-weight:800; color:#fff; flex:none;}
+  .em .step-no{background:var(--emerald);} .am .step-no{background:var(--amber);} .sk .step-no{background:var(--sky);} .sl .step-no{background:var(--slate);}
+  .card h4{font-size:14px; font-weight:700; color:var(--z900); line-height:1.2;}
+  .card .en{font-size:12.5px; font-weight:500; color:var(--z400); margin-top:1px; line-height:1.25;}
+  .card .meta{display:flex; align-items:center; gap:7px; margin-top:9px; flex-wrap:wrap;}
+  .route{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11px; font-weight:600; color:var(--z500); background:var(--z100); border:1px solid var(--z200); border-radius:6px; padding:2px 7px;}
+  .tag{font-size:11px; font-weight:600; border-radius:6px; padding:2px 8px;}
+  .tag.em{background:var(--emerald-50); color:var(--emerald-700);} .tag.am{background:var(--amber-50); color:var(--amber-700);} .tag.sk{background:var(--sky-50); color:var(--sky-700);} .tag.sl{background:var(--slate-50); color:var(--slate-700);}
+  .note{font-size:12px; color:var(--z500); line-height:1.35; margin-top:2px;}
+
+  .down{display:flex; justify-content:center; padding:1px 0;}
+  .down svg{width:16px; height:16px; color:var(--z300);}
+
+  /* between-phase arrow */
+  .arrow{flex:0 0 40px; display:flex; align-items:center; justify-content:center; padding-top:74px;}
+  .arrow svg{width:26px; height:26px; color:var(--emerald);}
+
+  /* branch card (event records) */
+  .branch{border-style:dashed; background:var(--z50);}
+  .branch .card-top .step-no{background:var(--slate);}
+
+  /* decision outcomes */
+  .outcomes{display:flex; flex-direction:column; gap:8px; margin-top:2px;}
+  .outcome{display:flex; align-items:center; gap:9px; padding:9px 12px; border-radius:11px; font-size:13px; font-weight:600;}
+  .outcome.ok{background:var(--emerald-50); color:var(--emerald-700); border:1px solid #a7f3d0;}
+  .outcome.rev{background:var(--rose-50); color:var(--rose); border:1px solid #fecdd3;}
+  .outcome .ic{font-size:15px; font-weight:800;}
+  .outcome small{display:block; font-weight:500; color:var(--z400); font-size:11.5px;}
+
+  /* status lifecycle */
+  .life{margin-top:30px; background:#fff; border:1px solid var(--z200); border-radius:16px; padding:18px 22px; display:flex; align-items:center; gap:18px; flex-wrap:wrap;}
+  .life-lbl{font-size:12px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--z400); flex:none;}
+  .life-flow{display:flex; align-items:center; gap:13px; flex-wrap:wrap;}
+  .status{padding:6px 14px; border-radius:999px; font-size:13px; font-weight:700; border:1.5px solid;}
+  .status.wait{background:var(--amber-50); color:var(--amber-700); border-color:#fcd34d;}
+  .status.ok{background:var(--emerald-50); color:var(--emerald-700); border-color:#6ee7b7;}
+  .status.rev{background:var(--rose-50); color:var(--rose); border-color:#fda4af;}
+  .life-flow .sep{color:var(--z300);}
+  .life-flow .sep svg{width:18px;height:18px; display:block;}
+  .branch-col{display:flex; flex-direction:column; gap:8px;}
+
+  /* context footer */
+  .ctx{margin-top:22px; display:grid; grid-template-columns:1.15fr 1fr 0.9fr; gap:14px;}
+  .ctx-card{background:#fff; border:1px solid var(--z200); border-radius:14px; padding:15px 17px;}
+  .ctx-card .k{font-size:11.5px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--z400);}
+  .ctx-card .chips{margin-top:10px; display:flex; flex-wrap:wrap; gap:7px;}
+  .chip{font-size:12px; font-weight:600; color:var(--z700); background:var(--z100); border:1px solid var(--z200); border-radius:7px; padding:4px 9px;}
+  .chip.g{background:var(--emerald-50); color:var(--emerald-700); border-color:#a7f3d0;}
+
+  .foot{margin-top:20px; display:flex; align-items:center; justify-content:space-between; gap:16px; font-size:11.5px; color:var(--z400);}
+  .foot b{color:var(--z500); font-weight:600;}
+</style>
+</head>
+<body>
+<div class="canvas">
+
+  <div class="head">
+    <div>
+      <div class="wordmark">Cakna <span>Hub</span></div>
+      <div class="subtitle">Aliran Kerja Hujung-ke-Hujung · <b>End-to-End Workflow</b></div>
+    </div>
+    <div class="head-right">
+      <div class="org">QC Group / Cakna &nbsp;·&nbsp; Program Komuniti CSR</div>
+      <span class="pill">Prototaip · Prototype</span>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span class="lbl">Peranan / Roles</span>
+    <span class="role"><span class="dot em"></span>Franchaisi <span style="color:var(--z400);font-weight:500">· Franchisee</span></span>
+    <span class="role"><span class="dot am"></span>Team CAKNA <span style="color:var(--z400);font-weight:500">· Reviewer</span></span>
+    <span class="role"><span class="dot sk"></span>HQ / IT <span style="color:var(--z400);font-weight:500">· Admin</span></span>
+    <span class="role"><span class="dot sl"></span>Sistem <span style="color:var(--z400);font-weight:500">· Automated</span></span>
+  </div>
+
+  <div class="flow">
+
+    <!-- PHASE 1 -->
+    <div class="phase">
+      <div class="phase-head">
+        <div class="phase-kicker"><span class="num">1</span>Onboarding</div>
+        <div class="phase-title">Daftar &amp; Akses<small>Registration &amp; access</small></div>
+      </div>
+      <div class="stack">
+        <div class="card em">
+          <div class="card-top"><span class="step-no">1</span><div><h4>Daftar Akaun</h4><div class="en">Register account</div></div></div>
+          <div class="meta"><span class="route">/register</span><span class="tag em">Franchaisi</span></div>
+        </div>
+        <div class="down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
+        <div class="card sk">
+          <div class="card-top"><span class="step-no">2</span><div><h4>Kelulusan Akaun</h4><div class="en">HQ/IT approves user</div></div></div>
+          <div class="note">Status akaun: <b>Pending → Active</b></div>
+          <div class="meta"><span class="route">/admin/users</span><span class="tag sk">HQ / IT</span></div>
+        </div>
+        <div class="down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
+        <div class="card em">
+          <div class="card-top"><span class="step-no">3</span><div><h4>Log Masuk</h4><div class="en">Secure login</div></div></div>
+          <div class="note">Sesi HMAC · kata laluan <i>scrypt</i></div>
+          <div class="meta"><span class="route">/login</span><span class="tag em">Franchaisi</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+
+    <!-- PHASE 2 -->
+    <div class="phase">
+      <div class="phase-head">
+        <div class="phase-kicker"><span class="num">2</span>Penghantaran</div>
+        <div class="phase-title">Hantar Laporan<small>Submission</small></div>
+      </div>
+      <div class="stack">
+        <div class="card em">
+          <div class="card-top"><span class="step-no">4</span><div><h4>Isi Borang Laporan Program</h4><div class="en">Submit programme report</div></div></div>
+          <div class="note"><b>6 bahagian:</b> Cawangan · Kluster &amp; Program · Penerima Manfaat · Perbelanjaan &amp; Dana · Gambar · Ulasan</div>
+          <div class="meta"><span class="route">/society/funding/new</span><span class="tag em">Franchaisi</span></div>
+        </div>
+        <div class="down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
+        <div class="card sl">
+          <div class="card-top"><span class="step-no">5</span><div><h4>Auto-Rujukan &amp; Simpan</h4><div class="en">Auto-reference &amp; store</div></div></div>
+          <div class="note">No. rujukan <b>HCQC/2026/000N</b> · status awal <b>Menunggu Semakan</b></div>
+          <div class="meta"><span class="tag sl">Sistem</span></div>
+        </div>
+        <div class="card branch">
+          <div class="card-top"><span class="step-no">+</span><div><h4>Rekod Acara</h4><div class="en">Event record — photos only, no funding</div></div></div>
+          <div class="meta"><span class="route">/society/events/new</span><span class="tag sl">Alt. laluan</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+
+    <!-- PHASE 3 -->
+    <div class="phase">
+      <div class="phase-head">
+        <div class="phase-kicker"><span class="num">3</span>Semakan</div>
+        <div class="phase-title">Semak &amp; Lulus<small>Review &amp; approval</small></div>
+      </div>
+      <div class="stack">
+        <div class="card am">
+          <div class="card-top"><span class="step-no">6</span><div><h4>Semakan Team CAKNA</h4><div class="en">Review queue</div></div></div>
+          <div class="note">Team CAKNA / HQ menyemak setiap permohonan</div>
+          <div class="meta"><span class="route">/admin/funding</span><span class="tag am">Team CAKNA</span></div>
+        </div>
+        <div class="down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
+        <div class="outcomes">
+          <div class="outcome ok"><span class="ic">✓</span><div>Diluluskan <small>Approved — dikira sebagai disbursed</small></div></div>
+          <div class="outcome rev"><span class="ic">↩</span><div>Perlu Penambahbaikan <small>Needs revision — dengan catatan</small></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+
+    <!-- PHASE 4 -->
+    <div class="phase">
+      <div class="phase-head">
+        <div class="phase-kicker"><span class="num">4</span>Pelaporan</div>
+        <div class="phase-title">Lapor &amp; Kongsi<small>Reporting &amp; sharing</small></div>
+      </div>
+      <div class="stack">
+        <div class="card sk">
+          <div class="card-top"><span class="step-no">7</span><div><h4>Dashboard &amp; Analitik</h4><div class="en">Dashboard &amp; analytics</div></div></div>
+          <div class="note">KPI · kutipan vs agihan ikut <b>negeri</b> · statistik ikut <b>Core</b> &amp; <b>PIC</b></div>
+          <div class="meta"><span class="route">/admin/dashboard</span><span class="tag sk">HQ · Team</span></div>
+        </div>
+        <div class="down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
+        <div class="card sl">
+          <div class="card-top"><span class="step-no">8</span><div><h4>Laporan Konsolidasi</h4><div class="en">Consolidated report for HQ / Yayasan</div></div></div>
+          <div class="meta"><span class="route">/admin/funding/report</span><span class="tag sl">Sistem</span></div>
+        </div>
+        <div class="down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
+        <div class="card sk">
+          <div class="card-top"><span class="step-no">9</span><div><h4>Eksport &amp; Kongsi</h4><div class="en">Export &amp; share</div></div></div>
+          <div class="meta"><span class="tag sk">PDF · Cetak</span><span class="tag sk">Excel · CSV</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- status lifecycle -->
+  <div class="life">
+    <span class="life-lbl">Kitaran Status<br>Status lifecycle</span>
+    <div class="life-flow">
+      <span class="status wait">Menunggu Semakan</span>
+      <span class="sep"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      <div class="branch-col">
+        <span class="status ok">Diluluskan</span>
+        <span class="status rev">Perlu Penambahbaikan</span>
+      </div>
+    </div>
+    <span class="note" style="max-width:360px; margin-left:8px;">Hanya permohonan <b>Diluluskan</b> dikira dalam jumlah agihan di dashboard &amp; laporan. <span style="color:var(--z400)">Only approved applications count toward disbursed totals.</span></span>
+  </div>
+
+  <!-- context -->
+  <div class="ctx">
+    <div class="ctx-card">
+      <div class="k">7 Core CSR</div>
+      <div class="chips">
+        <span class="chip g">Assist</span><span class="chip g">Biz</span><span class="chip g">Circle</span><span class="chip g">Digital</span><span class="chip g">Edu</span><span class="chip g">Future</span><span class="chip g">Green</span>
+      </div>
+    </div>
+    <div class="ctx-card">
+      <div class="k">5 Kluster HOME</div>
+      <div class="chips">
+        <span class="chip">HOME Edu</span><span class="chip">HOME Cheez</span><span class="chip">HOME Biz</span><span class="chip">HOME Health</span><span class="chip">HOME Go Green</span>
+      </div>
+    </div>
+    <div class="ctx-card">
+      <div class="k">Teknologi</div>
+      <div class="chips">
+        <span class="chip">Next.js 15</span><span class="chip">TypeScript</span><span class="chip">Tailwind v4</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>Merangkumi <b>Pengurusan Domain langkah 12–19</b> · Registration → Submission → Review → Storage → Dashboard → Consolidated report → Export</span>
+    <span><b>Cakna Hub</b> · Aliran Kerja / Workflow</span>
+  </div>
+
+</div>
+</body>
+</html>
