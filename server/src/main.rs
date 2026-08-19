@@ -44,6 +44,16 @@ async fn main() {
     let content_version = AppState::load_content_version(&pool).await;
     let st = AppState::new(pool, cfg.clone(), content_version);
 
+    // Auto-close Halaqah rooms that exceed the 5-hour limit.
+    let st_bg = st.clone();
+    tokio::spawn(async move {
+        let mut interval = tokio::time::interval(Duration::from_secs(5 * 60));
+        loop {
+            interval.tick().await;
+            cakna::halaqah::close_stale(&st_bg).await;
+        }
+    });
+
     let app = cakna::router(st);
     let addr = format!("0.0.0.0:{}", cfg.port);
     tracing::info!("listening on {addr}");

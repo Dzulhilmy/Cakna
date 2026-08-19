@@ -5,8 +5,8 @@
 //! An admin opens a room and becomes its **host**. Any signed-in user may join
 //! and listen. The host designates **one participant at a time** to hold the
 //! floor. That participant and the host may publish audio; everyone else is
-//! subscribe-only. Rooms have **no time limit** — they end when the host closes
-//! them.
+//! subscribe-only. Rooms have a **5-hour limit** — the server auto-closes them
+//! if the host hasn't done so within 5 hours of creation.
 //!
 //! Why permissions are changed server-side
 //! ---------------------------------------
@@ -148,7 +148,7 @@ struct Room {
 async fn load(st: &AppState, slug: &str) -> Result<Room, AppError> {
     sqlx::query_as::<_, (Uuid, String, String, Uuid, Option<Uuid>, i32, Option<Value>)>(
         "SELECT id, slug, title, host_id, speaker_id, page, share FROM halaqah_rooms \
-         WHERE slug = $1 AND closed_at IS NULL AND created_at >= NOW() - INTERVAL '24 hours'",
+         WHERE slug = $1 AND closed_at IS NULL AND created_at >= NOW() - INTERVAL '5 hours'",
     )
     .bind(slug)
     .fetch_optional(&st.pool)
@@ -256,7 +256,7 @@ pub async fn list(State(st): State<AppState>, _u: AuthUser) -> Result<Json<Value
          FROM halaqah_rooms r \
          JOIN users h ON h.id = r.host_id \
          LEFT JOIN users s ON s.id = r.speaker_id \
-         WHERE r.closed_at IS NULL AND r.created_at >= NOW() - INTERVAL '24 hours' ORDER BY r.created_at DESC",
+         WHERE r.closed_at IS NULL AND r.created_at >= NOW() - INTERVAL '5 hours' ORDER BY r.created_at DESC",
     )
     .fetch_all(&st.pool)
     .await?;
@@ -524,6 +524,39 @@ pub async fn set_share(
 
     publish_state(&st, &room, room.speaker_id, page, share.as_ref()).await;
     Ok(Json(json!({ "ok": true, "share": share })))
+}
+
+/// Background task: close any room that has been open for more than 5 hours
+/// without the host explicitly closing it. Called on a regular interval from
+/// `main`. Errors are logged and skipped — the next tick will retry.
+pub async fn close_stale(st: &AppState) {
+    let stale: Vec<(Uuid, String)> = match sqlx::query_as::<_, (Uuid, String)>(
+        "SELECT id, slug FROM halaqah_rooms \
+         WHERE closed_at IS NULL AND created_at <= NOW() - INTERVAL '5 hours'",
+    )
+    .fetch_all(&st.pool)
+    .await
+    {
+        Ok(rows) => rows,
+        Err(e) => {
+            tracing::warn!("halaqah: stale-room query failed: {e}");
+            return;
+        }
+    };
+
+    for (id, slug) in stale {
+        let _ = room_service(st, &slug, "DeleteRoom", json!({ "room": slug })).await;
+        match sqlx::query(
+            "UPDATE halaqah_rooms SET closed_at = now() WHERE id = $1 AND closed_at IS NULL",
+        )
+        .bind(id)
+        .execute(&st.pool)
+        .await
+        {
+            Ok(_) => tracing::info!("halaqah: auto-closed stale room {slug}"),
+            Err(e) => tracing::warn!("halaqah: failed to mark room {slug} closed: {e}"),
+        }
+    }
 }
 
 /// End the session. Host only. Also deletes the LiveKit room, disconnecting all.
