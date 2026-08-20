@@ -26,7 +26,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   static const _slides = <_Slide>[
     _Slide(CaknaMark(size: 96, color: CaknaColors.oliveDeep), 'Selamat datang ke Cakna',
-        'Mushaf digital 604 halaman dengan tajwid berwarna, terjemahan berbilang bahasa dan audio qari.'),
+        'Cakna bermaksud hadir, peka dan sedia membantu. Aplikasi rasmi komuniti HOME — menghubungkan ibadah harian, program komuniti dan Al-Quran dalam satu genggaman.'),
     _Slide(Icon(Icons.menu_book, size: 84, color: CaknaColors.olive), 'Baca, dengar, hafaz',
         'Ketuk ayat untuk audio dan terjemahan, lihat perkataan demi perkataan, dan tandakan penanda serta nota anda.'),
     _Slide(Icon(Icons.mosque_outlined, size: 84, color: CaknaColors.olive), 'Teman ibadah harian',
