@@ -208,6 +208,7 @@
 	.mushaf-text {
 		font-size: var(--arabic-size);
 		line-height: 2.2;
+		color: var(--pg-fg);
 	}
 	.surah-band {
 		text-align: center;
@@ -218,12 +219,13 @@
 		font-size: calc(var(--arabic-size) * 1.15);
 		padding: 10px 8px 12px;
 		margin: 14px 0 10px;
+		color: var(--pg-fg);
 	}
 	.surah-band small {
 		display: block;
 		font-family: 'Figtree', sans-serif;
 		font-size: 11px;
-		color: var(--muted-foreground);
+		color: var(--pg-muted);
 		letter-spacing: 0.04em;
 		margin-top: 2px;
 	}
@@ -233,6 +235,7 @@
 		margin: 6px 0 10px;
 		border-radius: 10px;
 		transition: background 0.2s;
+		color: var(--pg-fg);
 	}
 	/* Distinct GOLD highlight while the reciter is on the Basmalah (vs the GREEN
 	   ayah highlight) — so it's clear the reciter is on the Basmalah, not an ayah. */
@@ -290,7 +293,7 @@
 		margin-right: 0.15em;
 	}
 	.ay-block {
-		border-bottom: 1px solid var(--border);
+		border-bottom: 1px solid var(--pg-surface-b);
 		padding: 12px 0;
 	}
 	.ay-block .ay {
@@ -300,13 +303,13 @@
 	}
 	.ay-tl {
 		font-size: 13px;
-		color: var(--muted-foreground);
+		color: var(--pg-muted);
 		font-style: italic;
 		margin-top: 4px;
 	}
 	.ay-tr {
 		font-size: 14.5px;
-		color: var(--foreground);
+		color: var(--pg-text-85);
 		margin-top: 4px;
 		line-height: 1.6;
 	}

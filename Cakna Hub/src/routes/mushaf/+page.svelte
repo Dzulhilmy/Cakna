@@ -219,9 +219,8 @@
 		display: flex;
 		flex-direction: column;
 		min-height: 100dvh;
-		background: #0e1a14;
-		color: #e8e3d4;
-		padding-left: 76px;
+		background: var(--pg-bg);
+		color: var(--pg-fg);
 	}
 
 	.mushaf-header {
@@ -232,7 +231,7 @@
 		align-items: center;
 		gap: 12px;
 		padding: 12px 16px;
-		background: rgba(14, 26, 20, 0.95);
+		background: var(--pg-hdr);
 		border-bottom: 1px solid rgba(199, 162, 75, 0.15);
 		backdrop-filter: blur(8px);
 	}
@@ -243,14 +242,14 @@
 		width: 36px;
 		height: 36px;
 		border-radius: 10px;
-		background: rgba(255,255,255,0.05);
-		border: 1px solid rgba(255,255,255,0.08);
-		color: rgba(255,255,255,0.6);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-surface-b);
+		color: var(--pg-btn-color);
 		cursor: pointer;
 		text-decoration: none;
 		transition: background 0.15s;
 	}
-	.back-btn:hover, .icon-btn:hover { background: rgba(255,255,255,0.09); }
+	.back-btn:hover, .icon-btn:hover { background: var(--pg-btn-hover); }
 
 	.header-center {
 		flex: 1;
@@ -258,7 +257,7 @@
 		flex-direction: column;
 		align-items: center;
 	}
-	.page-label { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); }
+	.page-label { font-size: 13px; font-weight: 600; color: var(--pg-text-75); }
 	.surah-label { font-size: 11px; color: rgba(199,162,75,0.7); margin-top: 1px; }
 
 	.mushaf-main {
@@ -276,7 +275,7 @@
 	}
 	.spinner {
 		width: 32px; height: 32px;
-		border: 2px solid rgba(255,255,255,0.1);
+		border: 2px solid var(--pg-surface-b);
 		border-top-color: #c7a24b;
 		border-radius: 50%;
 		animation: spin 0.8s linear infinite;
@@ -300,7 +299,7 @@
 		align-items: center;
 		justify-content: space-between;
 		padding: 12px 20px 20px;
-		background: rgba(14, 26, 20, 0.95);
+		background: var(--pg-hdr);
 		border-top: 1px solid rgba(199, 162, 75, 0.12);
 		backdrop-filter: blur(8px);
 	}
@@ -309,15 +308,15 @@
 		place-items: center;
 		width: 44px; height: 44px;
 		border-radius: 12px;
-		background: rgba(255,255,255,0.05);
-		border: 1px solid rgba(255,255,255,0.08);
-		color: rgba(255,255,255,0.6);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-surface-b);
+		color: var(--pg-btn-color);
 		cursor: pointer;
 		transition: background 0.15s;
 	}
-	.nav-btn:hover:not(:disabled) { background: rgba(255,255,255,0.09); color: white; }
+	.nav-btn:hover:not(:disabled) { background: var(--pg-btn-hover); color: white; }
 	.nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-	.nav-label { font-size: 13px; color: rgba(255,255,255,0.35); letter-spacing: 0.05em; }
+	.nav-label { font-size: 13px; color: var(--pg-muted); letter-spacing: 0.05em; }
 
 	/* Sheets */
 	.sheet-backdrop {
@@ -340,7 +339,7 @@
 	.settings-panel { max-height: 85dvh; }
 	.sheet-handle {
 		width: 36px; height: 4px;
-		background: rgba(255,255,255,0.15);
+		background: var(--pg-btn-hover);
 		border-radius: 2px;
 		margin: 0 auto 16px;
 	}
@@ -349,56 +348,56 @@
 		align-items: center;
 		justify-content: space-between;
 		margin-bottom: 12px;
-		color: rgba(255,255,255,0.5);
+		color: var(--pg-btn-color);
 	}
 	.sheet-ref { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: #c7a24b; }
 	.sheet-ar {
 		font-family: var(--font-arabic, 'Amiri Quran', serif);
 		font-size: 22px;
 		line-height: 2;
-		color: #e8e3d4;
+		color: var(--pg-text-85);
 		margin-bottom: 8px;
 	}
-	.sheet-tr { font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.5); margin-bottom: 16px; }
+	.sheet-tr { font-size: 14px; line-height: 1.6; color: var(--pg-btn-color); margin-bottom: 16px; }
 	.sheet-actions { display: flex; gap: 8px; }
 	.sheet-btn {
 		flex: 1;
 		padding: 10px;
 		border-radius: 12px;
-		background: rgba(255,255,255,0.06);
-		border: 1px solid rgba(255,255,255,0.08);
-		color: rgba(255,255,255,0.7);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-surface-b);
+		color: var(--pg-text-75);
 		font-size: 13px;
 		cursor: pointer;
 		transition: background 0.15s;
 	}
-	.sheet-btn:hover { background: rgba(255,255,255,0.1); }
+	.sheet-btn:hover { background: var(--pg-btn-hover); }
 
 	/* Settings */
 	.setting-row {
 		padding: 12px 0;
-		border-bottom: 1px solid rgba(255,255,255,0.05);
+		border-bottom: 1px solid var(--pg-surface-b);
 	}
-	.setting-label { display: block; font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 8px; }
+	.setting-label { display: block; font-size: 12px; color: var(--pg-muted); margin-bottom: 8px; }
 	.setting-select {
 		width: 100%;
 		padding: 8px 12px;
 		border-radius: 10px;
-		background: rgba(255,255,255,0.06);
-		border: 1px solid rgba(255,255,255,0.1);
-		color: rgba(255,255,255,0.8);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-surface-b);
+		color: var(--pg-text-85);
 		font-size: 13px;
 		cursor: pointer;
 	}
 	.range-input {
-		accent-color: #22c55e;
+		accent-color: #b34a6e;
 	}
 	.toggle-btn {
 		padding: 6px 14px;
 		border-radius: 8px;
-		background: rgba(255,255,255,0.06);
-		border: 1px solid rgba(255,255,255,0.1);
-		color: rgba(255,255,255,0.5);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-surface-b);
+		color: var(--pg-muted);
 		font-size: 12px;
 		cursor: pointer;
 	}
@@ -410,7 +409,7 @@
 
 	/* Override MushafPage card to fit the dark hub theme */
 	:global(.mushaf) {
-		background: rgba(255,255,255,0.03) !important;
+		background: var(--pg-surface) !important;
 		border-color: rgba(199,162,75,0.2) !important;
 	}
 	:global(.mushaf .ay.playing) {
@@ -419,6 +418,6 @@
 	}
 	:global(.mushaf .font-arabic) {
 		font-family: var(--font-arabic, 'Amiri Quran', serif);
-		color: #e8e3d4;
+		color: var(--pg-fg);
 	}
 </style>
