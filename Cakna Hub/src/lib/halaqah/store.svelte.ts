@@ -50,7 +50,13 @@ class HalaqahStore {
 			});
 			if (!r.ok) {
 				const body = (await r.json().catch(() => null)) as { error?: string } | null;
-				throw new Error(body?.error ?? `HTTP ${r.status}`, { cause: r.status });
+				const statusMessages: Record<number, string> = {
+					404: 'Sesi halaqah tidak dijumpai.',
+					403: 'Anda tidak dibenarkan menyertai sesi ini.',
+					401: 'Sila log masuk untuk menyertai halaqah.',
+					429: 'Terlalu banyak percubaan. Sila cuba sebentar lagi.',
+				};
+				throw new Error(body?.error ?? statusMessages[r.status] ?? `HTTP ${r.status}`, { cause: r.status });
 			}
 			const s = new HalaqahSession();
 			await s.connect((await r.json()) as JoinInfo);

@@ -21,7 +21,7 @@
 				</div>
 				<div class="min-w-0 flex-1">
 					<p class="truncate font-medium text-zinc-900">{item.title}</p>
-					<span class="inline-block rounded-full px-2 py-0.5 text-xs {item.type === 'event' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'}">{item.type}</span>
+					<span class="inline-block rounded-full px-2 py-0.5 text-xs {item.type === 'event' ? 'bg-blue-100 text-blue-700' : 'bg-rose-100 text-rose-700'}">{item.type}</span>
 				</div>
 			</div>
 		{:else}

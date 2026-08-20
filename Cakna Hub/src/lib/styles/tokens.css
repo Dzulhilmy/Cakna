@@ -1,8 +1,8 @@
 /*
  * Design tokens — source of truth for the Cakna visual system.
- * The @theme block redefines the Tailwind rose-* ramp to match the
- * brand pastels (200 = Pastel Pink #FFD1DC, 300 = Orchid Pink #F2BDCD).
- * All rose-* utilities across the app pick up these values automatically.
+ * Synced with cakna.org brand pastels: 200 = #FFD1DC, 600 = #b34a6e.
+ * The @theme block redefines the Tailwind rose-* ramp so every
+ * rose-* utility across the app picks up the brand palette automatically.
  */
 @theme {
   --color-rose-50:  #fff5f8;
@@ -11,7 +11,7 @@
   --color-rose-300: #f2bdcd;
   --color-rose-400: #e38fa9;
   --color-rose-500: #d06a8e;
-  --color-rose-600: #b34a6e;
+  --color-rose-600: #b34a6e; /* brand primary — cakna.org accent */
   --color-rose-700: #8e3557;
   --color-rose-800: #6e2942;
   --color-rose-900: #54202f;
@@ -19,26 +19,63 @@
 }
 
 :root {
-  /* Semantic tokens — retheme the whole UI from here */
-  --background:   #fafafa;   /* zinc-50  */
+  /* Semantic tokens — synced with cakna.org */
+  --background:   #fafafa;   /* zinc-50 */
   --surface:      #ffffff;
   --border:       #e4e4e7;   /* zinc-200 */
   --foreground:   #18181b;   /* zinc-900 */
   --muted:        #71717a;   /* zinc-500 */
   --muted-foreground: #71717a;
-  --accent:       #b34a6e;   /* rose-600 */
+  --accent:       #b34a6e;   /* cakna.org brand pink */
   --accent-soft:  #ffe6ec;   /* rose-100 */
-  --primary:      #22c55e;   /* emerald-500 */
+  --primary:      #b34a6e;   /* rose-600, brand primary */
 
   /* Mushaf / Quran reader tokens */
   --card:          #fffdf7;
-  --card-foreground: #22312b;
+  --card-foreground: #221228;
   --font-arabic:   'Amiri Quran', 'Scheherazade New', serif;
   --arabic-size:   26px;
   --gold:          #c7a24b;
   --gold-soft:     #e3cd96;
-  --playing:       #eaf4ec;
+  --playing:       #fce8ef;
   --hl-1:          rgba(240, 200, 60, 0.3);
-  --hl-2:          rgba(60, 180, 110, 0.25);
+  --hl-2:          rgba(179, 74, 110, 0.22);
   --hl-3:          rgba(80, 150, 230, 0.25);
+
+  /* ── Page-level light/dark tokens (used by all content pages) ── */
+  --pg-bg:         #f0f4f8;
+  --pg-fg:         #1a2332;
+  --pg-hdr:        rgba(240,244,248,0.96);
+  --pg-hdr-border: rgba(0,0,0,0.07);
+  --pg-btn:        rgba(0,0,0,0.05);
+  --pg-btn-border: rgba(0,0,0,0.08);
+  --pg-btn-color:  rgba(0,0,0,0.5);
+  --pg-btn-hover:  rgba(0,0,0,0.09);
+  --pg-title:      rgba(0,0,0,0.75);
+  --pg-surface:    rgba(0,0,0,0.03);
+  --pg-surface-b:  rgba(0,0,0,0.06);
+  --pg-text-85:    rgba(0,0,0,0.85);
+  --pg-text-75:    rgba(0,0,0,0.75);
+  --pg-muted:      rgba(0,0,0,0.45);
+  --pg-subtle:     rgba(0,0,0,0.25);
+  --pg-faint:      rgba(0,0,0,0.18);
+}
+
+html[data-theme="dark"] {
+  --pg-bg:         #070e14;
+  --pg-fg:         #e2e8f0;
+  --pg-hdr:        rgba(7,14,20,0.96);
+  --pg-hdr-border: rgba(255,255,255,0.06);
+  --pg-btn:        rgba(255,255,255,0.04);
+  --pg-btn-border: rgba(255,255,255,0.07);
+  --pg-btn-color:  rgba(255,255,255,0.5);
+  --pg-btn-hover:  rgba(255,255,255,0.08);
+  --pg-title:      rgba(255,255,255,0.75);
+  --pg-surface:    rgba(255,255,255,0.03);
+  --pg-surface-b:  rgba(255,255,255,0.06);
+  --pg-text-85:    rgba(255,255,255,0.85);
+  --pg-text-75:    rgba(255,255,255,0.75);
+  --pg-muted:      rgba(255,255,255,0.45);
+  --pg-subtle:     rgba(255,255,255,0.25);
+  --pg-faint:      rgba(255,255,255,0.18);
 }

@@ -173,9 +173,8 @@
 		display: flex;
 		flex-direction: column;
 		min-height: 100dvh;
-		background: #070e14;
-		color: #e2e8f0;
-		padding-left: 76px;
+		background: var(--pg-bg);
+		color: var(--pg-fg);
 	}
 
 	.puasa-header {
@@ -186,8 +185,8 @@
 		align-items: center;
 		gap: 12px;
 		padding: 12px 16px;
-		background: rgba(7, 14, 20, 0.96);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+		background: var(--pg-hdr);
+		border-bottom: 1px solid var(--pg-hdr-border);
 		backdrop-filter: blur(8px);
 	}
 
@@ -197,15 +196,15 @@
 		width: 36px;
 		height: 36px;
 		border-radius: 10px;
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.07);
-		color: rgba(255, 255, 255, 0.5);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-btn-border);
+		color: var(--pg-btn-color);
 		cursor: pointer;
 		text-decoration: none;
 		transition: background 0.15s;
 		flex-shrink: 0;
 	}
-	.hdr-btn:hover { background: rgba(255, 255, 255, 0.08); }
+	.hdr-btn:hover { background: var(--pg-btn-hover); }
 
 	.hdr-center {
 		flex: 1;
@@ -216,7 +215,7 @@
 	.hdr-title {
 		font-size: 13px;
 		font-weight: 600;
-		color: rgba(255, 255, 255, 0.75);
+		color: var(--pg-text-75);
 	}
 	.hdr-date {
 		font-size: 11px;
@@ -244,13 +243,13 @@
 		align-items: center;
 		gap: 4px;
 		padding: 14px 8px;
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.06);
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-surface-b);
 		border-radius: 14px;
 	}
 	.stat-missed { border-color: rgba(248, 113, 113, 0.12); background: rgba(248, 113, 113, 0.04); }
 	.stat-icon { font-size: 18px; }
-	.stat-val { font-size: 20px; font-weight: 700; color: #e2e8f0; }
+	.stat-val { font-size: 20px; font-weight: 700; color: var(--pg-fg); }
 	.stat-lbl { font-size: 10px; color: rgba(255, 255, 255, 0.35); text-align: center; }
 
 	/* Today card */
@@ -274,11 +273,11 @@
 	}
 	.today-hijri {
 		font-size: 11px;
-		color: rgba(255, 255, 255, 0.4);
+		color: var(--pg-muted);
 	}
 	.today-prompt {
 		font-size: 13px;
-		color: rgba(255, 255, 255, 0.5);
+		color: var(--pg-btn-color);
 		margin-bottom: 12px;
 	}
 
@@ -294,13 +293,13 @@
 		gap: 6px;
 		padding: 14px 8px;
 		border-radius: 14px;
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.07);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-btn-border);
 		color: rgba(255, 255, 255, 0.7);
 		cursor: pointer;
 		transition: all 0.15s;
 	}
-	.record-btn:hover { background: rgba(255, 255, 255, 0.08); }
+	.record-btn:hover { background: var(--pg-btn-hover); }
 	.record-btn-r { border-color: rgba(199, 162, 75, 0.25); background: rgba(199, 162, 75, 0.08); }
 	.record-btn-r:hover { background: rgba(199, 162, 75, 0.14); }
 	.record-btn-q { border-color: rgba(34, 197, 94, 0.25); background: rgba(34, 197, 94, 0.07); }
@@ -320,7 +319,7 @@
 	}
 	.recorded-emoji { font-size: 32px; }
 	.recorded-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-	.recorded-type { font-size: 16px; font-weight: 600; color: #e2e8f0; }
+	.recorded-type { font-size: 16px; font-weight: 600; color: var(--pg-fg); }
 	.recorded-note { font-size: 11px; color: rgba(255, 255, 255, 0.35); }
 	.undo-btn {
 		display: flex;
@@ -343,7 +342,7 @@
 		font-weight: 700;
 		letter-spacing: 0.15em;
 		text-transform: uppercase;
-		color: rgba(255, 255, 255, 0.25);
+		color: var(--pg-subtle);
 		margin-bottom: 10px;
 	}
 	.recs-list {
@@ -356,7 +355,7 @@
 		align-items: center;
 		gap: 10px;
 		padding: 11px 12px;
-		background: rgba(255, 255, 255, 0.03);
+		background: var(--pg-surface);
 		border: 1px solid rgba(255, 255, 255, 0.04);
 		border-radius: 12px;
 	}

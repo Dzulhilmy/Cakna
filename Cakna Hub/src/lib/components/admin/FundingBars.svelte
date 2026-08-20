@@ -20,7 +20,7 @@
 				<div class="relative h-7 overflow-hidden rounded-lg bg-zinc-100">
 					<!-- collected bar -->
 					<div
-						class="absolute inset-y-0 left-0 rounded-lg bg-emerald-400/60"
+						class="absolute inset-y-0 left-0 rounded-lg bg-rose-400/60"
 						style="width: {(row.collected / maxVal) * 100}%"
 					></div>
 					<!-- given bar -->

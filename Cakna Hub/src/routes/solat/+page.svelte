@@ -178,31 +178,30 @@
 	.solat-root {
 		display: flex; flex-direction: column;
 		min-height: 100dvh;
-		background: #070e14; color: #e2e8f0;
-		padding-left: 76px;
+		background: var(--pg-bg); color: var(--pg-fg);
 	}
 	.solat-header {
 		position: sticky; top: 0; z-index: 20;
 		display: flex; align-items: center; gap: 12px;
 		padding: 12px 16px;
-		background: rgba(7,14,20,0.96);
-		border-bottom: 1px solid rgba(255,255,255,0.06);
+		background: var(--pg-hdr);
+		border-bottom: 1px solid var(--pg-hdr-border);
 		backdrop-filter: blur(8px);
 	}
 	.hdr-btn {
 		display: grid; place-items: center;
 		width: 36px; height: 36px;
 		border-radius: 10px;
-		background: rgba(255,255,255,0.04);
-		border: 1px solid rgba(255,255,255,0.07);
-		color: rgba(255,255,255,0.5);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-btn-border);
+		color: var(--pg-btn-color);
 		cursor: pointer; text-decoration: none;
 		transition: background 0.15s;
 	}
-	.hdr-btn:hover:not(:disabled) { background: rgba(255,255,255,0.08); }
+	.hdr-btn:hover:not(:disabled) { background: var(--pg-btn-hover); }
 	.hdr-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 	.hdr-center { flex: 1; display: flex; flex-direction: column; align-items: center; }
-	.hdr-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.75); }
+	.hdr-title { font-size: 13px; font-weight: 600; color: var(--pg-text-75); }
 	.hdr-loc { display: flex; align-items: center; gap: 4px; font-size: 11px; color: rgba(34,197,94,0.65); margin-top: 1px; }
 
 	.solat-main { padding: 20px 16px 40px; }
@@ -221,12 +220,12 @@
 	.next-info { display: flex; flex-direction: column; gap: 2px; }
 	.next-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(74,222,128,0.6); }
 	.next-name { font-size: 22px; font-weight: 700; color: rgba(74,222,128,0.95); }
-	.next-time { font-size: 36px; font-weight: 800; color: #e2e8f0; line-height: 1.1; letter-spacing: -0.02em; }
-	.next-diff { font-size: 13px; color: rgba(255,255,255,0.4); }
+	.next-time { font-size: 36px; font-weight: 800; color: var(--pg-fg); line-height: 1.1; letter-spacing: -0.02em; }
+	.next-diff { font-size: 13px; color: var(--pg-muted); }
 
 	.section-label {
 		font-size: 10px; font-weight: 700; letter-spacing: 0.15em;
-		text-transform: uppercase; color: rgba(255,255,255,0.25);
+		text-transform: uppercase; color: var(--pg-subtle);
 		margin-bottom: 10px;
 	}
 	.prayers-section { margin-bottom: 28px; }
@@ -235,13 +234,13 @@
 		display: flex; align-items: center; gap: 12px;
 		padding: 12px 14px;
 		border-radius: 12px;
-		background: rgba(255,255,255,0.03);
-		border: 1px solid rgba(255,255,255,0.04);
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-surface-b);
 	}
 	.prayer-next { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.2); }
-	.p-icon { width: 28px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.45); }
-	.p-name { flex: 1; font-size: 14px; color: rgba(255,255,255,0.75); }
-	.p-time { font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.85); }
+	.p-icon { width: 28px; display: flex; align-items: center; justify-content: center; color: var(--pg-muted); }
+	.p-name { flex: 1; font-size: 14px; color: var(--pg-text-75); }
+	.p-time { font-size: 15px; font-weight: 600; color: var(--pg-text-85); }
 	.p-badge {
 		font-size: 10px; font-weight: 600; padding: 3px 8px;
 		border-radius: 6px; background: rgba(34,197,94,0.2); color: rgba(74,222,128,0.9);
@@ -255,16 +254,16 @@
 	.city-btn {
 		padding: 8px 10px;
 		border-radius: 10px;
-		background: rgba(255,255,255,0.04);
-		border: 1px solid rgba(255,255,255,0.06);
-		color: rgba(255,255,255,0.5);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-surface-b);
+		color: var(--pg-btn-color);
 		font-size: 12px; cursor: pointer; text-align: center;
 		transition: all 0.15s;
 	}
-	.city-btn:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.8); }
+	.city-btn:hover { background: var(--pg-surface-b); color: var(--pg-text-85); }
 	.city-active { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.25); color: rgba(74,222,128,0.9); }
 
 	.source-note {
-		font-size: 11px; color: rgba(255,255,255,0.18); text-align: center;
+		font-size: 11px; color: var(--pg-faint); text-align: center;
 	}
 </style>

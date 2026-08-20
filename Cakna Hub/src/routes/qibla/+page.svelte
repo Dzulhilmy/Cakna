@@ -145,7 +145,7 @@
 				aria-label="Kompas kiblat"
 			>
 				<!-- Background circle -->
-				<circle cx="120" cy="120" r="110" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+				<circle cx="120" cy="120" r="110" fill="var(--pg-surface)" stroke="var(--pg-surface-b)" stroke-width="1" />
 
 				<!-- Rotating ring group: rotates opposite to device heading so cardinal labels track compass north -->
 				<g style="transform-origin: 120px 120px; transform: rotate({-(heading ?? 0)}deg)">
@@ -159,7 +159,7 @@
 							y1={120 + inner * Math.sin(rad)}
 							x2={120 + outer * Math.cos(rad)}
 							y2={120 + outer * Math.sin(rad)}
-							stroke={deg % 90 === 0 ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.12)'}
+							stroke={deg % 90 === 0 ? 'var(--pg-subtle)' : 'var(--pg-btn-hover)'}
 							stroke-width={deg % 90 === 0 ? 1.5 : 0.8}
 						/>
 					{/each}
@@ -174,7 +174,7 @@
 							text-anchor="middle"
 							font-size="12"
 							font-weight="700"
-							fill={c.deg === 0 ? 'rgba(248,113,113,0.9)' : 'rgba(255,255,255,0.55)'}
+							fill={c.deg === 0 ? 'rgba(248,113,113,0.9)' : 'var(--pg-muted)'}
 						>{c.label}</text>
 					{/each}
 				</g>
@@ -194,7 +194,7 @@
 				</g>
 
 				<!-- Center dot -->
-				<circle cx="120" cy="120" r="3" fill="rgba(255,255,255,0.3)" />
+				<circle cx="120" cy="120" r="3" fill="var(--pg-subtle)" />
 			</svg>
 
 			<!-- Compass status -->
@@ -239,9 +239,8 @@
 		display: flex;
 		flex-direction: column;
 		min-height: 100dvh;
-		background: #070e14;
-		color: #e2e8f0;
-		padding-left: 76px;
+		background: var(--pg-bg);
+		color: var(--pg-fg);
 	}
 
 	/* ── Header ── */
@@ -253,8 +252,8 @@
 		align-items: center;
 		gap: 12px;
 		padding: 12px 16px;
-		background: rgba(7, 14, 20, 0.96);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+		background: var(--pg-hdr);
+		border-bottom: 1px solid var(--pg-hdr-border);
 		backdrop-filter: blur(8px);
 	}
 	.hdr-btn {
@@ -263,15 +262,15 @@
 		width: 36px;
 		height: 36px;
 		border-radius: 10px;
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.07);
-		color: rgba(255, 255, 255, 0.5);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-btn-border);
+		color: var(--pg-btn-color);
 		cursor: pointer;
 		text-decoration: none;
 		transition: background 0.15s;
 		flex-shrink: 0;
 	}
-	.hdr-btn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.08); }
+	.hdr-btn:hover:not(:disabled) { background: var(--pg-btn-hover); }
 	.hdr-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 	.hdr-center {
 		flex: 1;
@@ -282,7 +281,7 @@
 	.hdr-title {
 		font-size: 13px;
 		font-weight: 600;
-		color: rgba(255, 255, 255, 0.75);
+		color: var(--pg-text-75);
 	}
 	.hdr-sub {
 		font-size: 10px;
@@ -370,7 +369,7 @@
 		font-weight: 700;
 		letter-spacing: 0.15em;
 		text-transform: uppercase;
-		color: rgba(255, 255, 255, 0.25);
+		color: var(--pg-subtle);
 		margin-bottom: 10px;
 	}
 	.city-grid {
@@ -381,9 +380,9 @@
 	.city-btn {
 		padding: 8px 10px;
 		border-radius: 10px;
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.06);
-		color: rgba(255, 255, 255, 0.5);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-surface-b);
+		color: var(--pg-btn-color);
 		font-size: 12px;
 		cursor: pointer;
 		text-align: center;

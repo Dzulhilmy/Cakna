@@ -89,7 +89,7 @@
 								class="rounded p-1 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700"
 							>
 								{#if copied === path}
-									<Check size={13} class="text-emerald-500" />
+									<Check size={13} class="text-rose-500" />
 								{:else}
 									<Copy size={13} />
 								{/if}

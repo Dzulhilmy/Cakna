@@ -179,7 +179,7 @@
 				<span class="font-medium text-zinc-900">Home Page</span>
 			</div>
 			{#if orderSaved}
-				<span class="flex items-center gap-1 text-xs font-semibold text-emerald-600">
+				<span class="flex items-center gap-1 text-xs font-semibold text-rose-600">
 					<Check size={11} /> Order saved
 				</span>
 			{/if}
@@ -233,7 +233,7 @@
 						>
 							{navLabel(key)}
 							{#if savedSection === (sectionSaveKey[key as HomeSectionKey] ?? key)}
-								<Check size={12} class="text-emerald-500" />
+								<Check size={12} class="text-rose-500" />
 							{/if}
 						</button>
 					</div>
@@ -269,7 +269,7 @@
 							</div>
 						</div>
 						<div class="mt-4 flex justify-end">
-							<button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 {savedSection === 'brand' ? '!bg-emerald-600' : ''}">
+							<button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 {savedSection === 'brand' ? '!bg-rose-700' : ''}">
 								{saveBtn('brand', 'Save brand')}
 							</button>
 						</div>
@@ -293,7 +293,7 @@
 								<Plus size={13} /> Add link
 							</button>
 							<div class="mt-4 flex justify-end">
-								<button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 {savedSection === 'nav' ? '!bg-emerald-600' : ''}">
+								<button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 {savedSection === 'nav' ? '!bg-rose-700' : ''}">
 									{saveBtn('nav', 'Save navigation')}
 								</button>
 							</div>
@@ -359,7 +359,7 @@
 							</div>
 						</div>
 						<div class="mt-4 flex justify-end">
-							<button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 {savedSection === 'hero' ? '!bg-emerald-600' : ''}">
+							<button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 {savedSection === 'hero' ? '!bg-rose-700' : ''}">
 								{saveBtn('hero', 'Save hero')}
 							</button>
 						</div>
@@ -420,7 +420,7 @@
 							</label>
 						</div>
 						<div class="mt-4 flex justify-end">
-							<button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 {savedSection === 'about' ? '!bg-emerald-600' : ''}">
+							<button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 {savedSection === 'about' ? '!bg-rose-700' : ''}">
 								{saveBtn('about', 'Save about')}
 							</button>
 						</div>
@@ -460,7 +460,7 @@
 							</div>
 						</div>
 						<div class="mt-4 flex justify-end">
-							<button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 {savedSection === 'programs' ? '!bg-emerald-600' : ''}">
+							<button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 {savedSection === 'programs' ? '!bg-rose-700' : ''}">
 								{saveBtn('programs', 'Save programs')}
 							</button>
 						</div>
@@ -505,7 +505,7 @@
 							</div>
 						</div>
 						<div class="mt-4 flex justify-end">
-							<button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 {savedSection === 'impact' ? '!bg-emerald-600' : ''}">
+							<button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 {savedSection === 'impact' ? '!bg-rose-700' : ''}">
 								{saveBtn('impact', 'Save impact')}
 							</button>
 						</div>
@@ -566,7 +566,7 @@
 							</div>
 						</div>
 						<div class="mt-4 flex justify-end">
-							<button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 {savedSection === 'cta' ? '!bg-emerald-600' : ''}">
+							<button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 {savedSection === 'cta' ? '!bg-rose-700' : ''}">
 								{saveBtn('cta', 'Save CTA')}
 							</button>
 						</div>
@@ -613,7 +613,7 @@
 							</div>
 						</div>
 						<div class="mt-4 flex justify-end">
-							<button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 {savedSection === 'homeGallery' ? '!bg-emerald-600' : ''}">
+							<button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 {savedSection === 'homeGallery' ? '!bg-rose-700' : ''}">
 								{saveBtn('homeGallery', 'Save gallery')}
 							</button>
 						</div>
@@ -660,7 +660,7 @@
 							</div>
 						</div>
 						<div class="mt-4 flex justify-end">
-							<button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 {savedSection === 'partners' ? '!bg-emerald-600' : ''}">
+							<button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 {savedSection === 'partners' ? '!bg-rose-700' : ''}">
 								{saveBtn('partners', 'Save partners')}
 							</button>
 						</div>

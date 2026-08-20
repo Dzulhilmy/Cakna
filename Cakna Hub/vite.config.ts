@@ -13,7 +13,7 @@ export default defineConfig({
 		})
 	],
 	server: {
-		port: 3001
+		port: parseInt(process.env.PORT ?? '3001')
 	},
 	ssr: {
 		noExternal: ['svelte-sonner']

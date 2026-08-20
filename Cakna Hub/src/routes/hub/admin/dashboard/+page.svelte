@@ -17,7 +17,7 @@
 	</header>
 
 	<section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-		<StatCard label="Total Collected" value={formatRM(summary.collected)} hint="{summary.reportCount} programme reports" dot="emerald" />
+		<StatCard label="Total Collected" value={formatRM(summary.collected)} hint="{summary.reportCount} programme reports" dot="rose" />
 		<StatCard label="Total Given" value={formatRM(summary.given)} hint="{disbursedPct}% of collected" dot="amber" />
 		<StatCard label="Net Balance" value={formatRM(summary.net)} hint="Collected − Given" dot="zinc" />
 		<StatCard label="Approved Funding" value={String(summary.applicationCount)} hint="{formatRM(summary.applicationTotal)} disbursed{pendingCount > 0 ? ` · ${pendingCount} pending` : ''}" />
@@ -35,7 +35,7 @@
 				</p>
 			</div>
 			<div class="flex items-center gap-3 text-xs">
-				<span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-sm bg-emerald-400/60"></span>Collected</span>
+				<span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-sm bg-rose-400/60"></span>Collected</span>
 				<span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-sm bg-amber-400/80"></span>Given</span>
 			</div>
 		</div>

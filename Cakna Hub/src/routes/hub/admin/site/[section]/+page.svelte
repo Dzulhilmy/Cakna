@@ -365,10 +365,10 @@
 			</div>
 			<div class="flex items-center gap-2">
 				{#if orderSaved}
-					<span class="flex items-center gap-1 text-xs font-semibold text-emerald-600"><Check size={11} /> Order saved</span>
+					<span class="flex items-center gap-1 text-xs font-semibold text-rose-600"><Check size={11} /> Order saved</span>
 				{/if}
 				{#if savedFlash}
-					<span class="flex items-center gap-1 text-xs font-semibold text-emerald-600"><Check size={11} /> Saved</span>
+					<span class="flex items-center gap-1 text-xs font-semibold text-rose-600"><Check size={11} /> Saved</span>
 				{/if}
 			</div>
 		</div>
@@ -592,7 +592,7 @@
 
 					<div class="flex justify-end">
 						<button type="submit" class="rounded-xl px-4 py-2 text-sm font-semibold text-white
-							{savedFlash ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'}">
+							{savedFlash ? 'bg-rose-700 hover:bg-rose-800' : 'bg-rose-600 hover:bg-rose-700'}">
 							{savedFlash ? '✓ Saved' : 'Save section'}
 						</button>
 					</div>
@@ -1210,7 +1210,7 @@
 
 					<!-- Save button at bottom of form -->
 					<div class="mt-6 flex justify-end">
-						<button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 {savedFlash ? '!bg-emerald-600' : ''}">
+						<button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 {savedFlash ? '!bg-rose-700' : ''}">
 							{savedFlash ? '✓ Saved' : 'Save changes'}
 						</button>
 					</div>
@@ -1739,7 +1739,7 @@
 			}}
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<div class="space-y-4" ondragover={(e) => { if (orderDragging) e.preventDefault(); }} ondrop={(e) => { if (orderDragging) e.preventDefault(); }}>
-				{#if orderSaved}<div class="flex items-center gap-1 text-xs font-semibold text-emerald-600"><Check size={12} /> Order saved</div>{/if}
+				{#if orderSaved}<div class="flex items-center gap-1 text-xs font-semibold text-rose-600"><Check size={12} /> Order saved</div>{/if}
 				{#each aboutOrder as key (key)}
 					{@const sMeta = ABOUT_SECTIONS.find((s) => s.key === key)}
 					<div

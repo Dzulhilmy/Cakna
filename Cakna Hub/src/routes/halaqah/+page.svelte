@@ -91,7 +91,7 @@
 				{#if session.speakerId}
 					{@const speaker = session.members.get(session.speakerId)}
 					<div class="speaker-card">
-						<Radio size={16} class="text-emerald-400" />
+						<Radio size={16} class="text-rose-400" />
 						<span class="speaker-label">Penceramah</span>
 						<span class="speaker-name">{speaker?.name ?? 'Tidak diketahui'}</span>
 					</div>
@@ -237,16 +237,15 @@
 	.hlq-root {
 		display: flex; flex-direction: column;
 		min-height: 100dvh;
-		background: #08100e;
-		color: #e2e8ea;
-		padding-left: 76px;
+		background: var(--pg-bg);
+		color: var(--pg-fg);
 	}
 
 	.hlq-header {
 		position: sticky; top: 0; z-index: 20;
 		display: flex; align-items: center; gap: 12px;
 		padding: 12px 16px;
-		background: rgba(8,16,14,0.96);
+		background: var(--pg-hdr);
 		border-bottom: 1px solid rgba(34,197,94,0.1);
 		backdrop-filter: blur(8px);
 	}
@@ -254,28 +253,28 @@
 		display: grid; place-items: center;
 		width: 36px; height: 36px;
 		border-radius: 10px;
-		background: rgba(255,255,255,0.04);
-		border: 1px solid rgba(255,255,255,0.07);
-		color: rgba(255,255,255,0.5);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-btn-border);
+		color: var(--pg-btn-color);
 		cursor: pointer;
 		text-decoration: none;
 		transition: background 0.15s;
 	}
-	.hdr-btn:hover { background: rgba(255,255,255,0.08); }
+	.hdr-btn:hover { background: var(--pg-btn-hover); }
 	.hdr-danger { border-color: rgba(248,113,113,0.2); color: rgba(248,113,113,0.7); }
 	.hdr-danger:hover { background: rgba(248,113,113,0.1); }
 	.hdr-center { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-	.hdr-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.75); }
+	.hdr-title { font-size: 13px; font-weight: 600; color: var(--pg-text-75); }
 	.hdr-badge {
 		display: flex; align-items: center; gap: 5px;
 		font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
-		text-transform: uppercase; color: rgba(74,222,128,0.9);
+		text-transform: uppercase; color: rgba(228,112,163,0.9);
 	}
 	.live-dot {
 		width: 7px; height: 7px;
 		border-radius: 50%;
-		background: #22c55e;
-		box-shadow: 0 0 6px #22c55e;
+		background: #b34a6e;
+		box-shadow: 0 0 6px #b34a6e;
 		animation: pulse 1.5s ease-in-out infinite;
 	}
 	@keyframes pulse {
@@ -303,13 +302,13 @@
 		font-size: 13px;
 	}
 	.speaker-label { color: rgba(74,222,128,0.7); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
-	.speaker-name { flex: 1; color: rgba(255,255,255,0.8); }
+	.speaker-name { flex: 1; color: var(--pg-text-85); }
 
 	.members-section {}
 	.sec-label {
 		display: flex; align-items: center; gap: 5px;
 		font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
-		text-transform: uppercase; color: rgba(255,255,255,0.3);
+		text-transform: uppercase; color: var(--pg-subtle);
 		margin-bottom: 8px;
 	}
 	.members-grid { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -317,8 +316,8 @@
 		display: flex; align-items: center; gap: 6px;
 		padding: 6px 10px;
 		border-radius: 20px;
-		background: rgba(255,255,255,0.05);
-		border: 1px solid rgba(255,255,255,0.07);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-btn-border);
 		font-size: 12px;
 	}
 	.member-speaking {
@@ -333,7 +332,7 @@
 		font-size: 11px; font-weight: 700;
 		display: grid; place-items: center;
 	}
-	.member-name { color: rgba(255,255,255,0.7); }
+	.member-name { color: var(--pg-text-75); }
 	.member-mic { display: flex; align-items: center; color: rgba(74,222,128,0.8); }
 
 	.controls {
@@ -344,13 +343,13 @@
 		display: flex; flex-direction: column; align-items: center; gap: 6px;
 		padding: 14px 8px;
 		border-radius: 14px;
-		background: rgba(255,255,255,0.05);
-		border: 1px solid rgba(255,255,255,0.07);
-		color: rgba(255,255,255,0.6);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-btn-border);
+		color: var(--pg-btn-color);
 		font-size: 11px; cursor: pointer;
 		transition: all 0.15s;
 	}
-	.ctrl-btn:hover { background: rgba(255,255,255,0.09); color: white; }
+	.ctrl-btn:hover { background: var(--pg-btn-hover); color: white; }
 	.ctrl-active { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.3); color: rgba(74,222,128,0.9); }
 	.ctrl-danger { color: rgba(248,113,113,0.7); }
 	.ctrl-danger:hover { background: rgba(248,113,113,0.12); border-color: rgba(248,113,113,0.2); }
@@ -359,9 +358,9 @@
 		display: flex; align-items: center; gap: 10px; justify-content: center;
 		padding: 10px 14px;
 		border-radius: 12px;
-		background: rgba(255,255,255,0.04);
-		border: 1px solid rgba(255,255,255,0.06);
-		font-size: 13px; color: rgba(255,255,255,0.55);
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-surface-b);
+		font-size: 13px; color: var(--pg-muted);
 	}
 	.follow-btn {
 		padding: 4px 10px;
@@ -399,30 +398,30 @@
 		color: rgba(74,222,128,0.9);
 		margin-bottom: 16px;
 	}
-	.lobby-title { font-size: 28px; font-weight: 700; color: rgba(255,255,255,0.9); margin-bottom: 6px; }
-	.lobby-sub { font-size: 14px; color: rgba(255,255,255,0.35); max-width: 320px; margin: 0 auto; }
+	.lobby-title { font-size: 28px; font-weight: 700; color: var(--pg-fg); margin-bottom: 6px; }
+	.lobby-sub { font-size: 14px; color: var(--pg-subtle); max-width: 320px; margin: 0 auto; }
 
 	.join-card {
-		background: rgba(255,255,255,0.03);
-		border: 1px solid rgba(255,255,255,0.07);
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-btn-border);
 		border-radius: 16px;
 		padding: 18px;
 		margin-bottom: 24px;
 	}
-	.card-title { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.6); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.08em; }
+	.card-title { font-size: 13px; font-weight: 700; color: var(--pg-btn-color); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.08em; }
 	.join-row { display: flex; gap: 8px; }
 	.join-input {
 		flex: 1;
 		padding: 10px 14px;
 		border-radius: 10px;
-		background: rgba(255,255,255,0.06);
-		border: 1px solid rgba(255,255,255,0.1);
-		color: rgba(255,255,255,0.85);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-surface-b);
+		color: var(--pg-text-85);
 		font-size: 14px;
 		outline: none;
 	}
 	.join-input:focus { border-color: rgba(34,197,94,0.4); }
-	.join-input::placeholder { color: rgba(255,255,255,0.2); }
+	.join-input::placeholder { color: var(--pg-faint); }
 	.join-btn {
 		padding: 10px 18px;
 		border-radius: 10px;
@@ -442,14 +441,14 @@
 		display: flex; align-items: flex-start; gap: 14px;
 		padding: 14px;
 		border-radius: 14px;
-		background: rgba(255,255,255,0.03);
-		border: 1px solid rgba(255,255,255,0.05);
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-surface-b);
 	}
 	.feat-icon { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 12px; background: rgba(74,222,128,0.08); color: rgba(74,222,128,0.8); flex-shrink: 0; }
 	.share-label { display: flex; align-items: center; gap: 6px; }
-	.feat-title { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.75); margin-bottom: 2px; }
-	.feat-sub { font-size: 12px; color: rgba(255,255,255,0.35); }
+	.feat-title { font-size: 14px; font-weight: 600; color: var(--pg-text-75); margin-bottom: 2px; }
+	.feat-sub { font-size: 12px; color: var(--pg-subtle); }
 
-	.lobby-note { font-size: 12px; color: rgba(255,255,255,0.2); text-align: center; }
+	.lobby-note { font-size: 12px; color: var(--pg-faint); text-align: center; }
 	.w-9 { width: 36px; }
 </style>

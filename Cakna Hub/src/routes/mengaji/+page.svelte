@@ -372,9 +372,8 @@
 		display: flex;
 		flex-direction: column;
 		min-height: 100dvh;
-		background: #070e14;
-		color: #e2e8f0;
-		padding-left: 76px;
+		background: var(--pg-bg);
+		color: var(--pg-fg);
 		padding-bottom: env(safe-area-inset-bottom);
 	}
 
@@ -387,7 +386,7 @@
 		align-items: center;
 		gap: 12px;
 		padding: 12px 16px;
-		background: rgba(7, 14, 20, 0.96);
+		background: var(--pg-hdr);
 		border-bottom: 1px solid rgba(34, 197, 94, 0.1);
 		backdrop-filter: blur(8px);
 	}
@@ -398,15 +397,15 @@
 		width: 36px;
 		height: 36px;
 		border-radius: 10px;
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.07);
-		color: rgba(255, 255, 255, 0.5);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-btn-border);
+		color: var(--pg-btn-color);
 		cursor: pointer;
 		text-decoration: none;
 		transition: background 0.15s;
 		flex-shrink: 0;
 	}
-	.hdr-btn:hover { background: rgba(255, 255, 255, 0.08); }
+	.hdr-btn:hover { background: var(--pg-btn-hover); }
 
 	.hdr-center {
 		flex: 1;
@@ -417,7 +416,7 @@
 	.hdr-title {
 		font-size: 13px;
 		font-weight: 600;
-		color: rgba(255, 255, 255, 0.75);
+		color: var(--pg-text-75);
 	}
 	.hdr-sub {
 		font-size: 11px;
@@ -438,7 +437,7 @@
 		padding: 7px 8px;
 		border-radius: 10px;
 		font-size: 13px;
-		color: rgba(255, 255, 255, 0.4);
+		color: var(--pg-muted);
 		cursor: pointer;
 		border: none;
 		background: transparent;
@@ -516,8 +515,8 @@
 		align-items: center;
 		gap: 6px;
 		padding: 16px 8px 12px;
-		background: rgba(255, 255, 255, 0.025);
-		border: 1px solid rgba(255, 255, 255, 0.06);
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-surface-b);
 		border-radius: 12px;
 		transition: background 0.15s, border-color 0.15s;
 	}
@@ -529,7 +528,7 @@
 	.huruf-ar {
 		font-family: 'Amiri Quran', 'Scheherazade New', serif;
 		font-size: 28px;
-		color: #e8e3d4;
+		color: var(--pg-fg);
 		line-height: 1.4;
 	}
 	.huruf-name {
@@ -550,8 +549,8 @@
 		align-items: center;
 		gap: 16px;
 		padding: 14px 16px;
-		background: rgba(255, 255, 255, 0.025);
-		border: 1px solid rgba(255, 255, 255, 0.06);
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-surface-b);
 		border-radius: 12px;
 	}
 
@@ -607,7 +606,7 @@
 	.drill-big-char {
 		font-family: 'Amiri Quran', 'Scheherazade New', serif;
 		font-size: 72px;
-		color: #e8e3d4;
+		color: var(--pg-fg);
 		line-height: 1.5;
 		direction: rtl;
 	}
@@ -635,8 +634,8 @@
 		align-items: center;
 		gap: 6px;
 		padding: 16px 8px;
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.07);
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-btn-border);
 		border-radius: 12px;
 		cursor: pointer;
 		transition: all 0.15s;
@@ -653,7 +652,7 @@
 	.drill-char {
 		font-family: 'Amiri Quran', 'Scheherazade New', serif;
 		font-size: 24px;
-		color: #e8e3d4;
+		color: var(--pg-fg);
 		direction: rtl;
 	}
 	.drill-cell-sound {
@@ -666,7 +665,7 @@
 
 	.drill-tip {
 		font-size: 12px;
-		color: rgba(255, 255, 255, 0.25);
+		color: var(--pg-subtle);
 		margin: 0;
 		padding: 12px;
 		text-align: center;
@@ -684,8 +683,8 @@
 		display: flex;
 		align-items: center;
 		gap: 0;
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.07);
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-btn-border);
 		border-radius: 14px;
 		overflow: hidden;
 	}
@@ -706,7 +705,7 @@
 	.score-val {
 		font-size: 20px;
 		font-weight: 700;
-		color: rgba(255, 255, 255, 0.75);
+		color: var(--pg-text-75);
 	}
 	.score-best { color: #c7a24b; }
 	.score-divider {
@@ -733,12 +732,12 @@
 	.quiz-start-title {
 		font-size: 20px;
 		font-weight: 700;
-		color: rgba(255, 255, 255, 0.85);
+		color: var(--pg-text-85);
 		margin: 0;
 	}
 	.quiz-start-desc {
 		font-size: 14px;
-		color: rgba(255, 255, 255, 0.4);
+		color: var(--pg-muted);
 		margin: 0;
 		text-align: center;
 		line-height: 1.6;
@@ -771,18 +770,18 @@
 	}
 	.quiz-q-label {
 		font-size: 13px;
-		color: rgba(255, 255, 255, 0.4);
+		color: var(--pg-muted);
 		margin: 0;
 	}
 	.quiz-letter-display {
 		font-family: 'Amiri Quran', 'Scheherazade New', serif;
 		font-size: 80px;
-		color: #e8e3d4;
+		color: var(--pg-fg);
 		line-height: 1.5;
 		direction: rtl;
 		padding: 16px 32px;
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.08);
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-surface-b);
 		border-radius: 20px;
 		min-width: 120px;
 		text-align: center;
@@ -797,16 +796,16 @@
 	.quiz-opt {
 		padding: 14px 8px;
 		border-radius: 14px;
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		color: rgba(255, 255, 255, 0.75);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-surface-b);
+		color: var(--pg-text-75);
 		font-size: 15px;
 		font-weight: 600;
 		cursor: pointer;
 		transition: all 0.15s;
 	}
 	.quiz-opt:hover:not(.opt-disabled) {
-		background: rgba(255, 255, 255, 0.08);
+		background: var(--pg-btn-hover);
 		border-color: rgba(34, 197, 94, 0.2);
 	}
 	.opt-disabled { cursor: not-allowed; }

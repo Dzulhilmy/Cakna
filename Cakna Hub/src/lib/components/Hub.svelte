@@ -11,7 +11,6 @@
 
 <SideNav active="home" />
 
-<div class="ml-20 lg:ml-24">
 <main class="relative mx-auto flex min-h-screen max-w-4xl flex-col justify-center px-6 py-16">
 	<div class="absolute inset-x-0 top-0 flex items-center justify-end gap-4 p-6">
 		<a href="/notifications" title="Announcements" class="text-zinc-400 transition-colors hover:text-rose-500">
@@ -53,4 +52,3 @@
 		</div>
 	{/if}
 </main>
-</div>

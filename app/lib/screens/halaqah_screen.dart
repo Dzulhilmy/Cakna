@@ -132,7 +132,7 @@ class _RoomCard extends StatelessWidget {
                 width: 8,
                 height: 8,
                 decoration: const BoxDecoration(
-                  color: Color(0xFF4CAF50),
+                  color: Color(0xFFEC407A),
                   shape: BoxShape.circle,
                 ),
               ),

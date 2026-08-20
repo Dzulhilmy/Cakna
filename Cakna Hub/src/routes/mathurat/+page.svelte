@@ -306,9 +306,8 @@
 		display: flex;
 		flex-direction: column;
 		min-height: 100dvh;
-		background: #0a1510;
-		color: #e8e3d4;
-		padding-left: 76px;
+		background: var(--pg-bg);
+		color: var(--pg-fg);
 		padding-bottom: env(safe-area-inset-bottom);
 	}
 
@@ -321,7 +320,7 @@
 		align-items: center;
 		gap: 12px;
 		padding: 12px 16px;
-		background: rgba(10, 21, 16, 0.96);
+		background: var(--pg-hdr);
 		border-bottom: 1px solid rgba(34, 197, 94, 0.1);
 		backdrop-filter: blur(8px);
 	}
@@ -330,34 +329,34 @@
 		place-items: center;
 		width: 36px; height: 36px;
 		border-radius: 10px;
-		background: rgba(255,255,255,0.04);
-		border: 1px solid rgba(255,255,255,0.07);
-		color: rgba(255,255,255,0.5);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-btn-border);
+		color: var(--pg-btn-color);
 		cursor: pointer;
 		text-decoration: none;
 		transition: background 0.15s;
 	}
-	.hdr-btn:hover { background: rgba(255,255,255,0.08); }
+	.hdr-btn:hover { background: var(--pg-btn-hover); }
 	.hdr-center { flex: 1; display: flex; flex-direction: column; align-items: center; }
-	.hdr-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.75); }
+	.hdr-title { font-size: 13px; font-weight: 600; color: var(--pg-text-75); }
 	.hdr-sub { font-size: 11px; color: rgba(34,197,94,0.6); }
 
 	/* ── Progress ────────────────────────────── */
 	.prog-wrap {
 		position: relative;
 		height: 3px;
-		background: rgba(255,255,255,0.06);
+		background: var(--pg-surface-b);
 	}
 	.prog-bar {
 		height: 100%;
-		background: linear-gradient(90deg, #16a34a, #22c55e);
+		background: linear-gradient(90deg, #8e3557, #b34a6e);
 		transition: width 0.4s ease;
 	}
 	.prog-label {
 		position: absolute;
 		right: 12px; top: 6px;
 		font-size: 10px;
-		color: rgba(255,255,255,0.25);
+		color: var(--pg-subtle);
 	}
 
 	/* ── Tabs ────────────────────────────────── */
@@ -365,12 +364,12 @@
 		display: flex;
 		gap: 8px;
 		padding: 10px 16px;
-		border-bottom: 1px solid rgba(255,255,255,0.05);
+		border-bottom: 1px solid var(--pg-surface-b);
 	}
 	.tab-group {
 		display: flex;
 		gap: 4px;
-		background: rgba(255,255,255,0.04);
+		background: var(--pg-btn);
 		border-radius: 10px;
 		padding: 3px;
 	}
@@ -378,7 +377,7 @@
 		padding: 5px 12px;
 		border-radius: 7px;
 		font-size: 12px;
-		color: rgba(255,255,255,0.4);
+		color: var(--pg-muted);
 		cursor: pointer;
 		border: none;
 		background: transparent;
@@ -396,26 +395,26 @@
 		overflow-y: auto;
 	}
 	.item-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-	.item-num { font-size: 11px; color: rgba(255,255,255,0.25); }
+	.item-num { font-size: 11px; color: var(--pg-subtle); }
 	.item-jenis {
 		font-size: 10px; font-weight: 600;
 		letter-spacing: 0.08em;
 		color: rgba(34,197,94,0.7);
 		text-transform: uppercase;
 	}
-	.item-tajuk { font-size: 16px; font-weight: 700; color: rgba(255,255,255,0.85); margin-bottom: 4px; }
-	.item-info { font-size: 12px; color: rgba(255,255,255,0.35); margin-bottom: 12px; }
+	.item-tajuk { font-size: 16px; font-weight: 700; color: var(--pg-text-85); margin-bottom: 4px; }
+	.item-info { font-size: 12px; color: var(--pg-subtle); margin-bottom: 12px; }
 	.ar-basmalah {
 		font-family: 'Amiri Quran', 'Scheherazade New', serif;
 		font-size: 22px; line-height: 2.2; text-align: center;
-		color: rgba(199,162,75,0.8); margin-bottom: 4px;
+		color: var(--gold); margin-bottom: 4px;
 	}
 	.ar-text {
 		font-family: 'Amiri Quran', 'Scheherazade New', serif;
-		line-height: 2.2; color: #e8e3d4; margin-bottom: 12px;
+		line-height: 2.2; color: var(--pg-fg); margin-bottom: 12px;
 	}
-	.rumi-text { font-size: 13px; font-style: italic; color: rgba(255,255,255,0.4); margin-bottom: 8px; }
-	.bm-text { line-height: 1.7; color: rgba(255,255,255,0.55); margin-bottom: 20px; }
+	.rumi-text { font-size: 13px; font-style: italic; color: var(--pg-muted); margin-bottom: 8px; }
+	.bm-text { line-height: 1.7; color: var(--pg-muted); margin-bottom: 20px; }
 
 	/* ── Floating counter button ─────────────── */
 	.fab-wrap {
@@ -449,7 +448,7 @@
 	}
 	.ring-bg {
 		fill: none;
-		stroke: rgba(255,255,255,0.07);
+		stroke: var(--pg-surface-b);
 		stroke-width: 6;
 	}
 	.ring-fill {
@@ -479,12 +478,12 @@
 	.fab-num {
 		font-size: 38px;
 		font-weight: 700;
-		color: rgba(255,255,255,0.9);
+		color: var(--pg-fg);
 		line-height: 1;
 	}
 	.fab-sub {
 		font-size: 11px;
-		color: rgba(255,255,255,0.35);
+		color: var(--pg-subtle);
 		letter-spacing: 0.05em;
 	}
 	.fab-check {
@@ -505,8 +504,8 @@
 		align-items: center;
 		justify-content: space-between;
 		padding: 8px 16px 20px;
-		background: rgba(10, 21, 16, 0.96);
-		border-top: 1px solid rgba(255,255,255,0.05);
+		background: var(--pg-hdr);
+		border-top: 1px solid var(--pg-surface-b);
 		backdrop-filter: blur(8px);
 		z-index: 25;
 	}
@@ -514,14 +513,14 @@
 		display: flex; align-items: center; gap: 4px;
 		padding: 8px 14px;
 		border-radius: 10px;
-		background: rgba(255,255,255,0.04);
-		border: 1px solid rgba(255,255,255,0.07);
-		color: rgba(255,255,255,0.45);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-btn-border);
+		color: var(--pg-muted);
 		font-size: 12px;
 		cursor: pointer;
 		transition: background 0.15s;
 	}
-	.foot-btn:hover:not(:disabled) { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); }
+	.foot-btn:hover:not(:disabled) { background: var(--pg-btn-hover); color: var(--pg-text-75); }
 	.foot-btn:disabled { opacity: 0.25; cursor: not-allowed; }
 	.foot-skip {
 		color: rgba(74,222,128,0.7);
@@ -533,13 +532,13 @@
 		display: grid; place-items: center;
 		width: 38px; height: 38px;
 		border-radius: 10px;
-		background: rgba(255,255,255,0.03);
-		border: 1px solid rgba(255,255,255,0.05);
-		color: rgba(255,255,255,0.25);
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-surface-b);
+		color: var(--pg-subtle);
 		cursor: pointer;
 		transition: background 0.15s;
 	}
-	.foot-reset:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.5); }
+	.foot-reset:hover { background: var(--pg-btn-hover); color: var(--pg-muted); }
 
 	/* ── Completion ──────────────────────────── */
 	.complete {
@@ -552,24 +551,24 @@
 	.complete-icon {
 		font-size: 40px; width: 80px; height: 80px;
 		border-radius: 50%;
-		background: rgba(34,197,94,0.15);
+		background: rgba(179,74,110,0.15);
 		display: grid; place-items: center;
-		color: #22c55e;
+		color: #b34a6e;
 	}
-	.complete h2 { font-size: 20px; font-weight: 700; color: rgba(255,255,255,0.85); margin: 0; }
-	.complete p { font-size: 14px; color: rgba(255,255,255,0.4); margin: 0; }
+	.complete h2 { font-size: 20px; font-weight: 700; color: var(--pg-text-85); margin: 0; }
+	.complete p { font-size: 14px; color: var(--pg-muted); margin: 0; }
 
 	.reset-btn {
 		display: flex; align-items: center; gap: 6px;
 		padding: 10px 20px;
 		border-radius: 12px;
-		background: rgba(255,255,255,0.06);
-		border: 1px solid rgba(255,255,255,0.1);
-		color: rgba(255,255,255,0.5);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-surface-b);
+		color: var(--pg-muted);
 		font-size: 13px; cursor: pointer;
 		transition: background 0.15s;
 	}
-	.reset-btn:hover { background: rgba(255,255,255,0.1); }
+	.reset-btn:hover { background: var(--pg-btn-hover); }
 
 	/* ── Settings sheet ──────────────────────── */
 	.backdrop {
@@ -586,23 +585,23 @@
 	}
 	.sheet-handle {
 		width: 36px; height: 4px;
-		background: rgba(255,255,255,0.12);
+		background: var(--pg-btn-hover);
 		border-radius: 2px;
 		margin: 0 auto 16px;
 	}
 	.sheet-hdr {
 		display: flex; align-items: center; justify-content: space-between;
 		margin-bottom: 16px;
-		color: rgba(255,255,255,0.5); font-size: 14px; font-weight: 600;
+		color: var(--pg-muted); font-size: 14px; font-weight: 600;
 	}
 	.sheet-hdr button { background: none; border: none; color: inherit; cursor: pointer; }
 	.srow {
 		display: flex; flex-direction: column; gap: 8px;
 		padding: 10px 0;
-		border-bottom: 1px solid rgba(255,255,255,0.04);
+		border-bottom: 1px solid var(--pg-surface-b);
 	}
 	.srow-check { flex-direction: row; align-items: center; justify-content: space-between; }
-	.slabel { font-size: 12px; color: rgba(255,255,255,0.4); }
-	.sval { font-size: 11px; color: rgba(255,255,255,0.3); text-align: right; }
-	.range { accent-color: #22c55e; width: 100%; }
+	.slabel { font-size: 12px; color: var(--pg-muted); }
+	.sval { font-size: 11px; color: var(--pg-subtle); text-align: right; }
+	.range { accent-color: #b34a6e; width: 100%; }
 </style>

@@ -150,9 +150,8 @@
 		display: flex;
 		flex-direction: column;
 		min-height: 100dvh;
-		background: #070e14;
-		color: #e2e8f0;
-		padding-left: 76px;
+		background: var(--pg-bg);
+		color: var(--pg-fg);
 	}
 
 	.doa-header {
@@ -163,8 +162,8 @@
 		align-items: center;
 		gap: 12px;
 		padding: 12px 16px;
-		background: rgba(7, 14, 20, 0.96);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+		background: var(--pg-hdr);
+		border-bottom: 1px solid var(--pg-hdr-border);
 		backdrop-filter: blur(8px);
 	}
 	.hdr-btn {
@@ -173,24 +172,24 @@
 		width: 36px;
 		height: 36px;
 		border-radius: 10px;
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.07);
-		color: rgba(255, 255, 255, 0.5);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-btn-border);
+		color: var(--pg-btn-color);
 		cursor: pointer;
 		text-decoration: none;
 		transition: background 0.15s;
 		flex-shrink: 0;
 	}
-	.hdr-btn:hover { background: rgba(255, 255, 255, 0.08); }
+	.hdr-btn:hover { background: var(--pg-btn-hover); }
 	.hdr-center { flex: 1; display: flex; justify-content: center; }
-	.hdr-title { font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, 0.75); }
+	.hdr-title { font-size: 13px; font-weight: 600; color: var(--pg-text-75); }
 	.hdr-spacer { width: 36px; flex-shrink: 0; }
 
 	.tabs-wrap {
 		display: flex;
 		gap: 4px;
 		padding: 10px 16px 0;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+		border-bottom: 1px solid var(--pg-surface-b);
 	}
 	.tab-btn {
 		flex: 1;
@@ -198,7 +197,7 @@
 		border-radius: 10px 10px 0 0;
 		background: transparent;
 		border: none;
-		color: rgba(255, 255, 255, 0.4);
+		color: var(--pg-muted);
 		font-size: 12px;
 		font-weight: 600;
 		cursor: pointer;
@@ -221,22 +220,22 @@
 	.skeleton-card {
 		padding: 18px;
 		border-radius: 16px;
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.05);
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-surface-b);
 		display: flex;
 		flex-direction: column;
 		gap: 10px;
 	}
-	.skel-title { height: 14px; width: 55%; border-radius: 4px; background: rgba(255,255,255,0.08); animation: pulse 1.4s ease-in-out infinite; }
-	.skel-arabic { height: 30px; border-radius: 4px; background: rgba(255,255,255,0.07); animation: pulse 1.4s ease-in-out infinite; }
-	.skel-meaning { height: 12px; width: 80%; border-radius: 4px; background: rgba(255,255,255,0.06); animation: pulse 1.4s ease-in-out infinite; }
+	.skel-title { height: 14px; width: 55%; border-radius: 4px; background: var(--pg-surface-b); animation: pulse 1.4s ease-in-out infinite; }
+	.skel-arabic { height: 30px; border-radius: 4px; background: var(--pg-surface-b); animation: pulse 1.4s ease-in-out infinite; }
+	.skel-meaning { height: 12px; width: 80%; border-radius: 4px; background: var(--pg-surface); animation: pulse 1.4s ease-in-out infinite; }
 	@keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
 	.dua-card {
 		padding: 18px;
 		border-radius: 16px;
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.05);
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-surface-b);
 	}
 	.dua-head {
 		display: flex;
@@ -245,7 +244,7 @@
 		gap: 10px;
 		margin-bottom: 14px;
 	}
-	.dua-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); margin: 0; }
+	.dua-title { font-size: 13px; font-weight: 600; color: var(--pg-text-85); margin: 0; }
 	.ref-badge {
 		flex-shrink: 0;
 		padding: 3px 8px;
@@ -262,25 +261,25 @@
 		font-family: 'Amiri Quran', 'Amiri', serif;
 		font-size: 22px;
 		line-height: 2;
-		color: rgba(255,255,255,0.92);
+		color: var(--pg-fg);
 		text-align: right;
 		margin-bottom: 10px;
 		padding: 12px 14px;
-		background: rgba(255,255,255,0.02);
+		background: var(--pg-surface);
 		border-radius: 10px;
-		border: 1px solid rgba(255,255,255,0.04);
+		border: 1px solid var(--pg-surface-b);
 	}
 	.arabic-text { margin: 0; }
-	.arabic-loading { font-size: 12px; color: rgba(255,255,255,0.3); margin-bottom: 10px; font-style: italic; }
+	.arabic-loading { font-size: 12px; color: var(--pg-subtle); margin-bottom: 10px; font-style: italic; }
 
 	.meaning-text {
 		font-size: 13px;
 		line-height: 1.65;
-		color: rgba(255,255,255,0.55);
+		color: var(--pg-muted);
 		margin: 0 0 10px;
 	}
 	.meaning-text:last-child { margin-bottom: 0; }
 
 	.error-msg, .empty-msg { text-align: center; color: #f87171; font-size: 13px; padding: 40px 0; }
-	.empty-msg { color: rgba(255,255,255,0.3); }
+	.empty-msg { color: var(--pg-subtle); }
 </style>

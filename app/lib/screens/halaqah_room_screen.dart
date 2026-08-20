@@ -292,7 +292,7 @@ class _ParticipantChip extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: const Color(0xFF4CAF50), width: 2.5),
+                      border: Border.all(color: const Color(0xFFEC407A), width: 2.5),
                     ),
                   ),
                 ),

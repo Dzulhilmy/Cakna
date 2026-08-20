@@ -3,15 +3,15 @@
 		label: string;
 		value: string;
 		hint?: string;
-		dot?: 'emerald' | 'amber' | 'zinc' | 'rose';
+		dot?: 'rose' | 'amber' | 'zinc' | 'pink';
 	}
 	let { label, value, hint, dot }: Props = $props();
 
 	const dotColors: Record<string, string> = {
-		emerald: 'bg-emerald-500',
+		rose: 'bg-rose-500',
+		pink: 'bg-pink-400',
 		amber: 'bg-amber-400',
-		zinc: 'bg-zinc-400',
-		rose: 'bg-rose-500'
+		zinc: 'bg-zinc-400'
 	};
 </script>
 

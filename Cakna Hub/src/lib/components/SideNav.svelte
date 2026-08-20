@@ -11,6 +11,7 @@
 		Droplet,
 		Compass,
 		Moon,
+		Sun,
 		Percent,
 		Search,
 		ListOrdered,
@@ -19,14 +20,34 @@
 		Target,
 		Grid2X2,
 		X,
-		ChevronRight
+		ChevronRight,
+		ChevronLeft
 	} from 'lucide-svelte';
 	import MathuratPicker from './MathuratPicker.svelte';
+	import { settings } from '$lib/state/stores.svelte';
+
+	const isDark = $derived(settings.value.theme === 'dark');
+	function toggleTheme() {
+		settings.value.theme = isDark ? 'light' : 'dark';
+	}
 
 	let { active = 'home' }: { active?: string } = $props();
 
 	let moreOpen = $state(false);
 	let mathuratOpen = $state(false);
+	let navCollapsed = $state(false);
+
+	$effect(() => {
+		navCollapsed = window.innerWidth < 768;
+	});
+
+	function toggleNav() {
+		navCollapsed = !navCollapsed;
+		if (navCollapsed) {
+			moreOpen = false;
+			mathuratOpen = false;
+		}
+	}
 
 	const mainNav = [
 		{ id: 'home', icon: Home, label: 'Home', href: '/hub' },
@@ -64,78 +85,105 @@
 {/if}
 
 <!-- Pill sidebar -->
-<nav class="fixed left-4 top-1/2 z-50 flex -translate-y-1/2 flex-col items-center" aria-label="Main navigation">
-	<div
-		class="side-pill flex flex-col items-center gap-1 rounded-[2rem] px-2 py-3"
-	>
-		<!-- Logo -->
-		<div class="logo-btn mb-2 flex h-10 w-10 items-center justify-center rounded-full">
-			<svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-				<path d="M12 2C8 2 4 6 4 10c0 5 8 12 8 12s8-7 8-12c0-4-4-8-8-8z" fill="currentColor" opacity="0.9"/>
-				<path d="M12 6c-1.5 2-2 4-2 5.5C10 13.5 11 15 12 16c1-1 2-2.5 2-4.5C14 10 13.5 8 12 6z" fill="white" opacity="0.6"/>
-			</svg>
+<div class="nav-outer" class:collapsed={navCollapsed}>
+	<nav class="flex flex-col items-center" aria-label="Main navigation">
+		<div class="side-pill flex flex-col items-center gap-1 rounded-[2rem] px-2 py-3">
+			<!-- Logo -->
+			<div class="logo-btn mb-2 flex h-10 w-10 items-center justify-center rounded-full">
+				<svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+					<path d="M12 2C8 2 4 6 4 10c0 5 8 12 8 12s8-7 8-12c0-4-4-8-8-8z" fill="currentColor" opacity="0.9"/>
+					<path d="M12 6c-1.5 2-2 4-2 5.5C10 13.5 11 15 12 16c1-1 2-2.5 2-4.5C14 10 13.5 8 12 6z" fill="white" opacity="0.6"/>
+				</svg>
+			</div>
+
+			<!-- Nav items -->
+			{#each mainNav as item (item.id)}
+				{#if item.id === 'mathurat'}
+					<button
+						onclick={() => { mathuratOpen = !mathuratOpen; moreOpen = false; }}
+						class="nav-item relative flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200"
+						class:active={mathuratOpen || active === item.id}
+						aria-label={item.label}
+						title={item.label}
+					>
+						<item.icon size={20} strokeWidth={1.8} />
+						<span class="tooltip pointer-events-none absolute left-14 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium opacity-0 transition-opacity duration-150">
+							{item.label}
+						</span>
+					</button>
+				{:else}
+					<a
+						href={item.href}
+						class="nav-item relative flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200"
+						class:active={active === item.id}
+						aria-label={item.label}
+						title={item.label}
+					>
+						<item.icon size={20} strokeWidth={1.8} />
+						<span class="tooltip pointer-events-none absolute left-14 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium opacity-0 transition-opacity duration-150">
+							{item.label}
+						</span>
+					</a>
+				{/if}
+			{/each}
+
+			<!-- Divider -->
+			<div class="divider my-1 h-px w-8 rounded-full"></div>
+
+			<!-- More button -->
+			<button
+				onclick={() => (moreOpen = !moreOpen)}
+				class="nav-item flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200"
+				class:active={moreOpen}
+				aria-label="Lagi"
+				title="Lagi"
+			>
+				{#if moreOpen}
+					<X size={20} strokeWidth={1.8} />
+				{:else}
+					<Grid2X2 size={20} strokeWidth={1.8} />
+				{/if}
+			</button>
+
+			<!-- Theme toggle -->
+			<button
+				onclick={toggleTheme}
+				class="theme-btn flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200"
+				aria-label={isDark ? 'Mod Cerah' : 'Mod Gelap'}
+				title={isDark ? 'Tukar ke Mod Cerah' : 'Tukar ke Mod Gelap'}
+			>
+				{#if isDark}
+					<Sun size={18} strokeWidth={1.8} />
+				{:else}
+					<Moon size={18} strokeWidth={1.8} />
+				{/if}
+			</button>
 		</div>
+	</nav>
 
-		<!-- Nav items -->
-		{#each mainNav as item (item.id)}
-			{#if item.id === 'mathurat'}
-				<button
-					onclick={() => { mathuratOpen = !mathuratOpen; moreOpen = false; }}
-					class="nav-item relative flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200"
-					class:active={mathuratOpen || active === item.id}
-					aria-label={item.label}
-					title={item.label}
-				>
-					<item.icon size={20} strokeWidth={1.8} />
-					<span class="tooltip pointer-events-none absolute left-14 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium opacity-0 transition-opacity duration-150">
-						{item.label}
-					</span>
-				</button>
-			{:else}
-				<a
-					href={item.href}
-					class="nav-item relative flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200"
-					class:active={active === item.id}
-					aria-label={item.label}
-					title={item.label}
-				>
-					<item.icon size={20} strokeWidth={1.8} />
-					<span class="tooltip pointer-events-none absolute left-14 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium opacity-0 transition-opacity duration-150">
-						{item.label}
-					</span>
-				</a>
-			{/if}
-		{/each}
-
-		<!-- Divider -->
-		<div class="divider my-1 h-px w-8 rounded-full"></div>
-
-		<!-- More button -->
-		<button
-			onclick={() => (moreOpen = !moreOpen)}
-			class="nav-item flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200"
-			class:active={moreOpen}
-			aria-label="Lagi"
-			title="Lagi"
-		>
-			{#if moreOpen}
-				<X size={20} strokeWidth={1.8} />
-			{:else}
-				<Grid2X2 size={20} strokeWidth={1.8} />
-			{/if}
-		</button>
-	</div>
-</nav>
+	<!-- Collapse toggle tab -->
+	<button
+		class="collapse-toggle"
+		onclick={toggleNav}
+		aria-label={navCollapsed ? 'Buka navigasi' : 'Tutup navigasi'}
+	>
+		{#if navCollapsed}
+			<ChevronRight size={14} strokeWidth={2.5} />
+		{:else}
+			<ChevronLeft size={14} strokeWidth={2.5} />
+		{/if}
+	</button>
+</div>
 
 <!-- Mathurat picker panel -->
-{#if mathuratOpen}
+{#if mathuratOpen && !navCollapsed}
 	<div class="more-panel fixed left-20 top-1/2 z-50 w-64 -translate-y-1/2 overflow-hidden rounded-2xl">
 		<MathuratPicker onclose={() => (mathuratOpen = false)} />
 	</div>
 {/if}
 
 <!-- More panel -->
-{#if moreOpen}
+{#if moreOpen && !navCollapsed}
 	<div
 		class="more-panel fixed left-20 top-1/2 z-50 w-56 -translate-y-1/2 overflow-hidden rounded-2xl"
 		style="max-height: min(480px, 85vh)"
@@ -162,20 +210,62 @@
 {/if}
 
 <style>
-	.side-pill {
-		background: rgba(15, 50, 35, 0.7);
+	/* Brand palette: cakna.org rose — #b34a6e (600), #6e2942 (800) */
+
+	.nav-outer {
+		position: fixed;
+		left: 0;
+		top: 50%;
+		z-index: 50;
+		display: flex;
+		align-items: center;
+		transform: translateY(-50%) translateX(1rem);
+		transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+
+	/* Pill is ~60px wide (px-2 = 8px each side + w-11 = 44px) */
+	.nav-outer.collapsed {
+		transform: translateY(-50%) translateX(-60px);
+	}
+
+	.collapse-toggle {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 18px;
+		height: 44px;
+		background: rgba(84, 32, 47, 0.75);
 		backdrop-filter: blur(16px);
 		-webkit-backdrop-filter: blur(16px);
-		border: 1px solid rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.09);
+		border-left: none;
+		border-radius: 0 0.6rem 0.6rem 0;
+		color: rgba(255, 255, 255, 0.55);
+		cursor: pointer;
+		transition: color 0.15s, background 0.15s;
+		box-shadow: 3px 0 10px rgba(0, 0, 0, 0.25);
+		flex-shrink: 0;
+	}
+
+	.collapse-toggle:hover {
+		color: rgba(255, 255, 255, 0.95);
+		background: rgba(110, 41, 66, 0.85);
+	}
+
+	.side-pill {
+		background: rgba(84, 32, 47, 0.75);
+		backdrop-filter: blur(16px);
+		-webkit-backdrop-filter: blur(16px);
+		border: 1px solid rgba(255, 255, 255, 0.09);
 		box-shadow:
-			0 8px 32px rgba(0, 0, 0, 0.4),
-			inset 0 1px 0 rgba(255, 255, 255, 0.06);
+			0 8px 32px rgba(0, 0, 0, 0.35),
+			inset 0 1px 0 rgba(255, 255, 255, 0.07);
 	}
 
 	.logo-btn {
-		background: rgba(45, 120, 80, 0.5);
-		color: rgba(255, 255, 255, 0.9);
-		border: 1px solid rgba(255, 255, 255, 0.1);
+		background: rgba(179, 74, 110, 0.55);
+		color: rgba(255, 255, 255, 0.95);
+		border: 1px solid rgba(255, 255, 255, 0.12);
 	}
 
 	.nav-item {
@@ -183,13 +273,13 @@
 	}
 
 	.nav-item:hover {
-		background: rgba(255, 255, 255, 0.08);
-		color: rgba(255, 255, 255, 0.85);
+		background: rgba(255, 255, 255, 0.09);
+		color: rgba(255, 255, 255, 0.9);
 	}
 
 	.nav-item.active {
 		background: rgba(255, 255, 255, 0.95);
-		color: #0f4a2e;
+		color: #6e2942;
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 	}
 
@@ -198,31 +288,40 @@
 	}
 
 	.tooltip {
-		background: rgba(15, 50, 35, 0.9);
+		background: rgba(84, 32, 47, 0.92);
 		backdrop-filter: blur(8px);
-		color: rgba(255, 255, 255, 0.9);
+		color: rgba(255, 255, 255, 0.92);
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 	}
 
 	.divider {
-		background: rgba(255, 255, 255, 0.08);
+		background: rgba(255, 255, 255, 0.09);
 	}
 
 	.more-panel {
-		background: rgba(12, 42, 28, 0.92);
+		background: rgba(58, 21, 32, 0.93);
 		backdrop-filter: blur(20px);
 		-webkit-backdrop-filter: blur(20px);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+		border: 1px solid rgba(255, 255, 255, 0.09);
+		box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
 	}
 
 	.more-item:hover {
-		background: rgba(255, 255, 255, 0.06);
+		background: rgba(255, 255, 255, 0.07);
 	}
 
 	.more-icon {
-		background: rgba(45, 120, 80, 0.3);
-		color: rgba(255, 255, 255, 0.6);
+		background: rgba(179, 74, 110, 0.35);
+		color: rgba(255, 255, 255, 0.65);
+	}
+
+	.theme-btn {
+		color: rgba(255, 255, 255, 0.45);
+	}
+
+	.theme-btn:hover {
+		background: rgba(255, 255, 255, 0.09);
+		color: rgba(255, 255, 255, 0.9);
 	}
 </style>

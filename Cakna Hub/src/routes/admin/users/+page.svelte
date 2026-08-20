@@ -84,7 +84,7 @@
 	</header>
 
 	{#if $page.form?.synced !== undefined}
-		<div class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-700">
+		<div class="rounded-lg border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm text-rose-700">
 			Synced {$page.form.synced} user{$page.form.synced !== 1 ? 's' : ''} from Cakna.
 		</div>
 	{/if}
@@ -155,7 +155,7 @@
 									name="status"
 									onchange={(e) => (e.currentTarget as HTMLSelectElement).form?.requestSubmit()}
 									class="rounded-lg border border-zinc-200 px-2.5 py-1.5 text-xs {u.status === 'active'
-										? 'text-emerald-700'
+										? 'text-rose-700'
 										: 'text-amber-700'}"
 								>
 									<option value="active" selected={u.status === 'active'}>Active</option>

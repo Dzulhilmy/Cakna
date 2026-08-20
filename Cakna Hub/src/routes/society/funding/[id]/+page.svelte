@@ -72,7 +72,7 @@
 				<input type="hidden" name="stage" value={stage} />
 				<textarea name="note" rows="2" placeholder="Nota (pilihan)…" class="w-full rounded-lg border border-amber-200 bg-white px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300 resize-none"></textarea>
 				<div class="flex gap-2">
-					<button type="submit" name="decision" value="approved" class="flex-1 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700">Lulus</button>
+					<button type="submit" name="decision" value="approved" class="flex-1 rounded-lg bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-rose-700">Lulus</button>
 					<button type="submit" name="decision" value="needs_revision" class="flex-1 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700">Perlu Semakan</button>
 				</div>
 			</form>

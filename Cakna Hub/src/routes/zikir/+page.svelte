@@ -103,7 +103,7 @@
 					<!-- Background track -->
 					<circle
 						cx="110" cy="110" r={RADIUS}
-						stroke="rgba(255,255,255,0.06)"
+						stroke="var(--pg-surface-b)"
 						stroke-width="12"
 						fill="none"
 					/>
@@ -217,9 +217,8 @@
 		display: flex;
 		flex-direction: column;
 		min-height: 100dvh;
-		background: #070e14;
-		color: #e2e8f0;
-		padding-left: 76px;
+		background: var(--pg-bg);
+		color: var(--pg-fg);
 	}
 
 	.zikir-header {
@@ -230,8 +229,8 @@
 		align-items: center;
 		gap: 12px;
 		padding: 12px 16px;
-		background: rgba(7, 14, 20, 0.96);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+		background: var(--pg-hdr);
+		border-bottom: 1px solid var(--pg-hdr-border);
 		backdrop-filter: blur(8px);
 	}
 
@@ -241,15 +240,15 @@
 		width: 36px;
 		height: 36px;
 		border-radius: 10px;
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.07);
-		color: rgba(255, 255, 255, 0.5);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-btn-border);
+		color: var(--pg-btn-color);
 		cursor: pointer;
 		text-decoration: none;
 		transition: background 0.15s;
 		flex-shrink: 0;
 	}
-	.hdr-btn:hover { background: rgba(255, 255, 255, 0.08); }
+	.hdr-btn:hover { background: var(--pg-btn-hover); }
 
 	.hdr-center {
 		flex: 1;
@@ -260,7 +259,7 @@
 	.hdr-title {
 		font-size: 13px;
 		font-weight: 600;
-		color: rgba(255, 255, 255, 0.75);
+		color: var(--pg-text-75);
 	}
 	.hdr-spacer { width: 36px; flex-shrink: 0; }
 
@@ -352,7 +351,7 @@
 	.counter-num {
 		font-size: 60px;
 		font-weight: 800;
-		color: #e2e8f0;
+		color: var(--pg-fg);
 		line-height: 1;
 		letter-spacing: -0.03em;
 	}
@@ -381,13 +380,13 @@
 		gap: 4px;
 		padding: 12px 16px;
 		border-radius: 14px;
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.07);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-btn-border);
 		color: rgba(255, 255, 255, 0.6);
 		cursor: pointer;
 		transition: all 0.15s;
 	}
-	.ctrl-btn:hover { background: rgba(255, 255, 255, 0.08); }
+	.ctrl-btn:hover { background: var(--pg-btn-hover); }
 	.ctrl-reset { flex: 0 0 auto; padding: 12px 20px; }
 	.ctrl-lbl { font-size: 10px; color: rgba(255, 255, 255, 0.3); text-transform: uppercase; letter-spacing: 0.08em; }
 	.ctrl-val { font-size: 18px; font-weight: 700; color: rgba(74, 222, 128, 0.9); }
@@ -398,7 +397,7 @@
 	.dhikr-tabs {
 		display: flex;
 		gap: 6px;
-		background: rgba(255, 255, 255, 0.03);
+		background: var(--pg-surface);
 		border-radius: 12px;
 		padding: 4px;
 	}
@@ -408,7 +407,7 @@
 		border-radius: 9px;
 		background: transparent;
 		border: none;
-		color: rgba(255, 255, 255, 0.4);
+		color: var(--pg-muted);
 		font-size: 13px;
 		font-weight: 500;
 		cursor: pointer;
@@ -427,7 +426,7 @@
 
 	.dhikr-card {
 		padding: 14px;
-		background: rgba(255, 255, 255, 0.03);
+		background: var(--pg-surface);
 		border: 1px solid rgba(255, 255, 255, 0.05);
 		border-radius: 14px;
 		display: flex;
@@ -439,7 +438,7 @@
 		text-align: right;
 		font-size: 20px;
 		line-height: 1.7;
-		color: rgba(255, 255, 255, 0.85);
+		color: var(--pg-text-85);
 		direction: rtl;
 		font-family: 'Traditional Arabic', 'Amiri', serif;
 	}
@@ -451,7 +450,7 @@
 	}
 	.dhikr-name {
 		font-size: 12px;
-		color: rgba(255, 255, 255, 0.45);
+		color: var(--pg-muted);
 	}
 	.dhikr-count {
 		font-size: 11px;
@@ -465,7 +464,7 @@
 	/* Skeleton */
 	.skeleton-card {
 		padding: 14px;
-		background: rgba(255, 255, 255, 0.03);
+		background: var(--pg-surface);
 		border: 1px solid rgba(255, 255, 255, 0.04);
 		border-radius: 14px;
 		display: flex;
@@ -475,7 +474,7 @@
 	.sk-arabic {
 		height: 36px;
 		border-radius: 6px;
-		background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.05) 75%);
+		background: linear-gradient(90deg, var(--pg-surface) 25%, var(--pg-surface-b) 50%, var(--pg-surface) 75%);
 		background-size: 200% 100%;
 		animation: shimmer 1.4s infinite;
 	}

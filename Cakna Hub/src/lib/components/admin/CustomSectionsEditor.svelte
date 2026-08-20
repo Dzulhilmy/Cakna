@@ -151,7 +151,7 @@
 			<p class="text-sm font-semibold text-zinc-800">Custom Sections</p>
 			<p class="text-xs text-zinc-400 mt-0.5">Extra blocks appended to this page</p>
 		</div>
-		{#if saved}<span class="flex items-center gap-1 text-sm font-medium text-emerald-600"><Check size={14} /> Saved</span>{/if}
+		{#if saved}<span class="flex items-center gap-1 text-sm font-medium text-rose-600"><Check size={14} /> Saved</span>{/if}
 	</div>
 
 	<form
@@ -408,7 +408,7 @@
 
 		<div class="flex justify-end">
 			<button type="submit"
-				class="rounded-xl {saved ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'} px-5 py-2.5 text-sm font-semibold text-white">
+				class="rounded-xl {saved ? 'bg-rose-700 hover:bg-rose-800' : 'bg-rose-600 hover:bg-rose-700'} px-5 py-2.5 text-sm font-semibold text-white">
 				{saved ? '✓ Saved' : 'Save sections'}
 			</button>
 		</div>

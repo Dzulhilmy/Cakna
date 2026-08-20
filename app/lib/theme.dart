@@ -1,37 +1,36 @@
 import 'package:flutter/material.dart';
 
-/// Cakna design system — muted olive-gray identity (user palette:
-/// #0c0c09 #1d1d16 #2b2b22 #474739 #5b5b4b #7c7c67 #abab9c). Near-monochrome,
-/// warm and refined; light + dark variants.
+/// Cakna design system — rose pink identity synced with cakna.org brand palette.
+/// Core ramp mirrors the web tokens: rose-950 → rose-200.
 class CaknaColors {
   // core ramp (darkest → lightest)
-  static const o900 = Color(0xFF0C0C09);
-  static const o800 = Color(0xFF1D1D16);
-  static const o700 = Color(0xFF2B2B22);
-  static const o600 = Color(0xFF474739);
-  static const o500 = Color(0xFF5B5B4B);
-  static const o400 = Color(0xFF7C7C67);
-  static const o300 = Color(0xFFABAB9C);
+  static const o900 = Color(0xFF0D0809);
+  static const o800 = Color(0xFF1E1119);
+  static const o700 = Color(0xFF3B1B2C);
+  static const o600 = Color(0xFF7B3558);
+  static const o500 = Color(0xFF9B4A6F);
+  static const o400 = Color(0xFFC47095);
+  static const o300 = Color(0xFFE0A8BF);
 
   // semantic
-  static const olive = o600; // primary #474739
-  static const oliveBright = o400; // lighter (dark-mode primary) #7C7C67
-  static const oliveDeep = o700; // emphasis #2B2B22
-  static const gold = o400; // accent (monochrome) #7C7C67
-  static const ink = o800; // #1D1D16
-  static const inkSoft = o500; // #5B5B4B
+  static const olive = o600; // primary rose #7B3558
+  static const oliveBright = o400; // lighter rose (dark-mode primary) #C47095
+  static const oliveDeep = o700; // dark rose emphasis #3B1B2C
+  static const gold = o400; // accent rose #C47095
+  static const ink = o800; // #1E1119
+  static const inkSoft = o500; // #9B4A6F
 
   // light
-  static const bg = Color(0xFFF6F5EF);
+  static const bg = Color(0xFFF9F2F6);
   static const surface = Color(0xFFFFFFFF);
-  static const border = Color(0xFFE5E4DA);
+  static const border = Color(0xFFF0DCE8);
 
   // dark
-  static const bgDark = o900; // #0C0C09
-  static const surfaceDark = o800; // #1D1D16
-  static const borderDark = o700; // #2B2B22
-  static const inkDark = Color(0xFFD8D7CB);
-  static const inkSoftDark = o300; // #ABAB9C
+  static const bgDark = o900; // #0D0809
+  static const surfaceDark = o800; // #1E1119
+  static const borderDark = o700; // #3B1B2C
+  static const inkDark = Color(0xFFF0D9E6);
+  static const inkSoftDark = o300; // #E0A8BF
 }
 
 ThemeData _base(Brightness b, ColorScheme scheme) {

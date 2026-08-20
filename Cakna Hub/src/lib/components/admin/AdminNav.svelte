@@ -57,7 +57,7 @@
 		href="https://cakna.org/admin"
 		target="_blank"
 		rel="noopener noreferrer"
-		class="inline-flex items-center justify-between gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-zinc-500 transition-colors hover:bg-emerald-50 hover:text-emerald-700"
+		class="inline-flex items-center justify-between gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-zinc-500 transition-colors hover:bg-rose-50 hover:text-rose-700"
 	>
 		<span>Mathurat Dashboard</span>
 		<ExternalLink size={13} class="shrink-0 opacity-50" />

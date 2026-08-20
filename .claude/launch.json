@@ -4,8 +4,9 @@
 		{
 			"name": "cakna",
 			"runtimeExecutable": "npm",
-			"runtimeArgs": ["run", "dev", "--", "--port", "8080"],
+			"runtimeArgs": ["run", "dev"],
 			"port": 8080,
+			"autoPort": true,
 			"cwd": "/Users/dzulhilmy/Cakna Project/Cakna Hub"
 		},
 		{

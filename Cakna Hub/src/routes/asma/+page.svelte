@@ -109,9 +109,8 @@
 		display: flex;
 		flex-direction: column;
 		min-height: 100dvh;
-		background: #070e14;
-		color: #e2e8f0;
-		padding-left: 76px;
+		background: var(--pg-bg);
+		color: var(--pg-fg);
 	}
 
 	/* ── Header ── */
@@ -123,8 +122,8 @@
 		align-items: center;
 		gap: 12px;
 		padding: 12px 16px;
-		background: rgba(7, 14, 20, 0.96);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+		background: var(--pg-hdr);
+		border-bottom: 1px solid var(--pg-hdr-border);
 		backdrop-filter: blur(8px);
 	}
 	.hdr-btn {
@@ -133,15 +132,15 @@
 		width: 36px;
 		height: 36px;
 		border-radius: 10px;
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.07);
-		color: rgba(255, 255, 255, 0.5);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-btn-border);
+		color: var(--pg-btn-color);
 		cursor: pointer;
 		text-decoration: none;
 		transition: background 0.15s;
 		flex-shrink: 0;
 	}
-	.hdr-btn:hover { background: rgba(255, 255, 255, 0.08); }
+	.hdr-btn:hover { background: var(--pg-btn-hover); }
 	.hdr-center {
 		flex: 1;
 		display: flex;
@@ -151,7 +150,7 @@
 	.hdr-title {
 		font-size: 13px;
 		font-weight: 600;
-		color: rgba(255, 255, 255, 0.75);
+		color: var(--pg-text-75);
 	}
 	.total-badge {
 		padding: 4px 10px;
@@ -180,21 +179,21 @@
 		gap: 10px;
 		padding: 14px;
 		border-radius: 14px;
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.05);
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-surface-b);
 	}
 	.skel-circle {
 		width: 36px;
 		height: 36px;
 		border-radius: 50%;
-		background: rgba(255, 255, 255, 0.07);
+		background: var(--pg-surface-b);
 		flex-shrink: 0;
 		animation: pulse 1.4s ease-in-out infinite;
 	}
 	.skel-lines { flex: 1; display: flex; flex-direction: column; gap: 6px; padding-top: 2px; }
 	.skel-line {
 		border-radius: 4px;
-		background: rgba(255, 255, 255, 0.07);
+		background: var(--pg-surface-b);
 		animation: pulse 1.4s ease-in-out infinite;
 	}
 	.skel-arabic { height: 20px; }
@@ -216,13 +215,13 @@
 	.name-card {
 		padding: 14px;
 		border-radius: 14px;
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.05);
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-surface-b);
 		cursor: pointer;
 		transition: background 0.15s, border-color 0.15s;
 		user-select: none;
 	}
-	.name-card:hover { background: rgba(255, 255, 255, 0.055); }
+	.name-card:hover { background: var(--pg-surface-b); }
 	.name-expanded {
 		background: rgba(199, 162, 75, 0.07);
 		border-color: rgba(199, 162, 75, 0.25);
@@ -251,7 +250,7 @@
 		font-family: 'Amiri Quran', 'Amiri', serif;
 		font-size: 22px;
 		line-height: 1.3;
-		color: rgba(255, 255, 255, 0.92);
+		color: var(--pg-text-85);
 		text-align: right;
 		margin: 0 0 4px;
 	}
@@ -264,7 +263,7 @@
 	}
 	.meaning {
 		font-size: 11px;
-		color: rgba(255, 255, 255, 0.5);
+		color: var(--pg-btn-color);
 		margin: 0;
 		line-height: 1.4;
 	}
@@ -273,7 +272,7 @@
 	.card-extra {
 		margin-top: 12px;
 		padding-top: 12px;
-		border-top: 1px solid rgba(255, 255, 255, 0.06);
+		border-top: 1px solid var(--pg-surface-b);
 		display: flex;
 		flex-direction: column;
 		gap: 8px;
@@ -284,11 +283,11 @@
 		font-weight: 700;
 		letter-spacing: 0.12em;
 		text-transform: uppercase;
-		color: rgba(255, 255, 255, 0.25);
+		color: var(--pg-subtle);
 	}
 	.extra-val {
 		font-size: 12px;
-		color: rgba(255, 255, 255, 0.7);
+		color: var(--pg-text-75);
 		line-height: 1.45;
 	}
 

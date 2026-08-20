@@ -146,9 +146,8 @@
 		display: flex;
 		flex-direction: column;
 		min-height: 100dvh;
-		background: #070e14;
-		color: #e2e8f0;
-		padding-left: 76px;
+		background: var(--pg-bg);
+		color: var(--pg-fg);
 		padding-bottom: env(safe-area-inset-bottom);
 	}
 
@@ -160,7 +159,7 @@
 		align-items: center;
 		gap: 12px;
 		padding: 12px 16px;
-		background: rgba(7, 14, 20, 0.96);
+		background: var(--pg-hdr);
 		border-bottom: 1px solid rgba(199, 162, 75, 0.1);
 		backdrop-filter: blur(8px);
 	}
@@ -171,15 +170,15 @@
 		width: 36px;
 		height: 36px;
 		border-radius: 10px;
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.07);
-		color: rgba(255, 255, 255, 0.5);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-btn-border);
+		color: var(--pg-btn-color);
 		cursor: pointer;
 		text-decoration: none;
 		transition: background 0.15s;
 	}
 	.hdr-btn:hover {
-		background: rgba(255, 255, 255, 0.08);
+		background: var(--pg-btn-hover);
 	}
 
 	.hdr-center {
@@ -191,7 +190,7 @@
 	.hdr-title {
 		font-size: 13px;
 		font-weight: 600;
-		color: rgba(255, 255, 255, 0.75);
+		color: var(--pg-text-75);
 	}
 	.hdr-sub {
 		font-size: 11px;
@@ -200,23 +199,23 @@
 
 	.search-wrap {
 		padding: 10px 16px;
-		background: rgba(255, 255, 255, 0.02);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+		background: var(--pg-surface);
+		border-bottom: 1px solid var(--pg-surface-b);
 	}
 	.search-input {
 		width: 100%;
 		box-sizing: border-box;
 		padding: 10px 14px;
-		background: rgba(255, 255, 255, 0.05);
-		border: 1px solid rgba(255, 255, 255, 0.08);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-surface-b);
 		border-radius: 12px;
-		color: #e2e8f0;
+		color: var(--pg-fg);
 		font-size: 14px;
 		outline: none;
 		transition: border-color 0.15s;
 	}
 	.search-input::placeholder {
-		color: rgba(255, 255, 255, 0.2);
+		color: var(--pg-subtle);
 	}
 	.search-input:focus {
 		border-color: rgba(199, 162, 75, 0.3);
@@ -226,13 +225,13 @@
 		display: flex;
 		gap: 4px;
 		padding: 8px 16px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		border-bottom: 1px solid var(--pg-surface-b);
 	}
 	.tab {
 		padding: 6px 20px;
 		border-radius: 8px;
 		font-size: 13px;
-		color: rgba(255, 255, 255, 0.4);
+		color: var(--pg-muted);
 		cursor: pointer;
 		border: none;
 		background: transparent;
@@ -266,7 +265,7 @@
 		padding: 12px 16px;
 		background: transparent;
 		border: none;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+		border-bottom: 1px solid var(--pg-surface-b);
 		cursor: pointer;
 		text-align: left;
 		color: inherit;
@@ -274,7 +273,7 @@
 	}
 	.surah-row:hover,
 	.juz-row:hover {
-		background: rgba(255, 255, 255, 0.03);
+		background: var(--pg-surface);
 	}
 	.surah-row:active,
 	.juz-row:active {
@@ -307,14 +306,14 @@
 	.surah-translit {
 		font-size: 14px;
 		font-weight: 600;
-		color: rgba(255, 255, 255, 0.85);
+		color: var(--pg-text-85);
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
 	.surah-sub {
 		font-size: 11px;
-		color: rgba(255, 255, 255, 0.3);
+		color: var(--pg-muted);
 	}
 
 	.surah-ar {
@@ -366,11 +365,11 @@
 	.juz-surah {
 		font-size: 14px;
 		font-weight: 600;
-		color: rgba(255, 255, 255, 0.85);
+		color: var(--pg-text-85);
 	}
 	.juz-sub {
 		font-size: 11px;
-		color: rgba(255, 255, 255, 0.3);
+		color: var(--pg-muted);
 	}
 
 	.juz-ar {
@@ -380,7 +379,7 @@
 	.juz-ar-text {
 		font-family: 'Amiri Quran', 'Scheherazade New', serif;
 		font-size: 16px;
-		color: rgba(255, 255, 255, 0.4);
+		color: var(--pg-muted);
 		line-height: 1.4;
 	}
 
@@ -389,7 +388,7 @@
 		align-items: center;
 		justify-content: center;
 		padding: 60px 20px;
-		color: rgba(255, 255, 255, 0.25);
+		color: var(--pg-subtle);
 		font-size: 14px;
 	}
 </style>

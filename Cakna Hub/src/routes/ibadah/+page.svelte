@@ -173,9 +173,8 @@
 		display: flex;
 		flex-direction: column;
 		min-height: 100dvh;
-		background: #070e14;
-		color: #e2e8f0;
-		padding-left: 76px;
+		background: var(--pg-bg);
+		color: var(--pg-fg);
 		padding-bottom: env(safe-area-inset-bottom);
 	}
 
@@ -188,7 +187,7 @@
 		align-items: center;
 		gap: 12px;
 		padding: 12px 16px;
-		background: rgba(7, 14, 20, 0.96);
+		background: var(--pg-hdr);
 		border-bottom: 1px solid rgba(34, 197, 94, 0.1);
 		backdrop-filter: blur(8px);
 	}
@@ -199,15 +198,15 @@
 		width: 36px;
 		height: 36px;
 		border-radius: 10px;
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.07);
-		color: rgba(255, 255, 255, 0.5);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-btn-border);
+		color: var(--pg-btn-color);
 		cursor: pointer;
 		text-decoration: none;
 		transition: background 0.15s;
 		flex-shrink: 0;
 	}
-	.hdr-btn:hover { background: rgba(255, 255, 255, 0.08); }
+	.hdr-btn:hover { background: var(--pg-btn-hover); }
 
 	.hdr-center {
 		flex: 1;
@@ -218,7 +217,7 @@
 	.hdr-title {
 		font-size: 13px;
 		font-weight: 600;
-		color: rgba(255, 255, 255, 0.75);
+		color: var(--pg-text-75);
 	}
 	.hdr-sub {
 		font-size: 11px;
@@ -230,8 +229,8 @@
 		display: flex;
 		gap: 4px;
 		padding: 10px 16px;
-		background: rgba(255, 255, 255, 0.02);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		background: var(--pg-surface);
+		border-bottom: 1px solid var(--pg-surface-b);
 		overflow-x: auto;
 		-webkit-overflow-scrolling: touch;
 	}
@@ -242,7 +241,7 @@
 		padding: 7px 14px;
 		border-radius: 10px;
 		font-size: 13px;
-		color: rgba(255, 255, 255, 0.4);
+		color: var(--pg-muted);
 		cursor: pointer;
 		border: none;
 		background: transparent;
@@ -285,7 +284,7 @@
 	@keyframes spin { to { transform: rotate(360deg); } }
 	.loading-text {
 		font-size: 14px;
-		color: rgba(255, 255, 255, 0.35);
+		color: var(--pg-muted);
 		margin: 0;
 	}
 	.error-wrap {
@@ -305,7 +304,7 @@
 	}
 	.empty-text {
 		font-size: 14px;
-		color: rgba(255, 255, 255, 0.25);
+		color: var(--pg-subtle);
 		margin: 0;
 	}
 
@@ -359,14 +358,14 @@
 		flex: 1;
 		padding: 10px;
 		border-radius: 12px;
-		background: rgba(255, 255, 255, 0.05);
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		color: rgba(255, 255, 255, 0.5);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-btn-border);
+		color: var(--pg-btn-color);
 		font-size: 13px;
 		cursor: pointer;
 		transition: background 0.15s;
 	}
-	.tawaf-reset:hover:not(:disabled) { background: rgba(255, 255, 255, 0.09); }
+	.tawaf-reset:hover:not(:disabled) { background: var(--pg-btn-hover); }
 	.tawaf-reset:disabled { opacity: 0.35; cursor: not-allowed; }
 
 	.tawaf-tap {
@@ -402,8 +401,8 @@
 		gap: 10px;
 	}
 	.step-card {
-		background: rgba(255, 255, 255, 0.025);
-		border: 1px solid rgba(255, 255, 255, 0.06);
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-surface-b);
 		border-radius: 14px;
 		padding: 16px;
 		display: flex;
@@ -423,11 +422,11 @@
 		min-width: 28px;
 		height: 28px;
 		border-radius: 8px;
-		background: rgba(255, 255, 255, 0.06);
-		border: 1px solid rgba(255, 255, 255, 0.08);
+		background: var(--pg-surface-b);
+		border: 1px solid var(--pg-surface-b);
 		font-size: 12px;
 		font-weight: 600;
-		color: rgba(255, 255, 255, 0.5);
+		color: var(--pg-btn-color);
 	}
 
 	.flag-badge {
@@ -449,9 +448,9 @@
 		color: rgba(251, 146, 60, 0.9);
 	}
 	.flag-sunat {
-		background: rgba(255, 255, 255, 0.05);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		color: rgba(255, 255, 255, 0.35);
+		background: var(--pg-surface-b);
+		border: 1px solid var(--pg-btn-border);
+		color: var(--pg-muted);
 	}
 
 	.step-ar {
@@ -467,7 +466,7 @@
 	.step-desc {
 		font-size: 14px;
 		line-height: 1.65;
-		color: rgba(255, 255, 255, 0.65);
+		color: var(--pg-text-75);
 		margin: 0;
 	}
 </style>

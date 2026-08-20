@@ -111,7 +111,7 @@
 				<button
 					class="rounded-xl border py-3 text-sm font-bold transition-colors
 						{answered !== null && o === q.correct
-						? 'border-emerald-600 bg-emerald-600/15 text-emerald-700 dark:text-emerald-400'
+						? 'border-rose-600 bg-rose-600/15 text-rose-700 dark:text-rose-400'
 						: answered === o
 							? 'border-red-600 bg-red-600/15 text-red-700 dark:text-red-400'
 							: 'bg-background'}"

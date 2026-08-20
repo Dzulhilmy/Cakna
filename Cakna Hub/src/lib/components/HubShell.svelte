@@ -28,7 +28,7 @@
 
 	<SideNav {active} />
 
-	<main class="ml-20 min-h-screen px-6 py-10 lg:ml-24 lg:px-12">
+	<main class="min-h-screen px-6 py-10 lg:px-12">
 		{@render children()}
 	</main>
 </div>

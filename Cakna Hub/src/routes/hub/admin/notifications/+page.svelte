@@ -18,7 +18,7 @@
 		kemalangan: 'bg-red-100 text-red-700',
 		takziah: 'bg-zinc-100 text-zinc-700',
 		kesihatan: 'bg-blue-100 text-blue-700',
-		umum: 'bg-emerald-100 text-emerald-700'
+		umum: 'bg-rose-100 text-rose-700'
 	};
 </script>
 

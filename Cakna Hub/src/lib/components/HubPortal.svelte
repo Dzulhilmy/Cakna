@@ -29,11 +29,11 @@
 
 <HubShell active="home">
 	<header class="mb-10 pt-4">
-		<p class="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400/60">
+		<p class="text-xs font-semibold uppercase tracking-[0.2em] text-rose-400/60">
 			Selamat datang
 		</p>
 		<h1 class="mt-1 text-3xl font-bold tracking-tight text-white lg:text-4xl">
-			Cakna <span class="text-emerald-400">Hub</span>
+			Cakna <span class="text-rose-400">Hub</span>
 		</h1>
 		<p class="mt-2 text-sm text-white/40">
 			Portal akses pantas kepada semua ciri Mushaf Digital.

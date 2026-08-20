@@ -209,9 +209,8 @@
 		display: flex;
 		flex-direction: column;
 		min-height: 100dvh;
-		background: #070e14;
-		color: #e2e8f0;
-		padding-left: 76px;
+		background: var(--pg-bg);
+		color: var(--pg-fg);
 		padding-bottom: env(safe-area-inset-bottom);
 	}
 
@@ -223,7 +222,7 @@
 		align-items: center;
 		gap: 12px;
 		padding: 12px 16px;
-		background: rgba(7, 14, 20, 0.96);
+		background: var(--pg-hdr);
 		border-bottom: 1px solid rgba(34, 197, 94, 0.1);
 		backdrop-filter: blur(8px);
 	}
@@ -234,15 +233,15 @@
 		width: 36px;
 		height: 36px;
 		border-radius: 10px;
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.07);
-		color: rgba(255, 255, 255, 0.5);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-btn-border);
+		color: var(--pg-btn-color);
 		cursor: pointer;
 		text-decoration: none;
 		transition: background 0.15s;
 	}
 	.hdr-btn:hover {
-		background: rgba(255, 255, 255, 0.08);
+		background: var(--pg-btn-hover);
 	}
 
 	.hdr-center {
@@ -254,7 +253,7 @@
 	.hdr-title {
 		font-size: 13px;
 		font-weight: 600;
-		color: rgba(255, 255, 255, 0.75);
+		color: var(--pg-text-75);
 	}
 	.hdr-sub {
 		font-size: 11px;
@@ -274,7 +273,7 @@
 		padding: 8px 4px;
 		border-radius: 10px;
 		font-size: 13px;
-		color: rgba(255, 255, 255, 0.4);
+		color: var(--pg-muted);
 		cursor: pointer;
 		border: none;
 		background: transparent;
@@ -304,7 +303,7 @@
 	.field-label {
 		font-size: 12px;
 		font-weight: 600;
-		color: rgba(255, 255, 255, 0.5);
+		color: var(--pg-btn-color);
 		letter-spacing: 0.04em;
 		text-transform: uppercase;
 	}
@@ -312,8 +311,8 @@
 	.input-wrap {
 		display: flex;
 		align-items: center;
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.08);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-surface-b);
 		border-radius: 12px;
 		overflow: hidden;
 		transition: border-color 0.15s;
@@ -326,7 +325,7 @@
 		padding: 0 12px;
 		font-size: 13px;
 		color: rgba(255, 255, 255, 0.3);
-		border-right: 1px solid rgba(255, 255, 255, 0.06);
+		border-right: 1px solid var(--pg-surface-b);
 		white-space: nowrap;
 	}
 
@@ -335,17 +334,17 @@
 		padding: 12px 14px;
 		background: transparent;
 		border: none;
-		color: #e2e8f0;
+		color: var(--pg-fg);
 		font-size: 16px;
 		outline: none;
 	}
 	.field-input::placeholder {
-		color: rgba(255, 255, 255, 0.15);
+		color: var(--pg-faint);
 	}
 
 	.field-hint {
 		font-size: 11px;
-		color: rgba(255, 255, 255, 0.25);
+		color: var(--pg-subtle);
 		margin: 0;
 	}
 
@@ -361,8 +360,8 @@
 		border: 1px solid rgba(34, 197, 94, 0.2);
 	}
 	.result-tidak {
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.07);
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-btn-border);
 	}
 
 	.result-label {
@@ -382,7 +381,7 @@
 	.result-amount {
 		font-size: 28px;
 		font-weight: 700;
-		color: #e2e8f0;
+		color: var(--pg-fg);
 		margin: 4px 0 0;
 	}
 

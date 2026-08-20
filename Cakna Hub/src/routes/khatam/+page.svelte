@@ -63,7 +63,7 @@
 	});
 
 	function cellColor(count) {
-		if (count === 0) return 'rgba(255,255,255,0.04)';
+		if (count === 0) return 'var(--pg-surface)';
 		if (count <= 3) return 'rgba(34,197,94,0.3)';
 		return 'rgba(34,197,94,0.85)';
 	}
@@ -102,7 +102,7 @@
 				<svg class="progress-ring" viewBox="0 0 160 160" width="160" height="160">
 					<circle
 						cx="80" cy="80" r={RADIUS}
-						stroke="rgba(255,255,255,0.06)"
+						stroke="var(--pg-surface-b)"
 						stroke-width="10"
 						fill="none"
 					/>
@@ -162,7 +162,7 @@
 			<div class="heatmap-legend">
 				<span class="legend-lbl">Kurang</span>
 				<div class="legend-cells">
-					<div class="heatmap-cell" style="background: rgba(255,255,255,0.04)"></div>
+					<div class="heatmap-cell" style="background: var(--pg-surface)"></div>
 					<div class="heatmap-cell" style="background: rgba(34,197,94,0.3)"></div>
 					<div class="heatmap-cell" style="background: rgba(34,197,94,0.6)"></div>
 					<div class="heatmap-cell" style="background: rgba(34,197,94,0.85)"></div>
@@ -214,9 +214,8 @@
 		display: flex;
 		flex-direction: column;
 		min-height: 100dvh;
-		background: #070e14;
-		color: #e2e8f0;
-		padding-left: 76px;
+		background: var(--pg-bg);
+		color: var(--pg-fg);
 	}
 
 	.khatam-header {
@@ -227,8 +226,8 @@
 		align-items: center;
 		gap: 12px;
 		padding: 12px 16px;
-		background: rgba(7, 14, 20, 0.96);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+		background: var(--pg-hdr);
+		border-bottom: 1px solid var(--pg-hdr-border);
 		backdrop-filter: blur(8px);
 	}
 
@@ -238,15 +237,15 @@
 		width: 36px;
 		height: 36px;
 		border-radius: 10px;
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.07);
-		color: rgba(255, 255, 255, 0.5);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-btn-border);
+		color: var(--pg-btn-color);
 		cursor: pointer;
 		text-decoration: none;
 		transition: background 0.15s;
 		flex-shrink: 0;
 	}
-	.hdr-btn:hover { background: rgba(255, 255, 255, 0.08); }
+	.hdr-btn:hover { background: var(--pg-btn-hover); }
 
 	.hdr-center {
 		flex: 1;
@@ -257,7 +256,7 @@
 	.hdr-title {
 		font-size: 13px;
 		font-weight: 600;
-		color: rgba(255, 255, 255, 0.75);
+		color: var(--pg-text-75);
 	}
 
 	.khatam-main {
@@ -317,12 +316,12 @@
 	.info-label {
 		flex: 1;
 		font-size: 12px;
-		color: rgba(255, 255, 255, 0.4);
+		color: var(--pg-muted);
 	}
 	.info-val {
 		font-size: 14px;
 		font-weight: 600;
-		color: rgba(255, 255, 255, 0.85);
+		color: var(--pg-text-85);
 	}
 	.khatam-num {
 		color: rgba(199, 162, 75, 0.9);
@@ -336,7 +335,7 @@
 		font-weight: 700;
 		letter-spacing: 0.15em;
 		text-transform: uppercase;
-		color: rgba(255, 255, 255, 0.25);
+		color: var(--pg-subtle);
 		margin-bottom: 10px;
 	}
 
@@ -367,7 +366,7 @@
 		gap: 6px;
 		margin-top: 8px;
 	}
-	.legend-lbl { font-size: 10px; color: rgba(255, 255, 255, 0.25); }
+	.legend-lbl { font-size: 10px; color: var(--pg-subtle); }
 	.legend-cells {
 		display: flex;
 		gap: 3px;
@@ -382,14 +381,14 @@
 	.target-btn {
 		padding: 8px 16px;
 		border-radius: 10px;
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.07);
-		color: rgba(255, 255, 255, 0.45);
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-btn-border);
+		color: var(--pg-muted);
 		font-size: 13px;
 		cursor: pointer;
 		transition: all 0.15s;
 	}
-	.target-btn:hover { background: rgba(255, 255, 255, 0.08); }
+	.target-btn:hover { background: var(--pg-btn-hover); }
 	.target-active {
 		background: rgba(34, 197, 94, 0.12);
 		border-color: rgba(34, 197, 94, 0.3);
@@ -403,7 +402,7 @@
 		align-items: flex-start;
 		gap: 10px;
 		padding: 14px;
-		background: rgba(255, 255, 255, 0.03);
+		background: var(--pg-surface);
 		border: 1px solid rgba(255, 255, 255, 0.05);
 		border-radius: 14px;
 	}
@@ -411,7 +410,7 @@
 	.tip-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
 	.tip-text {
 		font-size: 13px;
-		color: rgba(255, 255, 255, 0.5);
+		color: var(--pg-btn-color);
 		line-height: 1.5;
 	}
 	.tip-text strong { color: rgba(255, 255, 255, 0.8); }
