@@ -128,6 +128,26 @@
 		}
 	});
 
+	// Redirect listeners to whatever the speaker is sharing, within the app.
+	$effect(() => {
+		const sess = halaqah.session;
+		if (!sess?.connected || sess.canSpeak || !sess.following) return;
+		const sh = sess.share;
+		if (!sh) return;
+		const currentPath = page.url.pathname;
+		// Don't redirect away from the halaqah control page here — that page
+		// has its own effect that handles navigation from there.
+		if (currentPath.startsWith('/halaqah')) return;
+		if (sh.kind === 'route' && currentPath !== sh.path) {
+			void goto(sh.path);
+		} else if (sh.kind === 'page') {
+			const target = `/read/${sh.page}`;
+			if (currentPath !== target) void goto(target);
+		} else if (sh.kind === 'mathurat') {
+			if (currentPath !== '/mathurat') void goto('/mathurat');
+		}
+	});
+
 	// ── Derived display values ─────────────────────────────────────────────────
 	const speaking = $derived(s?.members.find((m) => m.speaking)?.name ?? null);
 	const label = $derived(speaking ?? s?.title ?? 'Halaqah');
@@ -286,10 +306,10 @@
 										<span>Al-Ma'thurat</span>
 									</span>
 								{:else}
-									<span class="sp-label">
+									<a class="sp-label" href={s.share.path}>
 										<MapPin size={12} />
 										<span>{s.share.label}</span>
-									</span>
+									</a>
 								{/if}
 							</div>
 						{/if}
@@ -313,12 +333,12 @@
 					{#if s.canSpeak}
 						<button
 							class="ctrl-btn"
-							class:ctrl-on={s.screenSharing}
-							onclick={() => s.toggleScreenShare()}
-							title={s.screenSharing ? 'Henti kongsi skrin' : 'Kongsi skrin'}
+							class:ctrl-on={s.sharing}
+							onclick={() => s.sharing ? s.stopSharing() : s.resumeSharing()}
+							title={s.sharing ? 'Henti kongsi skrin' : 'Kongsi skrin'}
 						>
 							<Monitor size={15} />
-							<span>{s.screenSharing ? 'Henti' : 'Kongsi Skrin'}</span>
+							<span>{s.sharing ? 'Henti Kongsi' : 'Kongsi Skrin'}</span>
 						</button>
 					{:else}
 						<button
