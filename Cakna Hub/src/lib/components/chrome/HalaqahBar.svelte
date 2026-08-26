@@ -49,7 +49,7 @@
 		expanded = !expanded;
 		if (expanded) {
 			// Keep the card inside the viewport
-			const cardH = 420;
+			const cardH = 560;
 			const maxTop = window.innerHeight - NAV_H - cardH - 16;
 			if (posTop > maxTop) posTop = Math.max(16, maxTop);
 		}
@@ -160,6 +160,14 @@
 		return sh.label;
 	});
 
+	const shareUrl = $derived.by(() => {
+		const sh = s?.share;
+		if (!sh) return null;
+		if (sh.kind === 'page') return `/read/${sh.page}`;
+		if (sh.kind === 'mathurat') return '/mathurat';
+		return sh.path;
+	});
+
 	function fmtTime(ms: number) {
 		return new Date(ms).toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
 	}
@@ -246,7 +254,7 @@
 				<!-- Audio viz -->
 				{#if s.floorTrack}
 					<div class="panel-viz">
-						<AudioVisualizer track={s.floorTrack} height={44} bars={22} />
+						<AudioVisualizer track={s.floorTrack} height={24} bars={22} />
 					</div>
 				{/if}
 
@@ -301,10 +309,10 @@
 										<span>Halaman {s.share.page}</span>
 									</a>
 								{:else if s.share.kind === 'mathurat'}
-									<span class="sp-label">
+									<a class="sp-label" href="/mathurat">
 										<ScrollText size={12} />
 										<span>Al-Ma'thurat</span>
-									</span>
+									</a>
 								{:else}
 									<a class="sp-label" href={s.share.path}>
 										<MapPin size={12} />
@@ -312,6 +320,15 @@
 									</a>
 								{/if}
 							</div>
+							{#if shareUrl}
+								<iframe
+									src={shareUrl}
+									title="Kandungan dikongsi"
+									loading="lazy"
+									class="sp-frame"
+									sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+								></iframe>
+							{/if}
 						{/if}
 						{#if s.screenShareTrack}
 							<video bind:this={screenVideo} autoplay muted playsinline></video>
@@ -456,33 +473,30 @@
 
 	/* ── Expanded panel ────────────────────────────────────────────────────── */
 	.panel {
-		padding: 12px 12px 14px;
+		padding: 8px 10px 10px;
 		display: flex;
 		flex-direction: column;
-		gap: 10px;
-		max-height: 380px;
-		overflow-y: auto;
-		overscroll-behavior: contain;
+		gap: 6px;
 	}
 
 	.panel-hdr {
 		display: flex;
 		align-items: center;
-		gap: 8px;
+		gap: 6px;
 	}
 	.live-badge {
 		display: flex;
 		align-items: center;
 		gap: 4px;
-		font-size: 9.5px;
+		font-size: 9px;
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
 		color: #b34a6e;
 	}
 	.live-dot {
-		width: 6px;
-		height: 6px;
+		width: 5px;
+		height: 5px;
 		border-radius: 50%;
 		background: #b34a6e;
 		box-shadow: 0 0 5px #b34a6e;
@@ -494,7 +508,7 @@
 	}
 	.panel-title {
 		flex: 1;
-		font-size: 12.5px;
+		font-size: 12px;
 		font-weight: 600;
 		white-space: nowrap;
 		overflow: hidden;
@@ -503,20 +517,20 @@
 	}
 
 	.panel-viz {
-		border-radius: 10px;
+		border-radius: 8px;
 		background: rgba(34, 197, 94, 0.06);
 		border: 1px solid rgba(34, 197, 94, 0.12);
 		overflow: hidden;
-		padding: 2px 0;
+		padding: 1px 0;
 	}
 
 	/* Section */
-	.psec { display: flex; flex-direction: column; gap: 5px; }
+	.psec { display: flex; flex-direction: column; gap: 3px; }
 	.psec-lbl {
 		display: flex;
 		align-items: center;
 		gap: 4px;
-		font-size: 9.5px;
+		font-size: 9px;
 		font-weight: 700;
 		letter-spacing: 0.1em;
 		text-transform: uppercase;
@@ -524,16 +538,16 @@
 	}
 
 	/* Members */
-	.member-list { display: flex; flex-direction: column; gap: 3px; }
+	.member-list { display: flex; flex-direction: column; gap: 2px; }
 	.mrow {
 		display: flex;
 		align-items: center;
-		gap: 8px;
-		padding: 5px 8px;
-		border-radius: 9px;
+		gap: 6px;
+		padding: 3px 7px;
+		border-radius: 8px;
 		background: var(--pg-btn);
 		border: 1px solid var(--pg-btn-border);
-		font-size: 12px;
+		font-size: 11.5px;
 		transition: background 0.12s;
 	}
 	.mrow.mrow-spk {
@@ -541,13 +555,13 @@
 		border: 1px solid rgba(34, 197, 94, 0.2);
 	}
 	.avatar {
-		width: 24px;
-		height: 24px;
+		width: 20px;
+		height: 20px;
 		flex-shrink: 0;
 		border-radius: 50%;
 		background: rgba(34, 197, 94, 0.12);
 		color: rgba(74, 222, 128, 0.9);
-		font-size: 11px;
+		font-size: 10px;
 		font-weight: 700;
 		display: grid;
 		place-items: center;
@@ -593,13 +607,13 @@
 	.sp-info {
 		display: flex;
 		align-items: center;
-		padding: 8px 10px;
+		padding: 5px 8px;
 	}
 	.sp-label {
 		display: flex;
 		align-items: center;
-		gap: 5px;
-		font-size: 11px;
+		gap: 4px;
+		font-size: 10.5px;
 		font-weight: 600;
 		color: var(--pg-muted);
 		text-decoration: none;
@@ -608,28 +622,35 @@
 	.share-preview video {
 		width: 100%;
 		display: block;
-		max-height: 160px;
+		max-height: 100px;
 		object-fit: contain;
 		background: #000;
+	}
+	.sp-frame {
+		width: 100%;
+		height: 100px;
+		border: none;
+		display: block;
+		border-top: 1px solid var(--pg-btn-border);
 	}
 
 	/* Quick controls */
 	.panel-ctrl {
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);
-		gap: 6px;
+		gap: 5px;
 	}
 	.ctrl-btn {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 4px;
-		padding: 9px 6px;
-		border-radius: 10px;
+		gap: 3px;
+		padding: 6px 4px;
+		border-radius: 9px;
 		background: var(--pg-btn);
 		border: 1px solid var(--pg-btn-border);
 		color: var(--pg-muted);
-		font-size: 10px;
+		font-size: 9.5px;
 		cursor: pointer;
 		text-decoration: none;
 		transition: all 0.12s;
