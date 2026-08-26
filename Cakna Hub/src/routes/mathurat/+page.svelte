@@ -2,9 +2,10 @@
 	import SideNav from '$lib/components/SideNav.svelte';
 	import { LISTS, TOTALS, VERSI_LABEL, JENIS_LABEL, BASMALAH, pickText, type Versi } from '$lib/data/mathurat';
 	import type { Waktu } from '$lib/data/mathurat';
-	import { mathuratState } from '$lib/state/stores.svelte';
+	import { mathuratState, todayKey } from '$lib/state/stores.svelte';
 	import type { MathuratState, MathuratTetapan } from '$lib/state/stores.svelte';
 	import { ChevronLeft, Settings, X, RotateCcw } from 'lucide-svelte';
+	import { halaqah } from '$lib/halaqah/store.svelte';
 
 	const DEFAULT_TETAPAN: MathuratTetapan = {
 		arSaiz: 26,
@@ -32,7 +33,8 @@
 				sughra: LISTS.sughra.map(() => 0),
 				kubra: LISTS.kubra.map(() => 0)
 			},
-			tetapan: { ...DEFAULT_TETAPAN }
+			tetapan: { ...DEFAULT_TETAPAN },
+			rekod: {}
 		};
 	}
 
@@ -94,6 +96,15 @@
 		const next = idx + 1;
 		// allow idx to reach list.length to trigger completion screen
 		if (next <= list.length) ms.idx[ms.version] = next;
+		// record completion when reaching the last item
+		if (next === list.length) {
+			const key = todayKey();
+			const rekod = { ...(ms.rekod ?? {}) };
+			const day = rekod[key] ?? {};
+			const waktuRec = day[ms.mode] ?? {};
+			rekod[key] = { ...day, [ms.mode]: { ...waktuRec, [ms.version]: true } };
+			ms.rekod = rekod;
+		}
 		mathuratState.value = { ...ms };
 	}
 
@@ -117,6 +128,30 @@
 		ms.mode = m;
 		mathuratState.value = { ...ms };
 	}
+
+	// Broadcast content position to halaqah when host is sharing
+	$effect(() => {
+		const sess = halaqah.session;
+		if (!sess?.connected || !sess.canSpeak || !sess.sharing) return;
+		void sess.setShare({
+			kind: 'mathurat',
+			version: ms.version,
+			mode: ms.mode,
+			idx: ms.idx[ms.version]
+		});
+	});
+
+	// Apply received mathurat share state when following as listener
+	$effect(() => {
+		const sess = halaqah.session;
+		if (!sess?.connected || sess.canSpeak || !sess.following) return;
+		const sh = sess.share;
+		if (sh?.kind !== 'mathurat') return;
+		ms.version = sh.version;
+		ms.mode = sh.mode;
+		ms.idx[sh.version] = sh.idx;
+		mathuratState.value = { ...ms };
+	});
 </script>
 
 <svelte:head><title>Al-Ma'thurat — Cakna</title></svelte:head>
@@ -478,12 +513,12 @@
 	.fab-num {
 		font-size: 38px;
 		font-weight: 700;
-		color: var(--pg-fg);
+		color: rgba(255, 255, 255, 0.95);
 		line-height: 1;
 	}
 	.fab-sub {
 		font-size: 11px;
-		color: var(--pg-subtle);
+		color: rgba(255, 255, 255, 0.5);
 		letter-spacing: 0.05em;
 	}
 	.fab-check {

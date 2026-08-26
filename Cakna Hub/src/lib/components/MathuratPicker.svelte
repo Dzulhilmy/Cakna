@@ -4,7 +4,7 @@
 	import type { MathuratTetapan } from '$lib/state/stores.svelte';
 	import { LISTS, VERSI_LABEL } from '$lib/data/mathurat';
 	import type { Versi, Waktu } from '$lib/data/mathurat';
-	import { Sun, Moon, ArrowRight, RotateCcw } from 'lucide-svelte';
+	import { Sun, Moon, ArrowRight, RotateCcw, BarChart2 } from 'lucide-svelte';
 
 	let { onclose }: { onclose: () => void } = $props();
 
@@ -126,6 +126,12 @@
 			<ArrowRight size={14} />
 		{/if}
 	</button>
+
+	<!-- Prestasi link -->
+	<a href="/mathurat/rekod" class="prestasi-link" onclick={onclose}>
+		<BarChart2 size={12} />
+		<span>Lihat Prestasi</span>
+	</a>
 </div>
 
 <style>
@@ -281,5 +287,22 @@
 	.cta-btn:hover {
 		background: rgba(45, 120, 80, 0.75);
 		border-color: rgba(80, 200, 120, 0.35);
+	}
+
+	.prestasi-link {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.3rem;
+		text-decoration: none;
+		color: rgba(255, 255, 255, 0.3);
+		font-size: 0.65rem;
+		font-weight: 500;
+		padding: 0.25rem;
+		border-radius: 0.375rem;
+		transition: color 0.15s;
+	}
+	.prestasi-link:hover {
+		color: rgba(255, 255, 255, 0.6);
 	}
 </style>

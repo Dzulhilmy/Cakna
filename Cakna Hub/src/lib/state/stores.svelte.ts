@@ -82,7 +82,7 @@ export interface MathuratState {
 	idx: { sughra: number; kubra: number };
 	counts: { sughra: number[]; kubra: number[] };
 	tetapan: MathuratTetapan;
-	rekod: Record<string, { pagi?: boolean; petang?: boolean }>;
+	rekod: Record<string, { pagi?: { sughra?: boolean; kubra?: boolean }; petang?: { sughra?: boolean; kubra?: boolean } }>;
 }
 
 export type CityChoice = number | { g: [number, number] }; // city index | GPS
