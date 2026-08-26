@@ -23,16 +23,28 @@
 	const FLOAT_W = 300;
 	const COMPACT_H = 60;
 	const NAV_H = 64;
+	const MOBILE_BP = 480;
 
 	// ── Float position ────────────────────────────────────────────────────────
 	let posLeft = $state(0);
 	let posTop = $state(0);
 	let mounted = $state(false);
+	let isMobile = $state(false);
+	let floatEl = $state<HTMLDivElement | null>(null);
+
+	const floatW = $derived(isMobile ? Math.max(0, (typeof window !== 'undefined' ? window.innerWidth : 375) - 16) : FLOAT_W);
 
 	onMount(() => {
-		posLeft = window.innerWidth - FLOAT_W - 16;
+		const checkMobile = () => {
+			isMobile = window.innerWidth <= MOBILE_BP;
+			if (isMobile) posLeft = 8;
+		};
+		checkMobile();
+		posLeft = isMobile ? 8 : window.innerWidth - FLOAT_W - 16;
 		posTop = window.innerHeight - NAV_H - COMPACT_H - 20;
 		mounted = true;
+		window.addEventListener('resize', checkMobile);
+		return () => window.removeEventListener('resize', checkMobile);
 	});
 
 	// Float doesn't push page content — set the legacy variable to 0.
@@ -44,15 +56,43 @@
 
 	// ── Expand / minimize ─────────────────────────────────────────────────────
 	let expanded = $state(false);
+	let floatH = $state(0); // 0 = auto; explicit px when user has resized
+	const RESIZE_GRIP_H = 14;
+	const MIN_FLOAT_H = COMPACT_H + 180 + RESIZE_GRIP_H;
 
 	function toggleExpand() {
 		expanded = !expanded;
 		if (expanded) {
-			// Keep the card inside the viewport
-			const cardH = 560;
+			const cardH = floatH || 540;
 			const maxTop = window.innerHeight - NAV_H - cardH - 16;
 			if (posTop > maxTop) posTop = Math.max(16, maxTop);
+		} else {
+			floatH = 0;
 		}
+	}
+
+	// ── Panel resize ──────────────────────────────────────────────────────────
+	let resizing = $state(false);
+	let resizeStartY = 0;
+	let resizeStartH = 0;
+
+	function onResizeStart(e: PointerEvent) {
+		e.stopPropagation();
+		resizing = true;
+		resizeStartY = e.clientY;
+		resizeStartH = floatH || floatEl?.offsetHeight || 480;
+		(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+	}
+
+	function onResizeMove(e: PointerEvent) {
+		if (!resizing) return;
+		const delta = e.clientY - resizeStartY;
+		const maxH = window.innerHeight - posTop - NAV_H - 20;
+		floatH = Math.max(MIN_FLOAT_H, Math.min(maxH, resizeStartH + delta));
+	}
+
+	function onResizeEnd() {
+		resizing = false;
 	}
 
 	// ── Drag ──────────────────────────────────────────────────────────────────
@@ -76,7 +116,7 @@
 		if (!didDrag && (Math.abs(nl - posLeft) > 4 || Math.abs(nt - posTop) > 4)) {
 			didDrag = true;
 		}
-		posLeft = Math.max(0, Math.min(window.innerWidth - FLOAT_W, nl));
+		posLeft = Math.max(0, Math.min(window.innerWidth - floatW, nl));
 		posTop = Math.max(0, Math.min(window.innerHeight - COMPACT_H, nt));
 	}
 
@@ -192,10 +232,12 @@
 
 {#if visible && s && mounted}
 	<div
+		bind:this={floatEl}
 		class="hlq-float"
 		class:is-expanded={expanded}
 		class:is-dragging={dragging}
-		style="left:{posLeft}px; top:{posTop}px; width:{FLOAT_W}px;"
+		class:is-resizing={resizing}
+		style="left:{posLeft}px; top:{posTop}px; width:{floatW}px;{expanded && floatH ? ` height:${floatH}px;` : ''}"
 	>
 		<!-- ── Compact pill (drag handle + primary tap target) ──────────────── -->
 		<div
@@ -241,7 +283,7 @@
 
 		<!-- ── Expanded panel ───────────────────────────────────────────────── -->
 		{#if expanded}
-			<div class="panel" onpointerdown={(e) => e.stopPropagation()} role="none">
+			<div class="panel" onpointerdown={(e) => e.stopPropagation()} role="none" style={floatH ? 'overflow-y:auto;' : ''}>
 				<!-- Live badge + title -->
 				<div class="panel-hdr">
 					<span class="live-badge">
@@ -380,6 +422,16 @@
 					</button>
 				{/if}
 			</div>
+
+			<!-- Resize grip -->
+			<div
+				class="resize-grip"
+				onpointerdown={onResizeStart}
+				onpointermove={onResizeMove}
+				onpointerup={onResizeEnd}
+				role="separator"
+				aria-label="Ubah saiz panel"
+			></div>
 		{/if}
 	</div>
 {/if}
@@ -397,11 +449,36 @@
 		user-select: none;
 		touch-action: none;
 		transition: box-shadow 0.15s;
+		display: flex;
+		flex-direction: column;
 	}
 	.hlq-float.is-dragging {
 		box-shadow: 0 16px 48px rgba(0, 0, 0, 0.22);
 		cursor: grabbing;
 	}
+	.hlq-float.is-resizing { cursor: ns-resize; }
+
+	/* ── Resize grip ───────────────────────────────────────────────────────── */
+	.resize-grip {
+		flex-shrink: 0;
+		height: 14px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: ns-resize;
+		background: var(--pg-btn);
+		border-top: 1px solid var(--pg-btn-border);
+		touch-action: none;
+	}
+	.resize-grip::before {
+		content: '';
+		width: 28px;
+		height: 3px;
+		border-radius: 2px;
+		background: var(--pg-btn-border);
+		transition: background 0.12s;
+	}
+	.resize-grip:hover::before { background: var(--pg-muted); }
 
 	/* ── Compact pill ──────────────────────────────────────────────────────── */
 	.pill {
@@ -477,6 +554,8 @@
 		display: flex;
 		flex-direction: column;
 		gap: 6px;
+		flex: 1;
+		min-height: 0;
 	}
 
 	.panel-hdr {
