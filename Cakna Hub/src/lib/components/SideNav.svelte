@@ -23,7 +23,6 @@
 		ChevronRight,
 		ChevronLeft
 	} from 'lucide-svelte';
-	import MathuratPicker from './MathuratPicker.svelte';
 	import { settings } from '$lib/state/stores.svelte';
 
 	const isDark = $derived(settings.value.theme === 'dark');
@@ -34,7 +33,6 @@
 	let { active = 'home' }: { active?: string } = $props();
 
 	let moreOpen = $state(false);
-	let mathuratOpen = $state(false);
 	let navCollapsed = $state(false);
 
 	$effect(() => {
@@ -45,7 +43,6 @@
 		navCollapsed = !navCollapsed;
 		if (navCollapsed) {
 			moreOpen = false;
-			mathuratOpen = false;
 		}
 	}
 
@@ -79,10 +76,6 @@
 	<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
 	<div class="fixed inset-0 z-40" onclick={() => (moreOpen = false)}></div>
 {/if}
-{#if mathuratOpen}
-	<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
-	<div class="fixed inset-0 z-40" onclick={() => (mathuratOpen = false)}></div>
-{/if}
 
 <!-- Pill sidebar -->
 <div class="nav-outer" class:collapsed={navCollapsed}>
@@ -95,33 +88,18 @@
 
 			<!-- Nav items -->
 			{#each mainNav as item (item.id)}
-				{#if item.id === 'mathurat'}
-					<button
-						onclick={() => { mathuratOpen = !mathuratOpen; moreOpen = false; }}
-						class="nav-item relative flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200"
-						class:active={mathuratOpen || active === item.id}
-						aria-label={item.label}
-						title={item.label}
-					>
-						<item.icon size={20} strokeWidth={1.8} />
-						<span class="tooltip pointer-events-none absolute left-14 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium opacity-0 transition-opacity duration-150">
-							{item.label}
-						</span>
-					</button>
-				{:else}
-					<a
-						href={item.href}
-						class="nav-item relative flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200"
-						class:active={active === item.id}
-						aria-label={item.label}
-						title={item.label}
-					>
-						<item.icon size={20} strokeWidth={1.8} />
-						<span class="tooltip pointer-events-none absolute left-14 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium opacity-0 transition-opacity duration-150">
-							{item.label}
-						</span>
-					</a>
-				{/if}
+				<a
+					href={item.href}
+					class="nav-item relative flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200"
+					class:active={active === item.id}
+					aria-label={item.label}
+					title={item.label}
+				>
+					<item.icon size={20} strokeWidth={1.8} />
+					<span class="tooltip pointer-events-none absolute left-14 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium opacity-0 transition-opacity duration-150">
+						{item.label}
+					</span>
+				</a>
 			{/each}
 
 			<!-- Divider -->
@@ -171,13 +149,6 @@
 		{/if}
 	</button>
 </div>
-
-<!-- Mathurat picker panel -->
-{#if mathuratOpen && !navCollapsed}
-	<div class="more-panel fixed left-20 top-1/2 z-50 w-64 -translate-y-1/2 overflow-hidden rounded-2xl">
-		<MathuratPicker onclose={() => (mathuratOpen = false)} />
-	</div>
-{/if}
 
 <!-- More panel -->
 {#if moreOpen && !navCollapsed}

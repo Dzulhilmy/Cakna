@@ -1,157 +1,104 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { mathuratState } from '$lib/state/stores.svelte';
+	import type { MathuratTetapan } from '$lib/state/stores.svelte';
+	import { LISTS, VERSI_LABEL } from '$lib/data/mathurat';
+	import type { Versi, Waktu } from '$lib/data/mathurat';
+	import { Sun, Moon, ArrowRight, RotateCcw, BarChart2, ChevronLeft, BookMarked } from 'lucide-svelte';
 	import SideNav from '$lib/components/SideNav.svelte';
-	import { LISTS, TOTALS, VERSI_LABEL, JENIS_LABEL, BASMALAH, pickText, type Versi } from '$lib/data/mathurat';
-	import type { Waktu } from '$lib/data/mathurat';
-	import { mathuratState, todayKey } from '$lib/state/stores.svelte';
-	import type { MathuratState, MathuratTetapan } from '$lib/state/stores.svelte';
-	import { ChevronLeft, Settings, X, RotateCcw } from 'lucide-svelte';
-	import { halaqah } from '$lib/halaqah/store.svelte';
 
 	const DEFAULT_TETAPAN: MathuratTetapan = {
-		arSaiz: 26,
-		bmSaiz: 14,
-		paparBm: true,
-		paparRumi: false,
-		jajarAr: 'kanan',
-		jajarBm: 'kiri',
-		bahasa: 'bm',
-		getar: true,
-		autoMaju: false,
-		skrinTerang: false,
-		autoWaktu: true
+		arSaiz: 26, bmSaiz: 14, paparBm: true, paparRumi: false,
+		jajarAr: 'kanan', jajarBm: 'kiri', bahasa: 'bm',
+		getar: true, autoMaju: false, skrinTerang: false, autoWaktu: true
 	};
 
-	function initState(): MathuratState {
-		const hour = new Date().getHours();
-		const mode: Waktu = hour >= 4 && hour < 13 ? 'pagi' : 'petang';
+	const autoWaktu: Waktu = new Date().getHours() >= 4 && new Date().getHours() < 13 ? 'pagi' : 'petang';
+
+	let version = $state<Versi>(mathuratState.value?.v2 ? mathuratState.value.version : 'sughra');
+	let waktu = $state<Waktu>(mathuratState.value?.v2 ? mathuratState.value.mode : autoWaktu);
+
+	function progFor(v: Versi) {
+		const s = mathuratState.value;
+		if (!s?.v2) return { idx: 0, total: LISTS[v].length, done: false };
+		const idx = s.idx[v] ?? 0;
+		const total = LISTS[v].length;
+		return { idx, total, done: idx >= total };
+	}
+
+	const prog = $derived(progFor(version));
+	const progPct = $derived(prog.total > 0 ? Math.round((prog.idx / prog.total) * 100) : 0);
+	const ctaLabel = $derived(
+		prog.done ? 'Mulakan Semula' : prog.idx > 0 ? 'Teruskan Wirid' : 'Mulakan Wirid'
+	);
+
+	// ── Stats ────────────────────────────────────
+	const rekod = $derived(mathuratState.value?.rekod ?? {});
+
+	const now = new Date();
+	const viewYear = now.getFullYear();
+	const viewMonth = now.getMonth();
+	const todayD = now.getDate();
+
+	function dateKey(y: number, m: number, d: number): string {
+		return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+	}
+
+	function getCompletions(day: number) {
+		const entry = rekod[dateKey(viewYear, viewMonth, day)];
+		if (!entry) return { sp: false, sk: false, kp: false, kk: false };
 		return {
-			v2: true,
-			version: 'sughra',
-			mode,
-			idx: { sughra: 0, kubra: 0 },
-			counts: {
-				sughra: LISTS.sughra.map(() => 0),
-				kubra: LISTS.kubra.map(() => 0)
-			},
-			tetapan: { ...DEFAULT_TETAPAN },
-			rekod: {}
+			sp: !!(entry.pagi?.sughra),
+			sk: !!(entry.petang?.sughra),
+			kp: !!(entry.pagi?.kubra),
+			kk: !!(entry.petang?.kubra)
 		};
 	}
 
-	if (!mathuratState.value || !mathuratState.value.v2) {
-		mathuratState.value = initState();
-	} else {
+	function dayHasAny(day: number): boolean {
+		const c = getCompletions(day);
+		return c.sp || c.sk || c.kp || c.kk;
+	}
+
+	const monthStats = $derived(() => {
+		const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+		let completed = 0;
+		for (let d = 1; d <= daysInMonth; d++) {
+			if (dayHasAny(d)) completed++;
+		}
+		let streak = 0;
+		for (let d = todayD; d >= 1; d--) {
+			if (dayHasAny(d)) streak++;
+			else break;
+		}
+		return { completed, streak, daysInMonth };
+	});
+
+	const todayC = $derived(getCompletions(todayD));
+	const todayDone = $derived(todayC.sp || todayC.sk || todayC.kp || todayC.kk);
+
+	// ── Actions ───────────────────────────────────
+	function start() {
 		const s = mathuratState.value;
-		if (!s.counts) s.counts = { sughra: LISTS.sughra.map(() => 0), kubra: LISTS.kubra.map(() => 0) };
-		if (!s.tetapan) s.tetapan = { ...DEFAULT_TETAPAN };
-	}
-
-	const ms = $derived(mathuratState.value as MathuratState);
-
-	let showSettings = $state(false);
-	let advancePending = $state(false);
-
-	const list     = $derived(LISTS[ms.version]);
-	const idx      = $derived(ms.idx[ms.version]);
-	const item     = $derived(list[idx] ?? null);
-	const counts   = $derived(ms.counts[ms.version]);
-	const count    = $derived(counts[idx] ?? 0);
-	const progress = $derived(
-		list.slice(0, idx).reduce((s, it) => s + it.reps, 0) + Math.min(count, item?.reps ?? 0)
-	);
-	const total       = $derived(TOTALS[ms.version]);
-	const progressPct = $derived(total > 0 ? Math.round((progress / total) * 100) : 0);
-	const repsLeft    = $derived(item ? Math.max(0, item.reps - count) : 0);
-	const isDone      = $derived(repsLeft === 0 && !!item);
-
-	// SVG ring
-	const R            = 52;
-	const CIRC         = 2 * Math.PI * R;
-	const ringProgress = $derived(item ? Math.min(count / item.reps, 1) : 0);
-	const dashOffset   = $derived(CIRC * (1 - ringProgress));
-
-	function arText() { return item ? pickText(item, ms.version, ms.mode, 'ar') : ''; }
-	function bmText() {
-		if (!item) return '';
-		return pickText(item, ms.version, ms.mode, ms.tetapan.bahasa === 'bm' ? 'bm' : 'bi');
-	}
-	function rumiText() { return item ? pickText(item, ms.version, ms.mode, 'rumi') : ''; }
-
-	function tap() {
-		if (!item || advancePending) return;
-		const newCount = count + 1;
-		ms.counts[ms.version][idx] = newCount;
-		mathuratState.value = { ...ms };
-		if (ms.tetapan.getar && navigator.vibrate) navigator.vibrate(30);
-		if (newCount >= item.reps) {
-			advancePending = true;
-			setTimeout(() => {
-				advancePending = false;
-				advance();
-			}, 700);
+		if (!s?.v2) {
+			mathuratState.value = {
+				v2: true, version, mode: waktu,
+				idx: { sughra: 0, kubra: 0 },
+				counts: { sughra: LISTS.sughra.map(() => 0), kubra: LISTS.kubra.map(() => 0) },
+				tetapan: { ...DEFAULT_TETAPAN },
+				rekod: {}
+			};
+		} else if (prog.done) {
+			mathuratState.value = {
+				...s, version, mode: waktu,
+				idx: { ...s.idx, [version]: 0 },
+				counts: { ...s.counts, [version]: LISTS[version].map(() => 0) }
+			};
+		} else {
+			mathuratState.value = { ...s, version, mode: waktu };
 		}
+		goto('/mathurat/baca');
 	}
-
-	function advance() {
-		const next = idx + 1;
-		// allow idx to reach list.length to trigger completion screen
-		if (next <= list.length) ms.idx[ms.version] = next;
-		// record completion when reaching the last item
-		if (next === list.length) {
-			const key = todayKey();
-			const rekod = { ...(ms.rekod ?? {}) };
-			const day = rekod[key] ?? {};
-			const waktuRec = day[ms.mode] ?? {};
-			rekod[key] = { ...day, [ms.mode]: { ...waktuRec, [ms.version]: true } };
-			ms.rekod = rekod;
-		}
-		mathuratState.value = { ...ms };
-	}
-
-	function prev() {
-		if (idx > 0) {
-			ms.idx[ms.version] = idx - 1;
-			mathuratState.value = { ...ms };
-		}
-	}
-
-	function resetAll() {
-		mathuratState.value = initState();
-	}
-
-	function setVersion(v: Versi) {
-		ms.version = v;
-		mathuratState.value = { ...ms };
-	}
-
-	function setMode(m: Waktu) {
-		ms.mode = m;
-		mathuratState.value = { ...ms };
-	}
-
-	// Broadcast content position to halaqah when host is sharing
-	$effect(() => {
-		const sess = halaqah.session;
-		if (!sess?.connected || !sess.canSpeak || !sess.sharing) return;
-		void sess.setShare({
-			kind: 'mathurat',
-			version: ms.version,
-			mode: ms.mode,
-			idx: ms.idx[ms.version]
-		});
-	});
-
-	// Apply received mathurat share state when following as listener
-	$effect(() => {
-		const sess = halaqah.session;
-		if (!sess?.connected || sess.canSpeak || !sess.following) return;
-		const sh = sess.share;
-		if (sh?.kind !== 'mathurat') return;
-		ms.version = sh.version;
-		ms.mode = sh.mode;
-		ms.idx[sh.version] = sh.idx;
-		mathuratState.value = { ...ms };
-	});
 </script>
 
 <svelte:head><title>Al-Ma'thurat — Cakna</title></svelte:head>
@@ -159,177 +106,132 @@
 <div class="root">
 	<!-- Header -->
 	<header class="hdr">
-		<a href="https://cakna.org/hub" class="hdr-btn">
+		<a href="/hub" class="hdr-btn" aria-label="Kembali">
 			<ChevronLeft size={20} />
 		</a>
 		<div class="hdr-center">
+			<BookMarked size={15} class="hdr-icon" />
 			<span class="hdr-title">Al-Ma'thurat</span>
-			<span class="hdr-sub">{VERSI_LABEL[ms.version].penuh} · {ms.mode === 'pagi' ? 'Pagi' : 'Petang'}</span>
 		</div>
-		<button class="hdr-btn" onclick={() => (showSettings = !showSettings)} aria-label="Tetapan">
-			<Settings size={18} />
-		</button>
+		<a href="/mathurat/rekod" class="hdr-btn" aria-label="Prestasi">
+			<BarChart2 size={18} />
+		</a>
 	</header>
 
-	<!-- Progress bar -->
-	<div class="prog-wrap">
-		<div class="prog-bar" style="width: {progressPct}%;"></div>
-		<span class="prog-label">{progress} / {total} ({progressPct}%)</span>
-	</div>
+	<div class="body">
+		<!-- ── Picker ─────────────────────────── -->
+		<section class="picker-section">
 
-	<!-- Version + mode tabs -->
-	<div class="tabs-row">
-		<div class="tab-group">
-			{#each (['sughra', 'kubra'] as Versi[]) as v (v)}
-				<button class="tab" class:tab-on={ms.version === v} onclick={() => setVersion(v)}>
-					{VERSI_LABEL[v].nama}
-				</button>
-			{/each}
-		</div>
-		<div class="tab-group">
-			{#each (['pagi', 'petang'] as Waktu[]) as m (m)}
-				<button class="tab" class:tab-on={ms.mode === m} onclick={() => setMode(m)}>
-					{m === 'pagi' ? 'Pagi' : 'Petang'}
-				</button>
-			{/each}
-		</div>
-	</div>
-
-	<!-- Content -->
-	{#if item}
-		<main class="content">
-			<div class="item-meta">
-				<span class="item-num">{idx + 1} / {list.length}</span>
-				<span class="item-jenis">{JENIS_LABEL[item.jenis]}</span>
+			<!-- Version -->
+			<div class="field">
+				<p class="field-label">Versi</p>
+				<div class="card-row">
+					{#each (['sughra', 'kubra'] as Versi[]) as v}
+						{@const p = progFor(v)}
+						<button
+							class="ver-card"
+							class:selected={version === v}
+							onclick={() => (version = v)}
+						>
+							{#if p.done}
+								<span class="badge badge-done">✓</span>
+							{:else if p.idx > 0}
+								<span class="badge badge-prog">{p.idx}/{p.total}</span>
+							{/if}
+							<span class="ver-name">{VERSI_LABEL[v].nama}</span>
+							<span class="ver-sub">{VERSI_LABEL[v].n} item</span>
+						</button>
+					{/each}
+				</div>
 			</div>
-			<h2 class="item-tajuk">{item.tajuk}</h2>
-			{#if item.info}
-				<p class="item-info">{item.info}</p>
-			{/if}
 
-			{#if item.basmalah}
-				<p class="ar-basmalah" dir="rtl">{BASMALAH}</p>
-			{/if}
-			<p
-				class="ar-text"
-				dir="rtl"
-				style="font-size: {ms.tetapan.arSaiz}px; text-align: {ms.tetapan.jajarAr === 'kanan' ? 'right' : ms.tetapan.jajarAr === 'kiri' ? 'left' : 'center'};"
-			>{arText()}</p>
-
-			{#if ms.tetapan.paparRumi}
-				<p class="rumi-text">{rumiText()}</p>
-			{/if}
-			{#if ms.tetapan.paparBm}
-				<p
-					class="bm-text"
-					style="font-size: {ms.tetapan.bmSaiz}px; text-align: {ms.tetapan.jajarBm === 'kiri' ? 'left' : ms.tetapan.jajarBm === 'kanan' ? 'right' : 'center'};"
-				>{bmText()}</p>
-			{/if}
-		</main>
-	{:else}
-		<!-- Completion screen -->
-		<div class="complete">
-			<div class="complete-icon">✓</div>
-			<h2>Wirid Selesai</h2>
-			<p>Tahniah! Anda telah melengkapkan {VERSI_LABEL[ms.version].penuh}.</p>
-			<button class="reset-btn" onclick={resetAll}>
-				<RotateCcw size={16} />
-				<span>Mula Semula</span>
-			</button>
-		</div>
-	{/if}
-
-	<!-- Floating counter button -->
-	{#if item}
-		<div class="fab-wrap">
-			<button
-				class="fab"
-				class:fab-done={isDone || advancePending}
-				onclick={tap}
-				disabled={advancePending}
-				aria-label="Tap untuk zikir"
-			>
-				<!-- Ring progress -->
-				<svg class="fab-ring" viewBox="0 0 120 120" aria-hidden="true">
-					<circle class="ring-bg" cx="60" cy="60" r={R} />
-					<circle
-						class="ring-fill"
-						cx="60" cy="60" r={R}
-						stroke-dasharray={CIRC}
-						stroke-dashoffset={dashOffset}
-						transform="rotate(-90 60 60)"
-					/>
-				</svg>
-				<!-- Center label -->
-				<div class="fab-inner">
-					{#if advancePending || (isDone && repsLeft === 0)}
-						<span class="fab-check">✓</span>
-					{:else}
-						<span class="fab-num">{repsLeft}</span>
-						<span class="fab-sub">lagi</span>
-					{/if}
+			<!-- Waktu -->
+			<div class="field">
+				<p class="field-label">Waktu</p>
+				<div class="card-row">
+					<button class="waktu-card" class:selected={waktu === 'pagi'} onclick={() => (waktu = 'pagi')}>
+						<Sun size={18} />
+						<span class="waktu-name">Pagi</span>
+					</button>
+					<button class="waktu-card" class:selected={waktu === 'petang'} onclick={() => (waktu = 'petang')}>
+						<Moon size={18} />
+						<span class="waktu-name">Petang</span>
+					</button>
 				</div>
-			</button>
-		</div>
-	{/if}
+			</div>
 
-	<!-- Nav footer -->
-	{#if item}
-		<footer class="nav-foot">
-			<button class="foot-btn" onclick={prev} disabled={idx <= 0}>
-				<ChevronLeft size={16} />
-				<span>Sebelum</span>
-			</button>
-			<button class="foot-reset" onclick={resetAll} title="Reset semua">
-				<RotateCcw size={15} />
-			</button>
-			<button class="foot-btn foot-skip" onclick={advance}>
-				<span>Langkau</span>
-				<ChevronLeft size={16} style="transform: rotate(180deg)" />
-			</button>
-		</footer>
-	{/if}
-
-	<!-- Settings sheet -->
-	{#if showSettings}
-		<div class="backdrop" onclick={() => (showSettings = false)} role="dialog" aria-modal="true">
-			<div class="sheet" onclick={(e) => e.stopPropagation()}>
-				<div class="sheet-handle"></div>
-				<div class="sheet-hdr">
-					<span>Tetapan Al-Ma'thurat</span>
-					<button onclick={() => (showSettings = false)}><X size={16} /></button>
-				</div>
-
-				<div class="srow">
-					<label class="slabel">Saiz Arab</label>
-					<input type="range" min="18" max="40" step="2" bind:value={ms.tetapan.arSaiz} class="range" />
-					<span class="sval">{ms.tetapan.arSaiz}px</span>
-				</div>
-				<div class="srow">
-					<label class="slabel">Bahasa</label>
-					<div class="tab-group">
-						<button class="tab" class:tab-on={ms.tetapan.bahasa === 'bm'} onclick={() => (ms.tetapan.bahasa = 'bm')}>Melayu</button>
-						<button class="tab" class:tab-on={ms.tetapan.bahasa === 'bi'} onclick={() => (ms.tetapan.bahasa = 'bi')}>English</button>
+			<!-- Progress (if in progress) -->
+			{#if prog.idx > 0}
+				<div class="prog-block">
+					<div class="prog-meta">
+						<span class="prog-text">
+							{prog.done ? 'Selesai' : `Item ${prog.idx}`} / {prog.total}
+						</span>
+						<span class="prog-pct">{progPct}%</span>
+					</div>
+					<div class="prog-track">
+						<div class="prog-fill" style="width: {Math.min(100, progPct)}%"></div>
 					</div>
 				</div>
-				<div class="srow srow-check">
-					<label class="slabel">Terjemahan</label>
-					<input type="checkbox" bind:checked={ms.tetapan.paparBm} />
+			{/if}
+
+			<!-- CTA -->
+			<button class="cta-btn" onclick={start}>
+				{#if prog.done}
+					<RotateCcw size={16} />
+				{:else}
+					<ArrowRight size={16} />
+				{/if}
+				{ctaLabel}
+			</button>
+		</section>
+
+		<!-- ── Divider ────────────────────────── -->
+		<div class="divider"></div>
+
+		<!-- ── Stats ─────────────────────────── -->
+		<section class="stats-section">
+			<p class="field-label">Prestasi Bulan Ini</p>
+
+			<div class="stat-row">
+				<div class="stat-card">
+					<span class="stat-num">{monthStats().streak}</span>
+					<span class="stat-label">Hari Berturut</span>
 				</div>
-				<div class="srow srow-check">
-					<label class="slabel">Transliterasi</label>
-					<input type="checkbox" bind:checked={ms.tetapan.paparRumi} />
+				<div class="stat-card">
+					<span class="stat-num">{monthStats().completed}</span>
+					<span class="stat-label">Hari Selesai</span>
 				</div>
-				<div class="srow srow-check">
-					<label class="slabel">Getaran</label>
-					<input type="checkbox" bind:checked={ms.tetapan.getar} />
+				<div class="stat-card">
+					<span class="stat-num">{monthStats().daysInMonth}</span>
+					<span class="stat-label">Hari Dalam Bulan</span>
 				</div>
-				<button class="reset-btn" style="margin-top:16px;width:100%;" onclick={() => { resetAll(); showSettings = false; }}>
-					<RotateCcw size={14} /> Reset Semua
-				</button>
 			</div>
-		</div>
-	{/if}
+
+			<!-- Today's session status -->
+			<div class="today-block">
+				<p class="today-label">Hari Ini</p>
+				<div class="session-pills">
+					<span class="pill" class:pill-done={todayC.sp} title="Sughra Pagi">SP</span>
+					<span class="pill" class:pill-done={todayC.sk} title="Sughra Petang">SK</span>
+					<span class="pill" class:pill-done={todayC.kp} title="Kubra Pagi">KP</span>
+					<span class="pill" class:pill-done={todayC.kk} title="Kubra Petang">KK</span>
+				</div>
+				{#if !todayDone}
+					<p class="today-hint">Belum ada sesi selesai hari ini</p>
+				{:else}
+					<p class="today-hint today-hint-done">
+						{[todayC.sp && 'Sughra Pagi', todayC.sk && 'Sughra Petang', todayC.kp && 'Kubra Pagi', todayC.kk && 'Kubra Petang'].filter(Boolean).join(', ')} selesai
+					</p>
+				{/if}
+			</div>
+
+			<a href="/mathurat/rekod" class="rekod-link">
+				<BarChart2 size={14} />
+				<span>Lihat Prestasi Lengkap</span>
+			</a>
+		</section>
+	</div>
 </div>
 
 <SideNav active="mathurat" />
@@ -346,7 +248,7 @@
 		padding-bottom: env(safe-area-inset-bottom);
 	}
 
-	/* ── Header ─────────────────────────────── */
+	/* ── Header ───────────────────────────────── */
 	.hdr {
 		position: sticky;
 		top: 0;
@@ -370,273 +272,302 @@
 		cursor: pointer;
 		text-decoration: none;
 		transition: background 0.15s;
+		flex-shrink: 0;
 	}
 	.hdr-btn:hover { background: var(--pg-btn-hover); }
-	.hdr-center { flex: 1; display: flex; flex-direction: column; align-items: center; }
-	.hdr-title { font-size: 13px; font-weight: 600; color: var(--pg-text-75); }
-	.hdr-sub { font-size: 11px; color: rgba(34,197,94,0.6); }
-
-	/* ── Progress ────────────────────────────── */
-	.prog-wrap {
-		position: relative;
-		height: 3px;
-		background: var(--pg-surface-b);
-	}
-	.prog-bar {
-		height: 100%;
-		background: linear-gradient(90deg, #8e3557, #b34a6e);
-		transition: width 0.4s ease;
-	}
-	.prog-label {
-		position: absolute;
-		right: 12px; top: 6px;
-		font-size: 10px;
-		color: var(--pg-subtle);
-	}
-
-	/* ── Tabs ────────────────────────────────── */
-	.tabs-row {
-		display: flex;
-		gap: 8px;
-		padding: 10px 16px;
-		border-bottom: 1px solid var(--pg-surface-b);
-	}
-	.tab-group {
-		display: flex;
-		gap: 4px;
-		background: var(--pg-btn);
-		border-radius: 10px;
-		padding: 3px;
-	}
-	.tab {
-		padding: 5px 12px;
-		border-radius: 7px;
-		font-size: 12px;
-		color: var(--pg-muted);
-		cursor: pointer;
-		border: none;
-		background: transparent;
-		transition: all 0.15s;
-	}
-	.tab-on {
-		background: rgba(34,197,94,0.2);
-		color: rgba(74,222,128,0.95);
-	}
-
-	/* ── Content ─────────────────────────────── */
-	.content {
+	.hdr-center {
 		flex: 1;
-		padding: 20px 20px 200px;
-		overflow-y: auto;
-	}
-	.item-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-	.item-num { font-size: 11px; color: var(--pg-subtle); }
-	.item-jenis {
-		font-size: 10px; font-weight: 600;
-		letter-spacing: 0.08em;
-		color: rgba(34,197,94,0.7);
-		text-transform: uppercase;
-	}
-	.item-tajuk { font-size: 16px; font-weight: 700; color: var(--pg-text-85); margin-bottom: 4px; }
-	.item-info { font-size: 12px; color: var(--pg-subtle); margin-bottom: 12px; }
-	.ar-basmalah {
-		font-family: 'Amiri Quran', 'Scheherazade New', serif;
-		font-size: 22px; line-height: 2.2; text-align: center;
-		color: var(--gold); margin-bottom: 4px;
-	}
-	.ar-text {
-		font-family: 'Amiri Quran', 'Scheherazade New', serif;
-		line-height: 2.2; color: var(--pg-fg); margin-bottom: 12px;
-	}
-	.rumi-text { font-size: 13px; font-style: italic; color: var(--pg-muted); margin-bottom: 8px; }
-	.bm-text { line-height: 1.7; color: var(--pg-muted); margin-bottom: 20px; }
-
-	/* ── Floating counter button ─────────────── */
-	.fab-wrap {
-		position: fixed;
-		bottom: 76px;
-		left: 76px; right: 0;
 		display: flex;
+		align-items: center;
 		justify-content: center;
-		z-index: 30;
-		pointer-events: none;
+		gap: 7px;
 	}
-	.fab {
+	:global(.hdr-icon) { color: rgba(74,222,128,0.7); }
+	.hdr-title {
+		font-size: 14px;
+		font-weight: 700;
+		color: var(--pg-text-85);
+		letter-spacing: 0.01em;
+	}
+
+	/* ── Body ────────────────────────────────── */
+	.body {
+		flex: 1;
+		overflow-y: auto;
+		padding: 20px 20px 40px;
+		max-width: 480px;
+		width: 100%;
+		margin: 0 auto;
+	}
+
+	/* ── Picker ──────────────────────────────── */
+	.picker-section {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.field {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.field-label {
+		font-size: 10px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		color: rgba(255, 255, 255, 0.3);
+		margin: 0;
+	}
+
+	.card-row {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 8px;
+	}
+
+	.ver-card {
 		position: relative;
-		width: 120px; height: 120px;
-		border-radius: 50%;
-		border: none;
-		background: transparent;
-		cursor: pointer;
-		pointer-events: auto;
-		transition: transform 0.12s;
-		-webkit-tap-highlight-color: transparent;
-		touch-action: manipulation;
-	}
-	.fab:active:not(:disabled) { transform: scale(0.93); }
-	.fab:disabled { cursor: default; }
-
-	.fab-ring {
-		position: absolute;
-		inset: 0;
-		width: 100%; height: 100%;
-	}
-	.ring-bg {
-		fill: none;
-		stroke: var(--pg-surface-b);
-		stroke-width: 6;
-	}
-	.ring-fill {
-		fill: none;
-		stroke: rgba(34,197,94,0.75);
-		stroke-width: 6;
-		stroke-linecap: round;
-		transition: stroke-dashoffset 0.25s ease, stroke 0.25s ease;
-	}
-	.fab-done .ring-fill {
-		stroke: rgba(74,222,128,0.95);
-		filter: drop-shadow(0 0 6px rgba(34,197,94,0.6));
-	}
-
-	.fab-inner {
-		position: absolute;
-		inset: 0;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;
-		gap: 2px;
-		background: rgba(10, 21, 16, 0.88);
-		border-radius: 50%;
-		margin: 10px;
-	}
-	.fab-num {
-		font-size: 38px;
-		font-weight: 700;
-		color: rgba(255, 255, 255, 0.95);
-		line-height: 1;
-	}
-	.fab-sub {
-		font-size: 11px;
-		color: rgba(255, 255, 255, 0.5);
-		letter-spacing: 0.05em;
-	}
-	.fab-check {
-		font-size: 36px;
-		color: rgba(74,222,128,0.95);
-		line-height: 1;
-	}
-	.fab-done .fab-inner {
-		background: rgba(10, 21, 16, 0.7);
-	}
-
-	/* ── Nav footer ──────────────────────────── */
-	.nav-foot {
-		position: fixed;
-		bottom: 0;
-		left: 76px; right: 0;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 8px 16px 20px;
-		background: var(--pg-hdr);
-		border-top: 1px solid var(--pg-surface-b);
-		backdrop-filter: blur(8px);
-		z-index: 25;
-	}
-	.foot-btn {
-		display: flex; align-items: center; gap: 4px;
-		padding: 8px 14px;
-		border-radius: 10px;
-		background: var(--pg-btn);
-		border: 1px solid var(--pg-btn-border);
-		color: var(--pg-muted);
-		font-size: 12px;
-		cursor: pointer;
-		transition: background 0.15s;
-	}
-	.foot-btn:hover:not(:disabled) { background: var(--pg-btn-hover); color: var(--pg-text-75); }
-	.foot-btn:disabled { opacity: 0.25; cursor: not-allowed; }
-	.foot-skip {
-		color: rgba(74,222,128,0.7);
-		border-color: rgba(34,197,94,0.15);
-		background: rgba(34,197,94,0.06);
-	}
-	.foot-skip:hover:not(:disabled) { background: rgba(34,197,94,0.12); color: rgba(74,222,128,0.9); }
-	.foot-reset {
-		display: grid; place-items: center;
-		width: 38px; height: 38px;
-		border-radius: 10px;
+		gap: 3px;
+		padding: 14px 12px 12px;
+		border-radius: 14px;
 		background: var(--pg-surface);
 		border: 1px solid var(--pg-surface-b);
-		color: var(--pg-subtle);
+		color: var(--pg-muted);
 		cursor: pointer;
-		transition: background 0.15s;
+		transition: background 0.15s, border-color 0.15s, color 0.15s;
 	}
-	.foot-reset:hover { background: var(--pg-btn-hover); color: var(--pg-muted); }
+	.ver-card:hover {
+		background: var(--pg-btn-hover);
+		color: var(--pg-text-75);
+	}
+	.ver-card.selected {
+		background: rgba(34, 197, 94, 0.1);
+		border-color: rgba(34, 197, 94, 0.3);
+		color: rgba(74, 222, 128, 0.95);
+	}
 
-	/* ── Completion ──────────────────────────── */
-	.complete {
-		flex: 1;
-		display: flex; flex-direction: column;
-		align-items: center; justify-content: center;
-		gap: 12px; padding: 40px 20px;
-		text-align: center;
+	.ver-name {
+		font-size: 15px;
+		font-weight: 700;
 	}
-	.complete-icon {
-		font-size: 40px; width: 80px; height: 80px;
-		border-radius: 50%;
-		background: rgba(179,74,110,0.15);
-		display: grid; place-items: center;
-		color: #b34a6e;
+	.ver-sub {
+		font-size: 11px;
+		color: var(--pg-subtle);
 	}
-	.complete h2 { font-size: 20px; font-weight: 700; color: var(--pg-text-85); margin: 0; }
-	.complete p { font-size: 14px; color: var(--pg-muted); margin: 0; }
+	.ver-card.selected .ver-sub {
+		color: rgba(74,222,128,0.5);
+	}
 
-	.reset-btn {
-		display: flex; align-items: center; gap: 6px;
-		padding: 10px 20px;
-		border-radius: 12px;
-		background: var(--pg-btn);
+	.badge {
+		position: absolute;
+		top: 8px;
+		right: 10px;
+		font-size: 10px;
+		font-weight: 700;
+		border-radius: 999px;
+		padding: 1px 6px;
+		line-height: 1.5;
+	}
+	.badge-done {
+		background: rgba(34, 197, 94, 0.18);
+		color: rgba(74, 222, 128, 0.9);
+	}
+	.badge-prog {
+		background: rgba(251, 191, 36, 0.15);
+		color: rgba(251, 191, 36, 0.9);
+	}
+
+	.waktu-card {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 5px;
+		padding: 14px 12px;
+		border-radius: 14px;
+		background: var(--pg-surface);
 		border: 1px solid var(--pg-surface-b);
 		color: var(--pg-muted);
-		font-size: 13px; cursor: pointer;
-		transition: background 0.15s;
+		cursor: pointer;
+		transition: background 0.15s, border-color 0.15s, color 0.15s;
 	}
-	.reset-btn:hover { background: var(--pg-btn-hover); }
-
-	/* ── Settings sheet ──────────────────────── */
-	.backdrop {
-		position: fixed; inset: 0; z-index: 50;
-		background: rgba(0,0,0,0.6);
-		display: flex; align-items: flex-end;
-	}
-	.sheet {
-		width: 100%; max-height: 80dvh; overflow-y: auto;
-		background: #111d16;
-		border-top: 1px solid rgba(34,197,94,0.15);
-		border-radius: 20px 20px 0 0;
-		padding: 12px 20px 40px;
-	}
-	.sheet-handle {
-		width: 36px; height: 4px;
+	.waktu-card:hover {
 		background: var(--pg-btn-hover);
-		border-radius: 2px;
-		margin: 0 auto 16px;
+		color: var(--pg-text-75);
 	}
-	.sheet-hdr {
-		display: flex; align-items: center; justify-content: space-between;
-		margin-bottom: 16px;
-		color: var(--pg-muted); font-size: 14px; font-weight: 600;
+	.waktu-card.selected {
+		background: rgba(34, 197, 94, 0.1);
+		border-color: rgba(34, 197, 94, 0.3);
+		color: rgba(74, 222, 128, 0.95);
 	}
-	.sheet-hdr button { background: none; border: none; color: inherit; cursor: pointer; }
-	.srow {
-		display: flex; flex-direction: column; gap: 8px;
-		padding: 10px 0;
-		border-bottom: 1px solid var(--pg-surface-b);
+	.waktu-name {
+		font-size: 14px;
+		font-weight: 600;
 	}
-	.srow-check { flex-direction: row; align-items: center; justify-content: space-between; }
-	.slabel { font-size: 12px; color: var(--pg-muted); }
-	.sval { font-size: 11px; color: var(--pg-subtle); text-align: right; }
-	.range { accent-color: #b34a6e; width: 100%; }
+
+	/* ── Progress block ──────────────────────── */
+	.prog-block {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+	.prog-meta {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+	}
+	.prog-text { font-size: 12px; color: var(--pg-muted); }
+	.prog-pct { font-size: 11px; color: var(--pg-subtle); }
+	.prog-track {
+		height: 4px;
+		border-radius: 999px;
+		background: var(--pg-surface-b);
+		overflow: hidden;
+	}
+	.prog-fill {
+		height: 100%;
+		border-radius: 999px;
+		background: linear-gradient(90deg, rgba(34,197,94,0.6), rgba(74,222,128,0.9));
+		transition: width 0.3s ease;
+	}
+
+	/* ── CTA ─────────────────────────────────── */
+	.cta-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		width: 100%;
+		padding: 14px;
+		border-radius: 14px;
+		background: rgba(34, 197, 94, 0.18);
+		border: 1px solid rgba(34, 197, 94, 0.3);
+		color: rgba(74, 222, 128, 0.95);
+		font-size: 15px;
+		font-weight: 700;
+		cursor: pointer;
+		transition: background 0.15s, border-color 0.15s;
+		letter-spacing: 0.01em;
+	}
+	.cta-btn:hover {
+		background: rgba(34, 197, 94, 0.28);
+		border-color: rgba(34, 197, 94, 0.45);
+	}
+
+	/* ── Divider ─────────────────────────────── */
+	.divider {
+		height: 1px;
+		background: var(--pg-surface-b);
+		margin: 24px 0;
+	}
+
+	/* ── Stats ───────────────────────────────── */
+	.stats-section {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.stat-row {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 8px;
+	}
+	.stat-card {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 3px;
+		padding: 14px 8px;
+		border-radius: 12px;
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-surface-b);
+	}
+	.stat-num {
+		font-size: 24px;
+		font-weight: 700;
+		color: rgba(74, 222, 128, 0.9);
+		line-height: 1;
+	}
+	.stat-label {
+		font-size: 10px;
+		color: var(--pg-subtle);
+		text-align: center;
+	}
+
+	/* ── Today block ─────────────────────────── */
+	.today-block {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		padding: 14px;
+		border-radius: 12px;
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-surface-b);
+	}
+	.today-label {
+		font-size: 10px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		color: rgba(255, 255, 255, 0.3);
+		margin: 0;
+	}
+	.session-pills {
+		display: flex;
+		gap: 6px;
+	}
+	.pill {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 36px;
+		padding: 4px 8px;
+		border-radius: 6px;
+		font-size: 11px;
+		font-weight: 700;
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-surface-b);
+		color: var(--pg-subtle);
+		letter-spacing: 0.03em;
+	}
+	.pill.pill-done {
+		background: rgba(34, 197, 94, 0.15);
+		border-color: rgba(34, 197, 94, 0.3);
+		color: rgba(74, 222, 128, 0.9);
+	}
+	.today-hint {
+		font-size: 11px;
+		color: var(--pg-subtle);
+		margin: 0;
+	}
+	.today-hint-done {
+		color: rgba(74, 222, 128, 0.6);
+	}
+
+	/* ── Rekod link ──────────────────────────── */
+	.rekod-link {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
+		padding: 11px;
+		border-radius: 12px;
+		background: transparent;
+		border: 1px solid var(--pg-surface-b);
+		color: var(--pg-subtle);
+		font-size: 13px;
+		font-weight: 500;
+		text-decoration: none;
+		transition: background 0.15s, color 0.15s;
+	}
+	.rekod-link:hover {
+		background: var(--pg-surface);
+		color: var(--pg-muted);
+	}
 </style>
