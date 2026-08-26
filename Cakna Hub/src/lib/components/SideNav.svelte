@@ -50,7 +50,7 @@
 	}
 
 	const mainNav = [
-		{ id: 'home', icon: Home, label: 'Home', href: '/hub' },
+		{ id: 'home', icon: Home, label: 'Utama', href: '/hub' },
 		{ id: 'mushaf', icon: BookOpen, label: 'Mushaf Digital', href: '/mushaf' },
 		{ id: 'solat', icon: Clock, label: 'Waktu Solat', href: '/solat' },
 		{ id: 'mathurat', icon: BookMarked, label: "Al-Ma'thurat", href: '/mathurat' },
@@ -89,11 +89,8 @@
 	<nav class="flex flex-col items-center" aria-label="Main navigation">
 		<div class="side-pill flex flex-col items-center gap-1 rounded-[2rem] px-2 py-3">
 			<!-- Logo -->
-			<div class="logo-btn mb-2 flex h-10 w-10 items-center justify-center rounded-full">
-				<svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-					<path d="M12 2C8 2 4 6 4 10c0 5 8 12 8 12s8-7 8-12c0-4-4-8-8-8z" fill="currentColor" opacity="0.9"/>
-					<path d="M12 6c-1.5 2-2 4-2 5.5C10 13.5 11 15 12 16c1-1 2-2.5 2-4.5C14 10 13.5 8 12 6z" fill="white" opacity="0.6"/>
-				</svg>
+			<div class="logo-btn mb-2 flex h-10 w-10 items-center justify-center rounded-full overflow-hidden">
+				<img src="/logo.jpg" alt="Cakna" class="h-full w-full object-contain" />
 			</div>
 
 			<!-- Nav items -->
