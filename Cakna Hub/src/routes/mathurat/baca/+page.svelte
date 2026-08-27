@@ -6,6 +6,7 @@
 	import type { MathuratState, MathuratTetapan } from '$lib/state/stores.svelte';
 	import { ChevronLeft, Settings, X, RotateCcw } from 'lucide-svelte';
 	import { halaqah } from '$lib/halaqah/store.svelte';
+	import { untrack } from 'svelte';
 
 	const DEFAULT_TETAPAN: MathuratTetapan = {
 		arSaiz: 26,
@@ -139,16 +140,24 @@
 		});
 	});
 
-	// Apply received mathurat share state when following as listener
+	// Apply received mathurat share state when following as listener.
+	// Reads mathuratState inside untrack to avoid a reactive loop
+	// (effect reads ms → writes mathuratState → ms recomputes → effect loops).
 	$effect(() => {
 		const sess = halaqah.session;
 		if (!sess?.connected || sess.canSpeak || !sess.following) return;
 		const sh = sess.share;
 		if (sh?.kind !== 'mathurat') return;
-		ms.version = sh.version;
-		ms.mode = sh.mode;
-		ms.idx[sh.version] = sh.idx;
-		mathuratState.value = { ...ms };
+		untrack(() => {
+			const cur = mathuratState.value;
+			if (!cur) return;
+			mathuratState.value = {
+				...cur,
+				version: sh.version,
+				mode: sh.mode,
+				idx: { ...cur.idx, [sh.version]: sh.idx }
+			};
+		});
 	});
 </script>
 

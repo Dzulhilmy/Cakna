@@ -24,6 +24,7 @@
 		ChevronLeft
 	} from 'lucide-svelte';
 	import { settings } from '$lib/state/stores.svelte';
+	import { afterNavigate } from '$app/navigation';
 
 	const isDark = $derived(settings.value.theme === 'dark');
 	function toggleTheme() {
@@ -37,6 +38,10 @@
 
 	$effect(() => {
 		navCollapsed = window.innerWidth < 768;
+	});
+
+	afterNavigate(() => {
+		moreOpen = false;
 	});
 
 	function toggleNav() {
