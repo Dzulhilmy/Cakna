@@ -153,9 +153,17 @@
 	$effect(() => {
 		const sess = halaqah.session;
 		const path = page.url.pathname;
+		const search = page.url.search;
 		if (!sess?.connected || !sess.canSpeak || !sess.sharing) return;
 		if (path.startsWith('/halaqah')) return;
-		if (path === '/mathurat') return;
+		// mathurat/baca has its own dedicated broadcast effect — skip here so
+		// the route kind does not shadow the mathurat kind for listeners.
+		if (path === '/mathurat/baca') return;
+		if (path === '/mushaf') {
+			const p = Number(new URLSearchParams(search).get('page') || 1);
+			void sess.setShare({ kind: 'page', page: p });
+			return;
+		}
 		const m = path.match(/^\/read\/(\d+)$/);
 		if (m) {
 			void sess.setShare({ kind: 'page', page: Number(m[1]) });
@@ -181,10 +189,10 @@
 		if (sh.kind === 'route' && currentPath !== sh.path) {
 			void goto(sh.path);
 		} else if (sh.kind === 'page') {
-			const target = `/read/${sh.page}`;
-			if (currentPath !== target) void goto(target);
+			const target = `/mushaf?page=${sh.page}`;
+			if (currentPath + page.url.search !== target) void goto(target);
 		} else if (sh.kind === 'mathurat') {
-			if (currentPath !== '/mathurat') void goto('/mathurat');
+			if (currentPath !== '/mathurat/baca') void goto('/mathurat/baca');
 		}
 	});
 
@@ -203,8 +211,8 @@
 	const shareUrl = $derived.by(() => {
 		const sh = s?.share;
 		if (!sh) return null;
-		if (sh.kind === 'page') return `/read/${sh.page}`;
-		if (sh.kind === 'mathurat') return '/mathurat';
+		if (sh.kind === 'page') return `/mushaf?page=${sh.page}`;
+		if (sh.kind === 'mathurat') return '/mathurat/baca';
 		return sh.path;
 	});
 
@@ -245,6 +253,7 @@
 			onpointerdown={onDragStart}
 			onpointermove={onDragMove}
 			onpointerup={onDragEnd}
+			onpointercancel={onDragEnd}
 			role="none"
 		>
 			<!-- Tap to open room (only fires if not dragging) -->
@@ -346,7 +355,7 @@
 						{#if s.share}
 							<div class="sp-info">
 								{#if s.share.kind === 'page'}
-									<a class="sp-label" href="/read/{s.share.page}">
+									<a class="sp-label" href="/mushaf?page={s.share.page}">
 										<BookOpen size={12} />
 										<span>Halaman {s.share.page}</span>
 									</a>
@@ -363,6 +372,7 @@
 								{/if}
 							</div>
 							{#if shareUrl}
+							<div class="sp-frame-wrap">
 								<iframe
 									src={shareUrl}
 									title="Kandungan dikongsi"
@@ -370,6 +380,7 @@
 									class="sp-frame"
 									sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
 								></iframe>
+							</div>
 							{/if}
 						{/if}
 						{#if s.screenShareTrack}
@@ -429,6 +440,7 @@
 				onpointerdown={onResizeStart}
 				onpointermove={onResizeMove}
 				onpointerup={onResizeEnd}
+				onpointercancel={onResizeEnd}
 				role="separator"
 				aria-label="Ubah saiz panel"
 			></div>
@@ -447,7 +459,6 @@
 		border: 1px solid var(--pg-btn-border);
 		background: var(--pg-bg);
 		user-select: none;
-		touch-action: none;
 		transition: box-shadow 0.15s;
 		display: flex;
 		flex-direction: column;
@@ -490,6 +501,7 @@
 		box-sizing: border-box;
 		cursor: grab;
 		border-bottom: 1px solid transparent;
+		touch-action: none;
 	}
 	.is-expanded .pill {
 		border-bottom-color: var(--pg-btn-border);
@@ -701,16 +713,25 @@
 	.share-preview video {
 		width: 100%;
 		display: block;
-		max-height: 100px;
+		max-height: 240px;
 		object-fit: contain;
 		background: #000;
 	}
-	.sp-frame {
+	.sp-frame-wrap {
 		width: 100%;
-		height: 100px;
+		height: 200px;
+		overflow: hidden;
+		border-top: 1px solid var(--pg-btn-border);
+		position: relative;
+	}
+	.sp-frame {
+		width: 200%;
+		height: 400px;
 		border: none;
 		display: block;
-		border-top: 1px solid var(--pg-btn-border);
+		transform: scale(0.5);
+		transform-origin: top left;
+		pointer-events: none;
 	}
 
 	/* Quick controls */

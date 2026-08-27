@@ -5,7 +5,7 @@
 	import { halaqah } from '$lib/halaqah/store.svelte';
 	import SideNav from '$lib/components/SideNav.svelte';
 	import {
-		Mic, MicOff, Users, LogOut, Copy, X, Radio,
+		Mic, MicOff, Users, LogOut, X, Radio,
 		ChevronLeft, Minimize2, Crown, BookOpen, ScrollText, MapPin, Clock, Monitor
 	} from 'lucide-svelte';
 
@@ -31,10 +31,6 @@
 	async function leave() { await halaqah.leave(); }
 	async function close() { await halaqah.close(); }
 
-	function copyLink() {
-		navigator.clipboard.writeText(`${location.origin}/halaqah/${session?.slug}`);
-	}
-
 	function toggleMic() { session?.setMic(!session.micOn); }
 
 	function minimize() { history.back(); }
@@ -58,12 +54,14 @@
 		if (!session?.connected || session.canSpeak || !session.following) return;
 		const sh = session.share;
 		if (!sh) return;
-		if (sh.kind === 'route') {
+		const cur = page.url.pathname + page.url.search;
+		if (sh.kind === 'route' && page.url.pathname !== sh.path) {
 			void goto(sh.path);
 		} else if (sh.kind === 'page') {
-			void goto(`/read/${sh.page}`);
+			const dest = `/read/${sh.page}`;
+			if (cur !== dest) void goto(dest);
 		} else if (sh.kind === 'mathurat') {
-			void goto('/mathurat');
+			if (page.url.pathname !== '/mathurat/baca') void goto('/mathurat/baca');
 		}
 	});
 </script>
@@ -223,12 +221,7 @@
 						</button>
 					{/if}
 
-					<button class="ctrl-btn" onclick={copyLink}>
-						<Copy size={22} />
-						<span>Kongsi</span>
-					</button>
-
-					{#if session.role === 'host'}
+{#if session.role === 'host'}
 						<button class="ctrl-btn ctrl-danger" onclick={close}>
 							<X size={22} />
 							<span>Tutup</span>
@@ -241,19 +234,29 @@
 					{/if}
 				</div>
 
-				<!-- Share state panel -->
+				<!-- Share content preview -->
 				{#if session.share}
-					<div class="share-info">
-						{#if session.share.kind === 'page'}
-							<a class="share-label" href="/read/{session.share.page}"><BookOpen size={14} /> Halaman {session.share.page}</a>
-						{:else if session.share.kind === 'mathurat'}
-							<a class="share-label" href="/mathurat"><ScrollText size={14} /> Al-Ma'thurat</a>
-						{:else if session.share.kind === 'route'}
-							<a class="share-label" href={session.share.path}><MapPin size={14} /> {session.share.label}</a>
-						{/if}
-						{#if !session.following && session.role !== 'host'}
-							<button class="follow-btn" onclick={() => session?.followSpeaker()}>Ikut</button>
-						{/if}
+					{@const shareUrl = session.share.kind === 'page' ? `/read/${session.share.page}` : session.share.kind === 'mathurat' ? '/mathurat/baca' : session.share.path}
+					<div class="content-preview">
+						<div class="preview-hdr">
+							{#if session.share.kind === 'page'}
+								<a class="preview-lbl" href="/read/{session.share.page}"><BookOpen size={13} /> Halaman {session.share.page}</a>
+							{:else if session.share.kind === 'mathurat'}
+								<a class="preview-lbl" href="/mathurat"><ScrollText size={13} /> Al-Ma'thurat</a>
+							{:else if session.share.kind === 'route'}
+								<a class="preview-lbl" href={session.share.path}><MapPin size={13} /> {session.share.label}</a>
+							{/if}
+							{#if !session.following && session.role !== 'host'}
+								<button class="follow-btn" onclick={() => session?.followSpeaker()}>Ikut</button>
+							{/if}
+						</div>
+						<iframe
+							src={shareUrl}
+							title="Kandungan dikongsi"
+							loading="lazy"
+							class="content-frame"
+							sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+						></iframe>
 					</div>
 				{/if}
 
@@ -444,10 +447,10 @@
 
 	/* Controls */
 	.controls {
-		display: grid; grid-template-columns: repeat(3, 1fr);
+		display: grid; grid-template-columns: repeat(2, 1fr);
 		gap: 8px;
 	}
-	.controls-4 { grid-template-columns: repeat(4, 1fr); }
+	.controls-4 { grid-template-columns: repeat(3, 1fr); }
 	.ctrl-btn {
 		display: flex; flex-direction: column; align-items: center; gap: 6px;
 		padding: 14px 8px;
@@ -463,20 +466,24 @@
 	.ctrl-danger { color: rgba(248,113,113,0.7); }
 	.ctrl-danger:hover { background: rgba(248,113,113,0.12); border-color: rgba(248,113,113,0.2); }
 
-	/* Share info */
-	.share-info {
-		display: flex; align-items: center; gap: 10px; justify-content: center;
-		padding: 10px 14px;
-		border-radius: 12px;
-		background: var(--pg-surface);
+	/* Content preview (shared content iframe) */
+	.content-preview {
+		border-radius: 14px;
+		overflow: hidden;
 		border: 1px solid var(--pg-surface-b);
+		background: var(--pg-surface);
+	}
+	.preview-hdr {
+		display: flex; align-items: center; gap: 10px;
+		padding: 10px 14px;
+		border-bottom: 1px solid var(--pg-btn-border);
 		font-size: 13px; color: var(--pg-muted);
 	}
-	.share-label {
+	.preview-lbl {
 		display: flex; align-items: center; gap: 6px;
-		text-decoration: none; color: inherit;
+		text-decoration: none; color: inherit; flex: 1;
 	}
-	a.share-label:hover { color: var(--pg-fg); }
+	a.preview-lbl:hover { color: var(--pg-fg); }
 	.follow-btn {
 		padding: 4px 10px;
 		border-radius: 8px;
@@ -484,6 +491,13 @@
 		border: 1px solid rgba(34,197,94,0.25);
 		color: rgba(74,222,128,0.9);
 		font-size: 11px; cursor: pointer;
+		flex-shrink: 0;
+	}
+	.content-frame {
+		width: 100%;
+		height: 55vh;
+		border: none;
+		display: block;
 	}
 
 	/* Audio unlock */
