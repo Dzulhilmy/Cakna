@@ -117,7 +117,8 @@
 
 	<!-- Table -->
 	<div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
-		<table class="w-full text-sm">
+		<div class="overflow-x-auto">
+		<table class="w-full min-w-[640px] text-sm">
 			<thead class="border-b border-zinc-100 bg-zinc-50">
 				<tr>
 					<th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-zinc-400">Name</th>
@@ -130,8 +131,8 @@
 			<tbody class="divide-y divide-zinc-100">
 				{#each filtered as u (u.id)}
 					<tr>
-						<td class="px-5 py-3 font-medium text-zinc-900">{u.name || '—'}</td>
-						<td class="px-5 py-3 text-zinc-500">{u.email}</td>
+						<td class="px-5 py-3 font-medium text-zinc-900 whitespace-nowrap">{u.name || '—'}</td>
+						<td class="px-5 py-3 text-zinc-500 whitespace-nowrap">{u.email}</td>
 						<td class="px-5 py-3">
 							<form method="POST" action="?/setRole" use:enhance class="inline-flex">
 								<input type="hidden" name="id" value={u.id} />
@@ -163,7 +164,7 @@
 								</select>
 							</form>
 						</td>
-						<td class="px-5 py-3 text-right">
+						<td class="px-5 py-3 text-right whitespace-nowrap">
 							<form method="POST" action="?/delete" use:enhance class="inline-flex">
 								<input type="hidden" name="id" value={u.id} />
 								<button
@@ -180,6 +181,7 @@
 				{/each}
 			</tbody>
 		</table>
+		</div>
 		{#if filtered.length === 0}
 			<div class="py-12 text-center text-sm text-zinc-400">
 				No {activeTab === 'all' ? '' : activeTab + ' '}users yet.
