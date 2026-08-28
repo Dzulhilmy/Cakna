@@ -16,7 +16,7 @@
 <PublicShell {content}>
 	{#each csrOrder as key (key)}
 		{#if key === 'hero'}
-			<section class="relative overflow-hidden {hasHero ? 'text-white' : 'bg-gradient-to-br from-rose-50 via-rose-100 to-rose-200'}">
+			<section class="relative overflow-hidden {hasHero ? 'bg-zinc-900 text-white' : 'bg-gradient-to-br from-rose-50 via-rose-100 to-rose-200'}">
 				{#if hasHero}
 					<SectionBg images={p.heroBgImages} overlay={p.heroOverlay} />
 				{:else}

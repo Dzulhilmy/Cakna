@@ -206,6 +206,7 @@ class _HubFormScreenState extends State<HubFormScreen> {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
+      width: double.infinity,
       padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 16, 20, 20),
       decoration: const BoxDecoration(
         gradient: LinearGradient(

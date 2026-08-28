@@ -31,7 +31,7 @@
 		{#if key === 'hero'}
 			<section
 				class="relative overflow-hidden {hasHeroImage
-					? 'text-white'
+					? 'bg-zinc-900 text-white'
 					: 'bg-gradient-to-br from-rose-50 via-rose-100 to-rose-200 text-zinc-800'}"
 			>
 				{#if hasHeroImage}

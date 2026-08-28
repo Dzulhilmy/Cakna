@@ -16,7 +16,7 @@
 <PublicShell {content}>
 	{#each aboutOrder as key (key)}
 		{#if key === 'hero'}
-			<section class="relative overflow-hidden {hasHero ? 'text-white' : 'bg-gradient-to-br from-rose-50 via-rose-100 to-rose-200'}">
+			<section class="relative overflow-hidden {hasHero ? 'bg-zinc-900 text-white' : 'bg-gradient-to-br from-rose-50 via-rose-100 to-rose-200'}">
 				{#if hasHero}
 					<SectionBg images={p.heroBgImages} overlay={p.heroOverlay} />
 				{:else}
@@ -44,9 +44,17 @@
 								<p class="mt-4 leading-relaxed text-zinc-600">{para}</p>
 							{/each}
 						</div>
-						<div class="rounded-2xl border border-rose-100 bg-rose-50 p-8">
-							<h3 class="text-base font-semibold uppercase tracking-wide text-rose-600">{p.visionTitle}</h3>
-							<p class="mt-3 leading-relaxed text-zinc-700">{p.visionText}</p>
+						<div class="flex flex-col gap-6">
+							<div class="rounded-2xl border border-rose-100 bg-rose-50 p-8">
+								<h3 class="text-base font-semibold uppercase tracking-wide text-rose-600">{p.visionTitle}</h3>
+								<p class="mt-3 leading-relaxed text-zinc-700">{p.visionText}</p>
+							</div>
+							{#if p.visionTitle2}
+								<div class="rounded-2xl border border-rose-100 bg-rose-50 p-8">
+									<h3 class="text-base font-semibold uppercase tracking-wide text-rose-600">{p.visionTitle2}</h3>
+									{#if p.visionText2}<p class="mt-3 leading-relaxed text-zinc-700">{p.visionText2}</p>{/if}
+								</div>
+							{/if}
 						</div>
 					</div>
 				</div>
