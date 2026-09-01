@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { LISTS, TOTALS, VERSI_LABEL, BASMALAH, pickText, type Versi } from '$lib/data/mathurat';
+	import { LISTS, TOTALS, VERSI_LABEL, BASMALAH, pickText, findUlang, arWithHighlight, type Versi } from '$lib/data/mathurat';
+	import { Repeat } from 'lucide-svelte';
 	import type { Waktu } from '$lib/data/mathurat';
 
 	const version = (page.url.searchParams.get('v') ?? 'sughra') as Versi;
@@ -16,6 +17,7 @@
 
 	function arText()  { return item ? pickText(item, version, mode, 'ar') : ''; }
 	function bmText()  { return item ? pickText(item, version, mode, 'bm') : ''; }
+	const ulang = item ? findUlang(arText()) : null;
 </script>
 
 <svelte:head><title>Al-Ma'thurat</title></svelte:head>
@@ -54,7 +56,14 @@
 			{#if item.basmalah}
 				<p class="ar-basmalah" dir="rtl">{BASMALAH}</p>
 			{/if}
-			<p class="ar-text" dir="rtl">{arText()}</p>
+			<p class="ar-text" dir="rtl">{@html arWithHighlight(arText())}</p>
+			{#if ulang}
+				<div class="ulang-card">
+					<Repeat size={14} class="ulang-icon" />
+					<span class="ulang-label">Ulang {ulang.count} kali</span>
+					<span class="ulang-phrase" dir="rtl">{ulang.phrase}</span>
+				</div>
+			{/if}
 			<p class="bm-text">{bmText()}</p>
 		</main>
 	{:else}
@@ -150,6 +159,37 @@
 		color: var(--pg-fg); margin-bottom: 12px;
 		text-align: right;
 	}
+	:global(.ulang-mark) {
+		background: rgba(184, 140, 30, 0.18);
+		border-radius: 5px;
+		padding: 0 3px;
+		color: #d4a843;
+		box-decoration-break: clone;
+		-webkit-box-decoration-break: clone;
+	}
+	.ulang-card {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 10px 14px;
+		margin-bottom: 16px;
+		border-radius: 10px;
+		background: rgba(184, 140, 30, 0.08);
+		border: 1px solid rgba(184, 140, 30, 0.25);
+	}
+	:global(.ulang-icon) { color: #d4a843; flex-shrink: 0; }
+	.ulang-label { font-size: 12px; color: rgba(212, 168, 67, 0.75); flex-shrink: 0; }
+	html:not([data-theme="dark"]) :global(.ulang-icon) { color: #8a6015; }
+	html:not([data-theme="dark"]) .ulang-label { color: rgba(100, 70, 10, 0.8); }
+	.ulang-phrase {
+		flex: 1;
+		font-family: 'Amiri Quran', 'Scheherazade New', serif;
+		font-size: 17px;
+		line-height: 1.9;
+		color: #d4a843;
+		text-align: right;
+	}
+	html:not([data-theme="dark"]) .ulang-phrase { color: #7a5010; }
 	.bm-text { line-height: 1.7; color: var(--pg-muted); margin-bottom: 20px; }
 
 	.complete {

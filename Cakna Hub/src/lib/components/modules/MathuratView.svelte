@@ -16,10 +16,13 @@
 		pecahAyat,
 		pickText,
 		safeIdx,
+		findUlang,
+		arWithHighlight,
 		type Versi,
 		type Waktu
 	} from '$lib/data/mathurat';
 	import { settings } from '$lib/state/stores.svelte';
+	import { Repeat } from 'lucide-svelte';
 
 	interface Props {
 		version: Versi;
@@ -41,6 +44,7 @@
 			: pickText(item, version, mode, 'bm')
 	);
 	const ayat = $derived(pecahAyat(arText));
+	const ulang = $derived(findUlang(arText));
 	// Long passages get a slightly smaller face so they still fit the panel.
 	const arSize = $derived(arText.length > 400 ? 22 : 26);
 </script>
@@ -64,7 +68,15 @@
 				<p class="ar" style="font-size:{arSize}px">{a}</p>
 			{/each}
 		{:else}
-			<p class="ar" style="font-size:{arSize}px">{arText}</p>
+			<p class="ar" style="font-size:{arSize}px">{@html arWithHighlight(arText)}</p>
+		{/if}
+
+		{#if ulang}
+			<div class="ulang-card">
+				<Repeat size={12} class="ulang-icon" />
+				<span class="ulang-label">Ulang {ulang.count} kali</span>
+				<span class="ulang-phrase" dir="rtl">{ulang.phrase}</span>
+			</div>
 		{/if}
 
 		{#if rumiText}
@@ -90,6 +102,37 @@
 		line-height: 2.1;
 		margin: 0 0 12px;
 	}
+	:global(.ulang-mark) {
+		background: rgba(184, 140, 30, 0.18);
+		border-radius: 5px;
+		padding: 0 3px;
+		color: #d4a843;
+		box-decoration-break: clone;
+		-webkit-box-decoration-break: clone;
+	}
+	.ulang-card {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		padding: 8px 12px;
+		margin: 4px 0 10px;
+		border-radius: 9px;
+		background: rgba(184, 140, 30, 0.08);
+		border: 1px solid rgba(184, 140, 30, 0.25);
+	}
+	:global(.ulang-icon) { color: #d4a843; flex-shrink: 0; }
+	.ulang-label { font-size: 11px; color: rgba(212, 168, 67, 0.75); flex-shrink: 0; }
+	html:not([data-theme="dark"]) :global(.ulang-icon) { color: #8a6015; }
+	html:not([data-theme="dark"]) .ulang-label { color: rgba(100, 70, 10, 0.8); }
+	.ulang-phrase {
+		flex: 1;
+		font-family: var(--font-arabic, 'Amiri Quran', 'Scheherazade New', serif);
+		font-size: 15px;
+		line-height: 1.9;
+		color: #d4a843;
+		text-align: right;
+	}
+	html:not([data-theme="dark"]) .ulang-phrase { color: #7a5010; }
 	.rumi {
 		font-style: italic;
 		font-size: 13.5px;

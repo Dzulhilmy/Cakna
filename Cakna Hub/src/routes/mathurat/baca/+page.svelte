@@ -1,10 +1,10 @@
 <script lang="ts">
 	import SideNav from '$lib/components/SideNav.svelte';
-	import { LISTS, TOTALS, VERSI_LABEL, JENIS_LABEL, BASMALAH, pickText, type Versi } from '$lib/data/mathurat';
+	import { LISTS, TOTALS, VERSI_LABEL, JENIS_LABEL, BASMALAH, pickText, findUlang, arWithHighlight, type Versi } from '$lib/data/mathurat';
 	import type { Waktu } from '$lib/data/mathurat';
 	import { mathuratState, todayKey } from '$lib/state/stores.svelte';
 	import type { MathuratState, MathuratTetapan } from '$lib/state/stores.svelte';
-	import { ChevronLeft, Settings, X, RotateCcw } from 'lucide-svelte';
+	import { ChevronLeft, Settings, X, RotateCcw, Repeat } from 'lucide-svelte';
 	import { halaqah } from '$lib/halaqah/store.svelte';
 	import { untrack } from 'svelte';
 
@@ -72,6 +72,7 @@
 	const dashOffset   = $derived(CIRC * (1 - ringProgress));
 
 	function arText() { return item ? pickText(item, ms.version, ms.mode, 'ar') : ''; }
+	const ulang = $derived(item ? findUlang(arText()) : null);
 	function bmText() {
 		if (!item) return '';
 		return pickText(item, ms.version, ms.mode, ms.tetapan.bahasa === 'bm' ? 'bm' : 'bi');
@@ -221,7 +222,15 @@
 				class="ar-text"
 				dir="rtl"
 				style="font-size: {ms.tetapan.arSaiz}px; text-align: {ms.tetapan.jajarAr === 'kanan' ? 'right' : ms.tetapan.jajarAr === 'kiri' ? 'left' : 'center'};"
-			>{arText()}</p>
+			>{@html arWithHighlight(arText())}</p>
+
+			{#if ulang}
+				<div class="ulang-card">
+					<Repeat size={14} class="ulang-icon" />
+					<span class="ulang-label">Ulang {ulang.count} kali</span>
+					<span class="ulang-phrase" dir="rtl">{ulang.phrase}</span>
+				</div>
+			{/if}
 
 			{#if ms.tetapan.paparRumi}
 				<p class="rumi-text">{rumiText()}</p>
@@ -458,6 +467,38 @@
 	}
 	.rumi-text { font-size: 13px; font-style: italic; color: var(--pg-muted); margin-bottom: 8px; }
 	.bm-text { line-height: 1.7; color: var(--pg-muted); margin-bottom: 20px; }
+
+	:global(.ulang-mark) {
+		background: rgba(184, 140, 30, 0.18);
+		border-radius: 5px;
+		padding: 0 3px;
+		color: #d4a843;
+		box-decoration-break: clone;
+		-webkit-box-decoration-break: clone;
+	}
+	.ulang-card {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 10px 14px;
+		margin-bottom: 16px;
+		border-radius: 10px;
+		background: rgba(184, 140, 30, 0.08);
+		border: 1px solid rgba(184, 140, 30, 0.25);
+	}
+	:global(.ulang-icon) { color: #d4a843; flex-shrink: 0; }
+	.ulang-label { font-size: 12px; color: rgba(212, 168, 67, 0.75); flex-shrink: 0; }
+	html:not([data-theme="dark"]) :global(.ulang-icon) { color: #8a6015; }
+	html:not([data-theme="dark"]) .ulang-label { color: rgba(100, 70, 10, 0.8); }
+	.ulang-phrase {
+		flex: 1;
+		font-family: 'Amiri Quran', 'Scheherazade New', serif;
+		font-size: 17px;
+		line-height: 1.9;
+		color: #d4a843;
+		text-align: right;
+	}
+	html:not([data-theme="dark"]) .ulang-phrase { color: #7a5010; }
 
 	/* ── Floating counter button ─────────────── */
 	.fab-wrap {
