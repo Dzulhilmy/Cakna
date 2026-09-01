@@ -265,6 +265,9 @@ class _BulletListBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasDescs = itemDescriptions.any((d) => d.trim().isNotEmpty);
+    if (hasDescs) {
+      return _AccordionList(items: items, itemDescriptions: itemDescriptions);
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -272,55 +275,140 @@ class _BulletListBlock extends StatelessWidget {
           if (items[i].trim().isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
-              child: hasDescs
-                  ? Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFF1F3),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: const Color(0xFFFCE7EB)),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(items[i],
-                              style: const TextStyle(
-                                  fontSize: 13.5,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFFD94F6A))),
-                          if (i < itemDescriptions.length &&
-                              itemDescriptions[i].trim().isNotEmpty) ...[
-                            const SizedBox(height: 4),
-                            Text(itemDescriptions[i],
-                                style: const TextStyle(
-                                    fontSize: 12.5,
-                                    color: Color(0xFF6B7280),
-                                    height: 1.4)),
-                          ],
-                        ],
-                      ),
-                    )
-                  : Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.only(top: 6),
-                          child: CircleAvatar(
-                              radius: 3, backgroundColor: Color(0xFFD94F6A)),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(items[i],
-                              style: const TextStyle(
-                                  fontSize: 13.5,
-                                  color: Color(0xFF374151),
-                                  height: 1.5)),
-                        ),
-                      ],
-                    ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(top: 6),
+                    child: CircleAvatar(
+                        radius: 3, backgroundColor: Color(0xFFD94F6A)),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(items[i],
+                        style: const TextStyle(
+                            fontSize: 13.5,
+                            color: Color(0xFF374151),
+                            height: 1.5)),
+                  ),
+                ],
+              ),
             ),
       ],
+    );
+  }
+}
+
+class _AccordionList extends StatefulWidget {
+  final List<String> items;
+  final List<String> itemDescriptions;
+  const _AccordionList({required this.items, required this.itemDescriptions});
+
+  @override
+  State<_AccordionList> createState() => _AccordionListState();
+}
+
+class _AccordionListState extends State<_AccordionList> {
+  int _openIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        for (var i = 0; i < widget.items.length; i++)
+          if (widget.items[i].trim().isNotEmpty) ...[
+            if (i > 0) const SizedBox(height: 6),
+            _AccordionCard(
+              title: widget.items[i],
+              desc: i < widget.itemDescriptions.length
+                  ? widget.itemDescriptions[i]
+                  : '',
+              isOpen: _openIndex == i,
+              onTap: () =>
+                  setState(() => _openIndex = _openIndex == i ? -1 : i),
+            ),
+          ],
+      ],
+    );
+  }
+}
+
+class _AccordionCard extends StatelessWidget {
+  final String title;
+  final String desc;
+  final bool isOpen;
+  final VoidCallback onTap;
+  const _AccordionCard({
+    required this.title,
+    required this.desc,
+    required this.isOpen,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFF1F3),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isOpen ? const Color(0xFFD94F6A) : const Color(0xFFFCE7EB),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 11, 12, 11),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFFD94F6A)),
+                    ),
+                  ),
+                  AnimatedRotation(
+                    turns: isOpen ? 0.125 : 0,
+                    duration: const Duration(milliseconds: 200),
+                    child: const Text(
+                      '+',
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Color(0xFF9CA3AF),
+                          fontWeight: FontWeight.w300,
+                          height: 1),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            AnimatedSize(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
+              child: isOpen && desc.trim().isNotEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 11),
+                      child: Text(
+                        desc,
+                        style: const TextStyle(
+                            fontSize: 12.5,
+                            color: Color(0xFF6B7280),
+                            height: 1.4),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
