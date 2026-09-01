@@ -4,6 +4,9 @@ import '../api/cakna_api.dart';
 
 /// Renders the admin-created custom sections for a hub page.
 /// Pass [sections] from hub.mapList(['customSections', pageKey]).
+/// Data shape: { id, background, eyebrow?, title, blocks: SectionBlock[], ctaLabel?, ctaHref? }
+/// SectionBlock: { id, type: "paragraph"|"text"|"image"|"bulletList", content?, align?,
+///                 images?, imageStyle?, caption?, items?, itemDescriptions? }
 class HubCustomSections extends StatelessWidget {
   final List<Map<String, dynamic>> sections;
   const HubCustomSections({super.key, required this.sections});
@@ -26,20 +29,101 @@ class _CustomSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final layout = data['layout'] as String? ?? 'text';
     final bg = data['background'] as String? ?? 'white';
     final bgColor = bg == 'tint' ? const Color(0xFFF7F6F2) : Colors.white;
+    final eyebrow = data['eyebrow'] as String? ?? '';
+    final title = data['title'] as String? ?? '';
+    final rawBlocks = data['blocks'];
+    final blocks = (rawBlocks is List ? rawBlocks : <dynamic>[])
+        .where((b) => b is Map)
+        .map((b) => Map<String, dynamic>.from(b as Map))
+        .toList();
+    final ctaLabel = data['ctaLabel'] as String? ?? '';
+    final ctaHref = data['ctaHref'] as String? ?? '';
 
     return Container(
       color: bgColor,
       padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
-      child: switch (layout) {
-        'gallery' => _GalleryLayout(data: data),
-        'bullets' => _BulletsLayout(data: data),
-        'imageText' => _ImageTextLayout(data: data),
-        _ => _TextLayout(data: data),
-      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (eyebrow.isNotEmpty) ...[_eyebrowText(eyebrow), const SizedBox(height: 6)],
+          if (title.isNotEmpty) _titleText(title),
+          if (blocks.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            for (final block in blocks) ...[
+              _BlockWidget(data: block),
+              const SizedBox(height: 8),
+            ],
+          ],
+          if (ctaLabel.isNotEmpty) _ctaButton(ctaLabel, ctaHref),
+        ],
+      ),
     );
+  }
+}
+
+// ── Block renderer ─────────────────────────────────────────────────────────
+
+class _BlockWidget extends StatelessWidget {
+  final Map<String, dynamic> data;
+  const _BlockWidget({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    final type = data['type'] as String? ?? 'paragraph';
+    switch (type) {
+      case 'paragraph':
+        final content = data['content'] as String? ?? '';
+        if (content.trim().isEmpty) return const SizedBox.shrink();
+        final align = data['align'] as String? ?? 'left';
+        return Text(
+          content,
+          textAlign: switch (align) {
+            'center' => TextAlign.center,
+            'right' => TextAlign.right,
+            'justify' => TextAlign.justify,
+            _ => TextAlign.left,
+          },
+          style: const TextStyle(fontSize: 13.5, color: Color(0xFF6B7280), height: 1.6),
+        );
+
+      case 'text':
+        final content = data['content'] as String? ?? '';
+        if (content.trim().isEmpty) return const SizedBox.shrink();
+        return Text(
+          content,
+          style: const TextStyle(
+              fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF374151)),
+        );
+
+      case 'image':
+        final rawImages = data['images'];
+        final images = (rawImages is List ? rawImages : <dynamic>[])
+            .map((e) => e?.toString() ?? '')
+            .where((e) => e.isNotEmpty)
+            .toList();
+        if (images.isEmpty) return const SizedBox.shrink();
+        final imageStyle = data['imageStyle'] as String? ?? 'gallery';
+        final caption = data['caption'] as String? ?? '';
+        return _ImageBlock(images: images, imageStyle: imageStyle, caption: caption);
+
+      case 'bulletList':
+        final rawItems = data['items'];
+        final items = (rawItems is List ? rawItems : <dynamic>[])
+            .map((e) => e?.toString() ?? '')
+            .where((e) => e.isNotEmpty)
+            .toList();
+        if (items.isEmpty) return const SizedBox.shrink();
+        final rawDescs = data['itemDescriptions'];
+        final descs = (rawDescs is List ? rawDescs : <dynamic>[])
+            .map((d) => d?.toString() ?? '')
+            .toList();
+        return _BulletListBlock(items: List<String>.from(items), itemDescriptions: descs);
+
+      default:
+        return const SizedBox.shrink();
+    }
   }
 }
 
@@ -63,23 +147,6 @@ Widget _titleText(String text) => Text(
           color: Color(0xFF111827),
           height: 1.3),
     );
-
-Widget _bodyParagraphs(String body) {
-  final paras =
-      body.split(RegExp(r'\n\s*\n')).where((p) => p.trim().isNotEmpty).toList();
-  if (paras.isEmpty) return const SizedBox.shrink();
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      for (final p in paras) ...[
-        const SizedBox(height: 10),
-        Text(p,
-            style: const TextStyle(
-                fontSize: 13.5, color: Color(0xFF374151), height: 1.6)),
-      ],
-    ],
-  );
-}
 
 Widget _ctaButton(String label, String href) {
   if (label.isEmpty) return const SizedBox.shrink();
@@ -139,90 +206,38 @@ Widget _networkImage(String url, {double height = 200}) {
 
 // ── layout variants ────────────────────────────────────────────────────────
 
-class _TextLayout extends StatelessWidget {
-  final Map<String, dynamic> data;
-  const _TextLayout({required this.data});
+class _ImageBlock extends StatelessWidget {
+  final List<String> images;
+  final String imageStyle;
+  final String caption;
+  const _ImageBlock(
+      {required this.images, required this.imageStyle, required this.caption});
 
   @override
   Widget build(BuildContext context) {
-    final eyebrow = data['eyebrow'] as String? ?? '';
-    final title = data['title'] as String? ?? '';
-    final body = data['body'] as String? ?? '';
-    final ctaLabel = data['ctaLabel'] as String? ?? '';
-    final ctaHref = data['ctaHref'] as String? ?? '';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (eyebrow.isNotEmpty) ...[_eyebrowText(eyebrow), const SizedBox(height: 6)],
-        if (title.isNotEmpty) _titleText(title),
-        if (body.isNotEmpty) _bodyParagraphs(body),
-        if (ctaLabel.isNotEmpty) _ctaButton(ctaLabel, ctaHref),
-      ],
-    );
-  }
-}
-
-class _ImageTextLayout extends StatelessWidget {
-  final Map<String, dynamic> data;
-  const _ImageTextLayout({required this.data});
-
-  @override
-  Widget build(BuildContext context) {
-    final eyebrow = data['eyebrow'] as String? ?? '';
-    final title = data['title'] as String? ?? '';
-    final body = data['body'] as String? ?? '';
-    final ctaLabel = data['ctaLabel'] as String? ?? '';
-    final ctaHref = data['ctaHref'] as String? ?? '';
-    final images = (data['images'] as List<dynamic>?)?.whereType<String>().toList() ?? [];
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (images.isNotEmpty) ...[
-          _networkImage(images.first),
-          const SizedBox(height: 14),
-        ],
-        if (eyebrow.isNotEmpty) ...[_eyebrowText(eyebrow), const SizedBox(height: 6)],
-        if (title.isNotEmpty) _titleText(title),
-        if (body.isNotEmpty) _bodyParagraphs(body),
-        if (ctaLabel.isNotEmpty) _ctaButton(ctaLabel, ctaHref),
-      ],
-    );
-  }
-}
-
-class _GalleryLayout extends StatelessWidget {
-  final Map<String, dynamic> data;
-  const _GalleryLayout({required this.data});
-
-  @override
-  Widget build(BuildContext context) {
-    final eyebrow = data['eyebrow'] as String? ?? '';
-    final title = data['title'] as String? ?? '';
-    final images = (data['images'] as List<dynamic>?)?.whereType<String>().toList() ?? [];
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (eyebrow.isNotEmpty) ...[_eyebrowText(eyebrow), const SizedBox(height: 6)],
-        if (title.isNotEmpty) _titleText(title),
-        if (images.isNotEmpty) ...[
-          const SizedBox(height: 12),
+        if (images.length == 1)
+          _networkImage(images.first)
+        else
           SizedBox(
-            height: 180,
+            height: 160,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: images.length,
               itemBuilder: (_, i) => Container(
-                width: 240,
+                width: 220,
                 margin: const EdgeInsets.only(right: 10),
                 clipBehavior: Clip.antiAlias,
                 decoration: BoxDecoration(
                   color: const Color(0xFFF3F4F6),
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Image.network(
                   CaknaApi.resolveHubUrl(images[i]),
                   fit: BoxFit.cover,
-                  errorBuilder: (ctx, err, st) => const Center(
+                  errorBuilder: (_, __, ___) => const Center(
                     child: Icon(Icons.image_outlined,
                         color: Color(0xFFD1D5DB), size: 28),
                   ),
@@ -230,57 +245,81 @@ class _GalleryLayout extends StatelessWidget {
               ),
             ),
           ),
+        if (caption.trim().isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Text(caption,
+              style: const TextStyle(
+                  fontSize: 11.5, color: Color(0xFF9CA3AF), height: 1.4)),
         ],
       ],
     );
   }
 }
 
-class _BulletsLayout extends StatelessWidget {
-  final Map<String, dynamic> data;
-  const _BulletsLayout({required this.data});
+class _BulletListBlock extends StatelessWidget {
+  final List<String> items;
+  final List<String> itemDescriptions;
+  const _BulletListBlock(
+      {required this.items, required this.itemDescriptions});
 
   @override
   Widget build(BuildContext context) {
-    final eyebrow = data['eyebrow'] as String? ?? '';
-    final title = data['title'] as String? ?? '';
-    final body = data['body'] as String? ?? '';
-    final ctaLabel = data['ctaLabel'] as String? ?? '';
-    final ctaHref = data['ctaHref'] as String? ?? '';
-    final bullets =
-        (data['bullets'] as List<dynamic>?)?.whereType<String>().toList() ?? [];
+    final hasDescs = itemDescriptions.any((d) => d.trim().isNotEmpty);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (eyebrow.isNotEmpty) ...[_eyebrowText(eyebrow), const SizedBox(height: 6)],
-        if (title.isNotEmpty) _titleText(title),
-        if (body.isNotEmpty) _bodyParagraphs(body),
-        if (bullets.isNotEmpty) ...[
-          const SizedBox(height: 12),
-          for (final b in bullets)
+        for (var i = 0; i < items.length; i++)
+          if (items[i].trim().isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(top: 6),
-                    child: CircleAvatar(
-                        radius: 3, backgroundColor: Color(0xFFD94F6A)),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(b,
-                        style: const TextStyle(
-                            fontSize: 13.5,
-                            color: Color(0xFF374151),
-                            height: 1.5)),
-                  ),
-                ],
-              ),
+              child: hasDescs
+                  ? Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFF1F3),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: const Color(0xFFFCE7EB)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(items[i],
+                              style: const TextStyle(
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFFD94F6A))),
+                          if (i < itemDescriptions.length &&
+                              itemDescriptions[i].trim().isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Text(itemDescriptions[i],
+                                style: const TextStyle(
+                                    fontSize: 12.5,
+                                    color: Color(0xFF6B7280),
+                                    height: 1.4)),
+                          ],
+                        ],
+                      ),
+                    )
+                  : Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(top: 6),
+                          child: CircleAvatar(
+                              radius: 3, backgroundColor: Color(0xFFD94F6A)),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(items[i],
+                              style: const TextStyle(
+                                  fontSize: 13.5,
+                                  color: Color(0xFF374151),
+                                  height: 1.5)),
+                        ),
+                      ],
+                    ),
             ),
-        ],
-        if (ctaLabel.isNotEmpty) _ctaButton(ctaLabel, ctaHref),
       ],
     );
   }
