@@ -27,7 +27,9 @@ export type AboutPage = {
   whoTitle: string;
   whoBody: string;
   visionTitle: string;
+  visionTitle2: string;
   visionText: string;
+  visionText2: string;
   purposeEyebrow: string;
   purposeTitle: string;
   purposeSubtitle: string;
@@ -109,6 +111,8 @@ export type SectionBlock = {
   caption?: string;
   /** For bulletList blocks */
   items?: string[];
+  /** Optional descriptions for each bullet item (parallel array, same index) */
+  itemDescriptions?: string[];
 };
 
 export type CustomSection = {
@@ -382,7 +386,10 @@ export const defaultSiteContent: SiteContent = {
     whoBody:
       "HOME Cakna is the Corporate Social Responsibility (CSR) initiative of HOME, established in 2018. We are dedicated to creating meaningful change by empowering communities through structured, impactful programs that focus on education, well-being, and sustainability.\n\nOur programs are designed to foster inclusivity, strengthen community bonds, and provide opportunities for personal and societal growth. With HOME Cakna, every effort is driven by a vision to uplift and inspire, leaving no one behind.",
     visionTitle: "Our Vision",
+    visionTitle2: "Our Mission",
     visionText:
+      "To be the cornerstone of positive change, where HOME connects individuals, families, and communities to opportunities that empower, nurture, and sustain brighter futures.",
+    visionText2:
       "To transform communities through HOME's commitment to impactful education, innovative care, and sustainable initiatives — bridging gaps and inspiring growth one step at a time.",
     purposeEyebrow: "Our Purpose",
     purposeTitle: "Driving Impactful Change",

@@ -3,7 +3,6 @@
 	import CustomSections from '$lib/components/public/CustomSections.svelte';
 	import SectionBg from '$lib/components/public/SectionBg.svelte';
 	import { hasBg } from '$lib/bg-utils';
-	import { Check } from 'lucide-svelte';
 	import { DEFAULT_SETEM_ORDER } from '$lib/site';
 	let { data } = $props();
 	const { content } = $derived(data);
@@ -74,17 +73,17 @@
 			{#if p.expect.length > 0}
 				<section class="bg-white py-20">
 					<div class="mx-auto max-w-6xl px-6">
-						<div class="rounded-2xl border border-zinc-200 bg-white p-8">
-							<h3 class="text-base font-semibold text-zinc-900">{p.expectTitle}</h3>
-							<ul class="mt-4 space-y-3">
-								{#each p.expect as item}
-									<li class="flex items-center gap-3 text-sm text-zinc-700">
-										<span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-rose-50 text-rose-600"><Check size={12} /></span>
-										{item}
-									</li>
-								{/each}
-							</ul>
-						</div>
+						{#if p.expectTitle}
+							<h2 class="text-3xl font-bold tracking-tight text-zinc-900">{p.expectTitle}</h2>
+						{/if}
+						<ul class="mt-8 divide-y divide-zinc-200 rounded-2xl border border-zinc-200">
+							{#each p.expect as item}
+								<li class="flex items-center gap-4 px-6 py-4">
+									<span class="h-2 w-2 shrink-0 rounded-full bg-rose-500"></span>
+									<span class="text-sm leading-relaxed text-zinc-700">{item}</span>
+								</li>
+							{/each}
+						</ul>
 					</div>
 				</section>
 			{/if}
