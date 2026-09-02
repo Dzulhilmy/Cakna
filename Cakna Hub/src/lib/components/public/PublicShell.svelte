@@ -3,9 +3,14 @@
 	import type { SiteContent } from '$lib/site';
 	import PublicNav from './PublicNav.svelte';
 	import DocsSection from './DocsSection.svelte';
+	import { publicLang } from '$lib/state/publicLang.svelte';
 
 	let { content, children }: { content: SiteContent; children: import('svelte').Snippet } = $props();
 	const { brand, nav, footer } = $derived(content);
+	const lang = $derived(publicLang.value);
+	const linksLabel = $derived(lang === 'en' ? 'Links' : 'Pautan');
+	const contactLabel = $derived(lang === 'en' ? 'Contact' : 'Hubungi');
+	const loginLabel = $derived(lang === 'en' ? 'Log in' : 'Log masuk');
 </script>
 
 <div class="min-h-screen bg-white text-zinc-800">
@@ -34,17 +39,17 @@
 			</div>
 
 			<div>
-				<p class="text-sm font-semibold text-white">Links</p>
+				<p class="text-sm font-semibold text-white">{linksLabel}</p>
 				<ul class="mt-3 space-y-2 text-sm text-zinc-400">
 					{#each nav as n (n.href + n.label)}
 						<li><a href={n.href} class="hover:text-rose-400">{n.label}</a></li>
 					{/each}
-					<li><a href="https://cakna.org/auth/login" class="hover:text-rose-400">Log in</a></li>
+					<li><a href="https://cakna.org/auth/login" class="hover:text-rose-400">{loginLabel}</a></li>
 				</ul>
 			</div>
 
 			<div>
-				<p class="text-sm font-semibold text-white">Contact</p>
+				<p class="text-sm font-semibold text-white">{contactLabel}</p>
 				<ul class="mt-3 space-y-2 text-sm text-zinc-400">
 					{#if footer.phone}
 						<li class="flex items-center gap-2"><Phone size={14} /> {footer.phone}</li>

@@ -4,8 +4,11 @@
 	import SectionBg from '$lib/components/public/SectionBg.svelte';
 	import { hasBg } from '$lib/bg-utils';
 	import { DEFAULT_ABOUT_ORDER } from '$lib/site';
+	import { publicLang } from '$lib/state/publicLang.svelte';
+	import { buildEnglishContent } from '$lib/publicContent';
 	let { data } = $props();
-	const { content } = $derived(data);
+	const enContent = $derived(buildEnglishContent(data.content));
+	const content = $derived(publicLang.value === 'en' ? enContent : data.content);
 	const p = $derived(content.aboutPage);
 	const hasHero = $derived(hasBg(p.heroBgImages));
 	const hasCta = $derived(hasBg(p.ctaBgImages));

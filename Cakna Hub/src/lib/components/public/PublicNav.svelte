@@ -1,11 +1,14 @@
 <script lang="ts">
 	import { Heart, Menu, X } from 'lucide-svelte';
 	import type { SiteContent } from '$lib/site';
+	import { publicLang } from '$lib/state/publicLang.svelte';
 
 	let { brand, nav }: { brand: SiteContent['brand']; nav: SiteContent['nav'] } = $props();
 
 	let open = $state(false);
 	const loginUrl = 'https://cakna.org/auth/login';
+	const lang = $derived(publicLang.value);
+	const loginLabel = $derived(lang === 'en' ? 'Log in' : 'Log masuk');
 </script>
 
 <svelte:window onkeydown={(e) => { if (e.key === 'Escape') open = false; }} />
@@ -33,9 +36,18 @@
 			{/each}
 		</nav>
 
-		<div class="hidden items-center gap-2 md:flex">
+		<div class="hidden items-center gap-3 md:flex">
+			<button
+				type="button"
+				onclick={() => publicLang.toggle()}
+				aria-label="Switch language"
+				class="flex overflow-hidden rounded-full border border-zinc-200 text-xs font-semibold transition-colors hover:border-rose-300"
+			>
+				<span class="px-2.5 py-1 transition-colors {lang === 'ms' ? 'bg-rose-600 text-white' : 'text-zinc-500 hover:text-zinc-700'}">MS</span>
+				<span class="px-2.5 py-1 transition-colors {lang === 'en' ? 'bg-rose-600 text-white' : 'text-zinc-500 hover:text-zinc-700'}">EN</span>
+			</button>
 			<a href={loginUrl} class="rounded-lg px-3.5 py-2 text-sm font-medium text-zinc-700 transition-colors hover:text-rose-700">
-				Log in
+				{loginLabel}
 			</a>
 		</div>
 
@@ -62,14 +74,23 @@
 						{n.label}
 					</a>
 				{/each}
-				<div class="mt-2 border-t border-zinc-100 pt-3">
+				<div class="mt-2 flex items-center gap-2 border-t border-zinc-100 pt-3">
 					<a
 						href={loginUrl}
 						onclick={() => (open = false)}
-						class="block rounded-lg border border-zinc-300 px-3.5 py-2.5 text-center text-sm font-medium text-zinc-700 transition-colors hover:border-rose-300 hover:text-rose-700"
+						class="flex-1 block rounded-lg border border-zinc-300 px-3.5 py-2.5 text-center text-sm font-medium text-zinc-700 transition-colors hover:border-rose-300 hover:text-rose-700"
 					>
-						Log in
+						{loginLabel}
 					</a>
+					<button
+						type="button"
+						onclick={() => publicLang.toggle()}
+						aria-label="Switch language"
+						class="flex overflow-hidden rounded-full border border-zinc-200 text-xs font-semibold transition-colors hover:border-rose-300"
+					>
+						<span class="px-2.5 py-2 transition-colors {lang === 'ms' ? 'bg-rose-600 text-white' : 'text-zinc-500'}">MS</span>
+						<span class="px-2.5 py-2 transition-colors {lang === 'en' ? 'bg-rose-600 text-white' : 'text-zinc-500'}">EN</span>
+					</button>
 				</div>
 			</nav>
 		</div>

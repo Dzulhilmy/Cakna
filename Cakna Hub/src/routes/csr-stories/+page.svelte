@@ -5,8 +5,12 @@
 	import { hasBg } from '$lib/bg-utils';
 	import { Calendar, Tag } from 'lucide-svelte';
 	import { DEFAULT_CSR_ORDER } from '$lib/site';
+	import { publicLang } from '$lib/state/publicLang.svelte';
+	import { buildEnglishContent } from '$lib/publicContent';
 	let { data } = $props();
-	const { content } = $derived(data);
+	const enContent = $derived(buildEnglishContent(data.content));
+	const content = $derived(publicLang.value === 'en' ? enContent : data.content);
+	const lang = $derived(publicLang.value);
 	const p = $derived(content.csrPage);
 	const hasHero = $derived(hasBg(p.heroBgImages));
 	const hasCta = $derived(hasBg(p.ctaBgImages));
@@ -39,7 +43,9 @@
 			<section class="bg-white py-20">
 				<div class="mx-auto max-w-6xl px-6">
 					{#if p.stories.length === 0}
-						<p class="text-center text-zinc-400">Tiada cerita lagi. Sila semak semula kemudian.</p>
+						<p class="text-center text-zinc-400">
+						{lang === 'en' ? 'No stories yet. Please check back later.' : 'Tiada cerita lagi. Sila semak semula kemudian.'}
+					</p>
 					{:else}
 						<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 							{#each p.stories as story (story.title)}
