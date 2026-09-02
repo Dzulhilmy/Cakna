@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../api/cakna_api.dart';
 import '../state/hub_content.dart';
 import '../widgets/hub_custom_sections.dart';
 
@@ -10,6 +11,8 @@ class HubAboutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hub = context.watch<HubContent>();
+    final order = hub.aboutSectionOrder();
+
     return Scaffold(
       backgroundColor: const Color(0xFFF7F6F2),
       body: ListView(
@@ -23,21 +26,8 @@ class HubAboutScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildWhoWeAre(hub),
-                  const SizedBox(height: 20),
-                  _buildVision(hub),
-                  const SizedBox(height: 20),
-                  _buildPurposes(hub),
-                  const SizedBox(height: 20),
-                  _buildStats(hub),
-                  const SizedBox(height: 20),
-                  _buildQuote(hub),
-                  const SizedBox(height: 20),
-                  _buildCta(hub),
-                  const SizedBox(height: 8),
-                  HubCustomSections(
-                    sections: hub.mapList(['customSections', 'about']),
-                  ),
+                  for (final key in order.where((k) => k != 'hero'))
+                    ..._widgetsForKey(key, hub),
                   const SizedBox(height: 32),
                 ],
               ),
@@ -48,36 +38,84 @@ class HubAboutScreen extends StatelessWidget {
     );
   }
 
+  List<Widget> _widgetsForKey(String key, HubContent hub) {
+    switch (key) {
+      case 'whoWeAre':
+        return [_buildWhoWeAre(hub), const SizedBox(height: 20), ..._buildVisionMission(hub), const SizedBox(height: 20)];
+      case 'purpose':
+        return [_buildPurposes(hub), const SizedBox(height: 20)];
+      case 'collabStats':
+        return [_buildStats(hub), const SizedBox(height: 20)];
+      case 'testimonial':
+        return [_buildQuote(hub), const SizedBox(height: 20)];
+      case 'cta':
+        return [_buildCta(hub), const SizedBox(height: 8)];
+      case 'customSections':
+        return [HubCustomSections(sections: hub.mapList(['customSections', 'about']))];
+      default:
+        return [];
+    }
+  }
+
   Widget _buildHeader(BuildContext context, HubContent hub) {
     final eyebrow = hub.s(['aboutPage', 'eyebrow'], 'Tentang Kami');
     final heading = hub.s(['aboutPage', 'heading'], 'Who We Are & Why We Exist');
+    final images = hub.strList(['aboutPage', 'heroBgImages']);
+    final overlayVal = hub.s(['aboutPage', 'heroOverlay'], 'medium');
+    final overlayOpacity = overlayVal == 'light' ? 0.15 : overlayVal == 'dark' ? 0.5 : 0.3;
+
+    const padding = EdgeInsets.fromLTRB(20, 0, 20, 48);
+    const radius = BorderRadius.only(
+      bottomLeft: Radius.circular(28),
+      bottomRight: Radius.circular(28),
+    );
+    final topPad = MediaQuery.of(context).padding.top + 20;
+
+    final content = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: topPad),
+        Text(eyebrow,
+            style: const TextStyle(
+                fontFamily: 'Lora',
+                fontSize: 28,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+                height: 1.2)),
+        const SizedBox(height: 8),
+        Text(heading, style: const TextStyle(fontSize: 14, color: Colors.white70)),
+      ],
+    );
+
+    if (images.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: radius,
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Image.network(CaknaApi.resolveHubUrl(images[0]), fit: BoxFit.cover),
+            ),
+            Positioned.fill(
+              child: Container(
+                  color: Color.fromRGBO(0, 0, 0, overlayOpacity + 0.2)),
+            ),
+            Padding(padding: padding, child: content),
+          ],
+        ),
+      );
+    }
+
     return Container(
-      padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 20, 20, 48),
+      padding: padding,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [Color(0xFF9E2A42), Color(0xFF6B1830)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(28),
-          bottomRight: Radius.circular(28),
-        ),
+        borderRadius: radius,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(eyebrow,
-              style: const TextStyle(
-                  fontFamily: 'Lora',
-                  fontSize: 28,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                  height: 1.2)),
-          const SizedBox(height: 8),
-          Text(heading, style: const TextStyle(fontSize: 14, color: Colors.white70)),
-        ],
-      ),
+      child: content,
     );
   }
 
@@ -128,25 +166,32 @@ class HubAboutScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildVision(HubContent hub) {
-    final visionTitle = hub.s(['aboutPage', 'visionTitle'], 'Visi Kami');
-    final text = hub.s(
+  List<Widget> _buildVisionMission(HubContent hub) {
+    final visionTitle = hub.s(['aboutPage', 'visionTitle'], 'Our Vision');
+    final visionText = hub.s(
       ['aboutPage', 'visionText'],
-      'Mentransformasi komuniti melalui komitmen HOME kepada pendidikan '
-          'yang berdampak, penjagaan inovatif, dan inisiatif lestari — merapatkan '
-          'jurang dan menginspirasi pertumbuhan satu langkah pada satu masa.',
+      'To be the cornerstone of positive change, where HOME connects individuals, '
+          'families, and communities to opportunities that empower, nurture, and sustain brighter futures.',
     );
-    return _Card(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _Label(visionTitle.toUpperCase()),
-          const SizedBox(height: 10),
-          Text(text,
-              style: const TextStyle(fontSize: 13.5, color: Color(0xFF374151), height: 1.6)),
-        ],
-      ),
-    );
+    final missionTitle = hub.s(['aboutPage', 'visionTitle2'], '');
+    final missionText = hub.s(['aboutPage', 'visionText2'], '');
+
+    Widget card(String title, String text) => _Card(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _Label(title.toUpperCase()),
+              const SizedBox(height: 10),
+              Text(text,
+                  style: const TextStyle(fontSize: 13.5, color: Color(0xFF374151), height: 1.6)),
+            ],
+          ),
+        );
+
+    return [
+      card(visionTitle, visionText),
+      if (missionTitle.isNotEmpty) ...[const SizedBox(height: 12), card(missionTitle, missionText)],
+    ];
   }
 
   Widget _buildPurposes(HubContent hub) {

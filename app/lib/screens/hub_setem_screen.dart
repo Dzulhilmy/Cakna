@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../api/cakna_api.dart';
 import '../state/hub_content.dart';
 import '../widgets/hub_custom_sections.dart';
 
@@ -10,6 +11,8 @@ class HubSetemScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hub = context.watch<HubContent>();
+    final order = hub.setemSectionOrder();
+
     return Scaffold(
       backgroundColor: const Color(0xFFF7F6F2),
       body: ListView(
@@ -23,21 +26,8 @@ class HubSetemScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildChallenges(hub),
-                  const SizedBox(height: 20),
-                  _buildWhatIsSetem(hub),
-                  const SizedBox(height: 20),
-                  _buildFeatures(hub),
-                  const SizedBox(height: 20),
-                  _buildAudience(hub),
-                  const SizedBox(height: 20),
-                  _buildFlow(hub),
-                  const SizedBox(height: 20),
-                  _buildCta(hub),
-                  const SizedBox(height: 8),
-                  HubCustomSections(
-                    sections: hub.mapList(['customSections', 'setem']),
-                  ),
+                  for (final key in order.where((k) => k != 'hero'))
+                    ..._widgetsForKey(key, hub),
                   const SizedBox(height: 32),
                 ],
               ),
@@ -48,6 +38,27 @@ class HubSetemScreen extends StatelessWidget {
     );
   }
 
+  List<Widget> _widgetsForKey(String key, HubContent hub) {
+    switch (key) {
+      case 'gap':
+        return [_buildChallenges(hub), const SizedBox(height: 20)];
+      case 'whatIsSetem':
+        return [_buildWhatIsSetem(hub), const SizedBox(height: 20)];
+      case 'whatToExpect':
+        return [_buildFeatures(hub), const SizedBox(height: 20)];
+      case 'whoIsItFor':
+        return [_buildAudience(hub), const SizedBox(height: 20)];
+      case 'ourProcess':
+        return [_buildFlow(hub), const SizedBox(height: 20)];
+      case 'cta':
+        return [_buildCta(hub), const SizedBox(height: 8)];
+      case 'customSections':
+        return [HubCustomSections(sections: hub.mapList(['customSections', 'setem']))];
+      default:
+        return [];
+    }
+  }
+
   Widget _buildHeader(BuildContext context, HubContent hub) {
     final eyebrow = hub.s(['setemPage', 'eyebrow'], 'SETEM');
     final heading = hub.s(['setemPage', 'heading'], 'Math Therapy Seminar');
@@ -56,39 +67,68 @@ class HubSetemScreen extends StatelessWidget {
       'Merapatkan jurang matematik, satu pelajar pada satu masa — '
           'bengkel khusus yang membantu pelajar mengatasi ketakutan terhadap matematik.',
     );
+    final images = hub.strList(['setemPage', 'heroBgImages']);
+    final overlayVal = hub.s(['setemPage', 'heroOverlay'], 'medium');
+    final overlayOpacity = overlayVal == 'light' ? 0.15 : overlayVal == 'dark' ? 0.5 : 0.3;
+
+    const padding = EdgeInsets.fromLTRB(20, 0, 20, 48);
+    const radius = BorderRadius.only(
+      bottomLeft: Radius.circular(28),
+      bottomRight: Radius.circular(28),
+    );
+    final topPad = MediaQuery.of(context).padding.top + 20;
+
+    final content = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: topPad),
+        Text(eyebrow,
+            style: const TextStyle(
+                fontFamily: 'Lora',
+                fontSize: 36,
+                fontWeight: FontWeight.w700,
+                color: Colors.white)),
+        const SizedBox(height: 4),
+        Text(heading,
+            style: const TextStyle(
+                fontSize: 16,
+                color: Colors.white70,
+                fontWeight: FontWeight.w500)),
+        const SizedBox(height: 10),
+        Text(subtext,
+            style: const TextStyle(fontSize: 13, color: Colors.white60, height: 1.5)),
+      ],
+    );
+
+    if (images.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: radius,
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Image.network(CaknaApi.resolveHubUrl(images[0]), fit: BoxFit.cover),
+            ),
+            Positioned.fill(
+              child: Container(
+                  color: Color.fromRGBO(0, 0, 0, overlayOpacity + 0.2)),
+            ),
+            Padding(padding: padding, child: content),
+          ],
+        ),
+      );
+    }
+
     return Container(
-      padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 20, 20, 48),
+      padding: padding,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [Color(0xFF9E2A42), Color(0xFF6B1830)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(28),
-          bottomRight: Radius.circular(28),
-        ),
+        borderRadius: radius,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(eyebrow,
-              style: const TextStyle(
-                  fontFamily: 'Lora',
-                  fontSize: 36,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white)),
-          const SizedBox(height: 4),
-          Text(heading,
-              style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.white70,
-                  fontWeight: FontWeight.w500)),
-          const SizedBox(height: 10),
-          Text(subtext,
-              style: const TextStyle(fontSize: 13, color: Colors.white60, height: 1.5)),
-        ],
-      ),
+      child: content,
     );
   }
 
@@ -173,6 +213,7 @@ class HubSetemScreen extends StatelessWidget {
           'yang diperibadikan, SETEM bertujuan untuk meningkatkan keyakinan pelajar, '
           'memperbaiki pemahaman mereka, dan menjadikan pembelajaran matematik menyeronokkan.',
     );
+    final expectItems = hub.strList(['setemPage', 'expect']);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -199,24 +240,39 @@ class HubSetemScreen extends StatelessWidget {
           const SizedBox(height: 10),
           Text(body,
               style: const TextStyle(fontSize: 13.5, color: Color(0xFF374151), height: 1.65)),
+          if (expectItems.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            const Divider(height: 1, color: Color(0xFFE5E7EB)),
+            const SizedBox(height: 10),
+            for (final item in expectItems)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(top: 6),
+                      child: CircleAvatar(radius: 3, backgroundColor: Color(0xFFD94F6A)),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(item,
+                          style: const TextStyle(
+                              fontSize: 13.5, color: Color(0xFF374151), height: 1.5)),
+                    ),
+                  ],
+                ),
+              ),
+          ],
         ],
       ),
     );
   }
 
   Widget _buildFeatures(HubContent hub) {
-    final expectTitle = hub.s(['setemPage', 'expectTitle'], 'What to Expect');
+    final expectTitle = hub.s(['setemPage', 'expectTitle'], '');
     final raw = hub.strList(['setemPage', 'expect']);
-    final labels = raw.isNotEmpty
-        ? raw
-        : [
-            'Bengkel Interaktif',
-            'Aktiviti Matematik Menarik',
-            'Tingkat Keyakinan Matematik',
-            'Pembelajaran Kolaboratif & Seronok',
-            'Teknik Matematik Gunaan',
-            'Pendekatan Whole-Brain Learning',
-          ];
+    if (raw.isEmpty) return const SizedBox.shrink();
     final iconMap = <String, IconData>{
       for (final e in [
         ('interactive', Icons.group_work_outlined),
@@ -231,6 +287,13 @@ class HubSetemScreen extends StatelessWidget {
         ('kolaboratif', Icons.emoji_people_outlined),
         ('teknik', Icons.calculate_outlined),
         ('whole', Icons.psychology_outlined),
+        ('personalized', Icons.psychology_outlined),
+        ('beyond', Icons.explore_outlined),
+        ('supportive', Icons.support_outlined),
+        ('tried', Icons.verified_outlined),
+        ('backed', Icons.school_outlined),
+        ('boosts', Icons.trending_up),
+        ('fun', Icons.celebration_outlined),
       ])
         e.$1: e.$2,
     };
@@ -245,8 +308,10 @@ class HubSetemScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionTitle(expectTitle),
-        const SizedBox(height: 12),
+        if (expectTitle.isNotEmpty) ...[
+          _SectionTitle(expectTitle),
+          const SizedBox(height: 12),
+        ],
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -255,15 +320,15 @@ class HubSetemScreen extends StatelessWidget {
           ),
           child: Column(
             children: [
-              for (var i = 0; i < labels.length; i++) ...[
+              for (var i = 0; i < raw.length; i++) ...[
                 if (i > 0) const Divider(height: 1, indent: 16, endIndent: 16),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
                   child: Row(
                     children: [
-                      Icon(iconFor(labels[i]), size: 20, color: const Color(0xFFD94F6A)),
+                      Icon(iconFor(raw[i]), size: 20, color: const Color(0xFFD94F6A)),
                       const SizedBox(width: 12),
-                      Text(labels[i],
+                      Text(raw[i],
                           style: const TextStyle(
                               fontSize: 13.5,
                               fontWeight: FontWeight.w500,
