@@ -1,13 +1,43 @@
 import type { PageServerLoad, Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
-import type { Role } from '$lib/types';
-import { listHubUsers, setUserRole, setUserStatus, setUserDepartment, deleteUser, syncCaknaUsers } from '$lib/server/auth';
+import type { Role, UserStatus } from '$lib/types';
+import { listHubUsers, listCaknaUsers, setUserRole, setUserStatus, setUserDepartment, deleteUser, syncCaknaUsers } from '$lib/server/auth';
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, request }) => {
 	const actor = locals.user!;
 	if (actor.role !== 'admin') redirect(302, '/hub/admin/dashboard');
-	const users = await listHubUsers(actor);
-	return { users, pending: users.filter((u) => u.status === 'pending').length };
+
+	const cookie = request.headers.get('cookie') ?? '';
+	const [hubUsers, caknaUsers] = await Promise.all([listHubUsers(actor), listCaknaUsers(cookie)]);
+
+	const hubEmails = new Set(hubUsers.map((u) => u.email.toLowerCase()));
+
+	const caknaOnly = caknaUsers
+		.filter((u) => !hubEmails.has(u.email.toLowerCase()))
+		.map((u) => ({
+			id: `cakna:${u.id}`,
+			email: u.email,
+			name: u.name ?? '',
+			role: 'member' as Role,
+			branch: '',
+			status: 'pending' as UserStatus,
+			createdAt: u.last_login
+				? new Date(u.last_login * 1000).toISOString()
+				: new Date().toISOString(),
+			caknaOnly: true as const
+		}));
+
+	const users = [
+		...hubUsers.map((u) => ({ ...u, caknaOnly: false as const })),
+		...caknaOnly
+	];
+
+	return {
+		users,
+		hubCount: hubUsers.length,
+		caknaOnlyCount: caknaOnly.length,
+		pending: users.filter((u) => u.status === 'pending' && !u.caknaOnly).length
+	};
 };
 
 export const actions: Actions = {

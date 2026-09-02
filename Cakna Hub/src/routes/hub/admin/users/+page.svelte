@@ -5,7 +5,7 @@
 	import type { Role } from '$lib/types';
 
 	let { data } = $props();
-	const { users, pending } = $derived(data);
+	const { users, hubCount, caknaOnlyCount, pending } = $derived(data);
 
 	type Tab = 'all' | 'member' | 'franchisee' | 'pic' | 'admin';
 
@@ -63,7 +63,7 @@
 		<div>
 			<h1 class="text-2xl font-bold tracking-tight text-zinc-900">Users</h1>
 			<p class="mt-1 text-sm text-zinc-500">
-				{users.length} account{users.length !== 1 ? 's' : ''} total.
+				{hubCount} Hub account{hubCount !== 1 ? 's' : ''}{caknaOnlyCount > 0 ? `, ${caknaOnlyCount} from Cakna not yet synced` : ''}.
 				{#if pending > 0}
 					<span class="text-amber-600 font-medium">{pending} pending approval.</span>
 				{:else}
@@ -157,89 +157,110 @@
 
 	<!-- Table -->
 	<div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
-		<table class="w-full text-sm">
-			<thead class="border-b border-zinc-100 bg-zinc-50">
-				<tr>
-					<th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-zinc-400">Name</th>
-					<th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-zinc-400">Email</th>
-					<th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-zinc-400">Role</th>
-					<th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-zinc-400">Department</th>
-					<th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-zinc-400">Status</th>
-					<th class="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide text-zinc-400">Actions</th>
-				</tr>
-			</thead>
-			<tbody class="divide-y divide-zinc-100">
-				{#each filtered as u (u.id)}
+		<div class="overflow-x-auto">
+			<table class="w-full min-w-[760px] text-sm">
+				<thead class="border-b border-zinc-100 bg-zinc-50">
 					<tr>
-						<td class="px-5 py-3 font-medium text-zinc-900">{u.name || '—'}</td>
-						<td class="px-5 py-3 text-zinc-500">{u.email}</td>
-						<td class="px-5 py-3">
-							<form method="POST" action="?/setRole" use:enhance class="inline-flex">
-								<input type="hidden" name="id" value={u.id} />
-								<select
-									name="role"
-									onchange={(e) => (e.currentTarget as HTMLSelectElement).form?.requestSubmit()}
-									class="rounded-lg border border-zinc-200 px-2.5 py-1.5 text-xs text-zinc-700"
-								>
-									{#each roleOptions as r (r)}
-										<option value={r} selected={r === u.role || (r === 'pic' && u.role === 'reviewer') || (r === 'member' && u.role === 'host')}
-											>{ROLE_LABELS[r]}</option
-										>
-									{/each}
-								</select>
-							</form>
-						</td>
-						<td class="px-5 py-3">
-							{#if isPic(u.role)}
-								<form method="POST" action="?/setDepartment" use:enhance class="inline-flex">
-									<input type="hidden" name="id" value={u.id} />
-									<select
-										name="department"
-										onchange={(e) => (e.currentTarget as HTMLSelectElement).form?.requestSubmit()}
-										class="rounded-lg border border-zinc-200 px-2.5 py-1.5 text-xs text-zinc-700"
-									>
-										<option value="" selected={!u.branch}>— unset —</option>
-										{#each PIC_DEPARTMENTS as dept (dept)}
-											<option value={dept} selected={u.branch === dept}>{dept}</option>
-										{/each}
-									</select>
-								</form>
-							{:else}
-								<span class="text-zinc-300">—</span>
-							{/if}
-						</td>
-						<td class="px-5 py-3">
-							<form method="POST" action="?/setStatus" use:enhance class="inline-flex">
-								<input type="hidden" name="id" value={u.id} />
-								<select
-									name="status"
-									onchange={(e) => (e.currentTarget as HTMLSelectElement).form?.requestSubmit()}
-									class="rounded-lg border border-zinc-200 px-2.5 py-1.5 text-xs {u.status === 'active'
-										? 'text-rose-700'
-										: 'text-amber-700'}"
-								>
-									<option value="active" selected={u.status === 'active'}>Active</option>
-									<option value="pending" selected={u.status === 'pending'}>Pending</option>
-								</select>
-							</form>
-						</td>
-						<td class="px-5 py-3 text-right">
-							<form method="POST" action="?/delete" use:enhance class="inline-flex">
-								<input type="hidden" name="id" value={u.id} />
-								<button
-									type="submit"
-									onclick={(e) => {
-										if (!confirm('Delete this user?')) e.preventDefault();
-									}}
-									class="rounded-lg border border-red-200 px-2.5 py-1.5 text-xs text-red-600 hover:bg-red-50"
-									>Delete</button
-								>
-							</form>
-						</td>
+						<th class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide text-zinc-400">Name</th>
+						<th class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide text-zinc-400">Email</th>
+						<th class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide text-zinc-400">Role</th>
+						<th class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide text-zinc-400">Department</th>
+						<th class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide text-zinc-400">Status</th>
+						<th class="px-5 py-4 pr-6 text-right text-xs font-semibold uppercase tracking-wide text-zinc-400">Actions</th>
 					</tr>
-				{/each}
-			</tbody>
-		</table>
+				</thead>
+				<tbody class="divide-y divide-zinc-100">
+					{#each filtered as u (u.id)}
+						<tr class={u.caknaOnly ? 'bg-zinc-50/60' : ''}>
+							<td class="px-5 py-4 font-medium text-zinc-900 whitespace-nowrap">
+								<span>{u.name || '—'}</span>
+								{#if u.caknaOnly}
+									<span class="ml-1.5 inline-flex items-center rounded-full bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-700">
+										Cakna
+									</span>
+								{/if}
+							</td>
+							<td class="px-5 py-4 text-zinc-500 whitespace-nowrap">{u.email}</td>
+							<td class="px-5 py-4">
+								{#if u.caknaOnly}
+									<span class="text-zinc-400 text-xs">—</span>
+								{:else}
+									<form method="POST" action="?/setRole" use:enhance class="inline-flex">
+										<input type="hidden" name="id" value={u.id} />
+										<select
+											name="role"
+											onchange={(e) => (e.currentTarget as HTMLSelectElement).form?.requestSubmit()}
+											class="rounded-lg border border-zinc-200 px-2.5 py-1.5 text-xs text-zinc-700"
+										>
+											{#each roleOptions as r (r)}
+												<option value={r} selected={r === u.role || (r === 'pic' && u.role === 'reviewer') || (r === 'member' && u.role === 'host')}
+													>{ROLE_LABELS[r]}</option
+												>
+											{/each}
+										</select>
+									</form>
+								{/if}
+							</td>
+							<td class="px-5 py-4">
+								{#if !u.caknaOnly && isPic(u.role)}
+									<form method="POST" action="?/setDepartment" use:enhance class="inline-flex">
+										<input type="hidden" name="id" value={u.id} />
+										<select
+											name="department"
+											onchange={(e) => (e.currentTarget as HTMLSelectElement).form?.requestSubmit()}
+											class="rounded-lg border border-zinc-200 px-2.5 py-1.5 text-xs text-zinc-700"
+										>
+											<option value="" selected={!u.branch}>— unset —</option>
+											{#each PIC_DEPARTMENTS as dept (dept)}
+												<option value={dept} selected={u.branch === dept}>{dept}</option>
+											{/each}
+										</select>
+									</form>
+								{:else}
+									<span class="text-zinc-300">—</span>
+								{/if}
+							</td>
+							<td class="px-5 py-4">
+								{#if u.caknaOnly}
+									<span class="text-zinc-400 text-xs">Not synced</span>
+								{:else}
+									<form method="POST" action="?/setStatus" use:enhance class="inline-flex">
+										<input type="hidden" name="id" value={u.id} />
+										<select
+											name="status"
+											onchange={(e) => (e.currentTarget as HTMLSelectElement).form?.requestSubmit()}
+											class="rounded-lg border border-zinc-200 px-2.5 py-1.5 text-xs {u.status === 'active'
+												? 'text-rose-700'
+												: 'text-amber-700'}"
+										>
+											<option value="active" selected={u.status === 'active'}>Active</option>
+											<option value="pending" selected={u.status === 'pending'}>Pending</option>
+										</select>
+									</form>
+								{/if}
+							</td>
+							<td class="px-5 py-4 pr-6 text-right whitespace-nowrap">
+								{#if !u.caknaOnly}
+									<form method="POST" action="?/delete" use:enhance class="inline-flex">
+										<input type="hidden" name="id" value={u.id} />
+										<button
+											type="submit"
+											onclick={(e) => {
+												if (!confirm('Delete this user?')) e.preventDefault();
+											}}
+											class="rounded-lg border border-red-200 px-2.5 py-1.5 text-xs text-red-600 hover:bg-red-50"
+											>Delete</button
+										>
+									</form>
+								{:else}
+									<span class="text-zinc-300 text-xs">—</span>
+								{/if}
+							</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
 		{#if filtered.length === 0}
 			<div class="py-12 text-center text-sm text-zinc-400">
 				{search ? `No users matching "${search}"` : `No ${activeTab === 'all' ? '' : activeTab + ' '}users yet.`}

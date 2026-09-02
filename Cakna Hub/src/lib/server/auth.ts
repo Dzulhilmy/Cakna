@@ -48,7 +48,7 @@ export async function getCurrentUser(cookieHeader: string | null): Promise<HubUs
 	const me = await checkCaknaSession(cookieHeader);
 	if (!me) return null;
 	try {
-		return await resolveUser(me.email, me.name);
+		return await resolveUser(me.email, me.name ?? '');
 	} catch {
 		return null;
 	}
@@ -56,16 +56,29 @@ export async function getCurrentUser(cookieHeader: string | null): Promise<HubUs
 
 // ─── Cakna → Hub user sync ──────────────────────────────────────────────────
 
+async function fetchCaknaUserList(cookieHeader: string): Promise<CaknaUserRecord[]> {
+	try {
+		const res = await fetch(`${apiBase()}/api/admin/users`, {
+			headers: { cookie: cookieHeader },
+			signal: AbortSignal.timeout(10000)
+		});
+		if (!res.ok) return [];
+		const { users } = (await res.json()) as { me: string; users: CaknaUserRecord[] };
+		return users.filter((u) => !!u.email);
+	} catch {
+		return [];
+	}
+}
+
+export async function listCaknaUsers(cookieHeader: string): Promise<CaknaUserRecord[]> {
+	return fetchCaknaUserList(cookieHeader);
+}
+
 export async function syncCaknaUsers(cookieHeader: string): Promise<{ synced: number }> {
-	const res = await fetch(`${apiBase()}/admin/users`, {
-		headers: { cookie: cookieHeader },
-		signal: AbortSignal.timeout(10000)
-	});
-	if (!res.ok) throw new Error(`Cakna /admin/users: ${res.status}`);
-	const { users } = (await res.json()) as { me: string; users: CaknaUserRecord[] };
+	const users = await fetchCaknaUserList(cookieHeader);
+	if (!users.length) throw new Error('Could not reach Cakna user list');
 	let synced = 0;
 	for (const u of users) {
-		if (!u.email) continue;
 		await resolveUser(u.email, u.name ?? '');
 		synced++;
 	}
