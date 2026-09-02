@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../state/app_state.dart';
 import '../state/auth.dart';
+import '../utils/hub_l10n.dart';
 
 class HubProfileScreen extends StatefulWidget {
   const HubProfileScreen({super.key});
@@ -53,7 +55,8 @@ class _HubProfileScreenState extends State<HubProfileScreen>
   Future<void> _register() async {
     setState(() => _error = null);
     if (_regPw.text != _regPwConfirm.text) {
-      setState(() => _error = 'Kata laluan tidak sepadan.');
+      final lang = context.read<AppState>().uiLang;
+      setState(() => _error = tHub('pw_mismatch', lang));
       return;
     }
     final auth = context.read<Auth>();
@@ -72,6 +75,7 @@ class _HubProfileScreenState extends State<HubProfileScreen>
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<Auth>();
+    final lang = context.select<AppState, String>((app) => app.uiLang);
     final topPad = MediaQuery.of(context).padding.top;
 
     return Scaffold(
@@ -104,9 +108,9 @@ class _HubProfileScreenState extends State<HubProfileScreen>
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Text(
-                  'Profil',
-                  style: TextStyle(
+                Text(
+                  tHub('profile', lang),
+                  style: const TextStyle(
                     fontFamily: 'Lora',
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
@@ -119,8 +123,8 @@ class _HubProfileScreenState extends State<HubProfileScreen>
           // ── Body ────────────────────────────────────────────────────────
           Expanded(
             child: auth.signedIn
-                ? _buildProfile(auth)
-                : _buildAuthForms(auth),
+                ? _buildProfile(auth, lang)
+                : _buildAuthForms(auth, lang),
           ),
         ],
       ),
@@ -128,7 +132,7 @@ class _HubProfileScreenState extends State<HubProfileScreen>
   }
 
   // ── Signed-in profile ─────────────────────────────────────────────────────
-  Widget _buildProfile(Auth auth) {
+  Widget _buildProfile(Auth auth, String lang) {
     final initials = (auth.email ?? '?')[0].toUpperCase();
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -170,9 +174,9 @@ class _HubProfileScreenState extends State<HubProfileScreen>
               color: const Color(0xFFFFF1F3),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Text(
-              'Francaisi',
-              style: TextStyle(
+            child: Text(
+              tHub('franchisee', lang),
+              style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFFD94F6A),
@@ -192,9 +196,9 @@ class _HubProfileScreenState extends State<HubProfileScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'MAKLUMAT AKAUN',
-                  style: TextStyle(
+                Text(
+                  tHub('account_info', lang),
+                  style: const TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
                     color: Color(0xFF9CA3AF),
@@ -217,19 +221,33 @@ class _HubProfileScreenState extends State<HubProfileScreen>
                   ],
                 ),
                 const Divider(height: 20),
-                Row(
-                  children: [
-                    const Icon(Icons.badge_outlined,
-                        size: 16, color: Color(0xFF9CA3AF)),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        'ID: ${auth.id ?? '-'}',
-                        style: const TextStyle(
-                            fontSize: 13, color: Color(0xFF6B7280)),
+                InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () {
+                    Clipboard.setData(ClipboardData(text: auth.email ?? ''));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(tHub('email_copied', lang)),
+                        duration: const Duration(seconds: 2),
                       ),
-                    ),
-                  ],
+                    );
+                  },
+                  child: Row(
+                    children: [
+                      const Icon(Icons.copy_outlined,
+                          size: 16, color: Color(0xFF9CA3AF)),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          tHub('copy_email', lang),
+                          style: const TextStyle(
+                              fontSize: 13, color: Color(0xFF6B7280)),
+                        ),
+                      ),
+                      const Icon(Icons.chevron_right,
+                          size: 16, color: Color(0xFFD1D5DB)),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -250,7 +268,7 @@ class _HubProfileScreenState extends State<HubProfileScreen>
                   : const Icon(Icons.logout_rounded,
                       size: 18, color: Color(0xFFD94F6A)),
               label: Text(
-                auth.busy ? 'Menunggu...' : 'Log Keluar',
+                auth.busy ? tHub('loading', lang) : tHub('logout', lang),
                 style: const TextStyle(
                     color: Color(0xFFD94F6A), fontWeight: FontWeight.w600),
               ),
@@ -268,7 +286,7 @@ class _HubProfileScreenState extends State<HubProfileScreen>
   }
 
   // ── Login / Register ───────────────────────────────────────────────────────
-  Widget _buildAuthForms(Auth auth) {
+  Widget _buildAuthForms(Auth auth, String lang) {
     return Column(
       children: [
         const SizedBox(height: 20),
@@ -293,9 +311,9 @@ class _HubProfileScreenState extends State<HubProfileScreen>
               ),
               indicatorSize: TabBarIndicatorSize.tab,
               dividerColor: Colors.transparent,
-              tabs: const [
-                Tab(text: 'Log Masuk'),
-                Tab(text: 'Daftar'),
+              tabs: [
+                Tab(text: tHub('login_tab', lang)),
+                Tab(text: tHub('register_tab', lang)),
               ],
             ),
           ),
@@ -333,8 +351,8 @@ class _HubProfileScreenState extends State<HubProfileScreen>
           child: TabBarView(
             controller: _tabs,
             children: [
-              _buildLoginForm(auth),
-              _buildRegisterForm(auth),
+              _buildLoginForm(auth, lang),
+              _buildRegisterForm(auth, lang),
             ],
           ),
         ),
@@ -354,7 +372,7 @@ class _HubProfileScreenState extends State<HubProfileScreen>
     }
   }
 
-  Widget _buildLoginForm(Auth auth) {
+  Widget _buildLoginForm(Auth auth, String lang) {
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
       child: Column(
@@ -362,15 +380,15 @@ class _HubProfileScreenState extends State<HubProfileScreen>
         children: [
           _field(
             controller: _loginEmail,
-            label: 'E-mel',
-            hint: 'nama@contoh.com',
+            label: tHub('email_label', lang),
+            hint: tHub('email_hint', lang),
             icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
           ),
           const SizedBox(height: 14),
           _pwField(
             controller: _loginPw,
-            label: 'Kata Laluan',
+            label: tHub('password_label', lang),
             visible: _loginPwVisible,
             onToggle: () => setState(() => _loginPwVisible = !_loginPwVisible),
           ),
@@ -394,8 +412,8 @@ class _HubProfileScreenState extends State<HubProfileScreen>
                       child: CircularProgressIndicator(
                           strokeWidth: 2, color: Colors.white),
                     )
-                  : const Text('Log Masuk',
-                      style: TextStyle(
+                  : Text(tHub('login_btn', lang),
+                      style: const TextStyle(
                           fontSize: 15, fontWeight: FontWeight.w600)),
             ),
           ),
@@ -407,7 +425,7 @@ class _HubProfileScreenState extends State<HubProfileScreen>
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 child: Text(
-                  'atau',
+                  tHub('or_divider', lang),
                   style: TextStyle(
                       fontSize: 12.5, color: Colors.grey.shade500),
                 ),
@@ -450,9 +468,9 @@ class _HubProfileScreenState extends State<HubProfileScreen>
                               size: 13, color: Colors.white),
                         ),
                         const SizedBox(width: 10),
-                        const Text(
-                          'Teruskan dengan QCXIS',
-                          style: TextStyle(
+                        Text(
+                          tHub('sso_btn', lang),
+                          style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: Color(0xFF374151)),
@@ -466,7 +484,7 @@ class _HubProfileScreenState extends State<HubProfileScreen>
     );
   }
 
-  Widget _buildRegisterForm(Auth auth) {
+  Widget _buildRegisterForm(Auth auth, String lang) {
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
       child: Column(
@@ -474,22 +492,22 @@ class _HubProfileScreenState extends State<HubProfileScreen>
         children: [
           _field(
             controller: _regEmail,
-            label: 'E-mel',
-            hint: 'nama@contoh.com',
+            label: tHub('email_label', lang),
+            hint: tHub('email_hint', lang),
             icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
           ),
           const SizedBox(height: 14),
           _pwField(
             controller: _regPw,
-            label: 'Kata Laluan',
+            label: tHub('password_label', lang),
             visible: _regPwVisible,
             onToggle: () => setState(() => _regPwVisible = !_regPwVisible),
           ),
           const SizedBox(height: 14),
           _pwField(
             controller: _regPwConfirm,
-            label: 'Sahkan Kata Laluan',
+            label: tHub('confirm_pw_label', lang),
             visible: _regPwVisible,
             onToggle: () => setState(() => _regPwVisible = !_regPwVisible),
           ),
@@ -513,8 +531,8 @@ class _HubProfileScreenState extends State<HubProfileScreen>
                       child: CircularProgressIndicator(
                           strokeWidth: 2, color: Colors.white),
                     )
-                  : const Text('Daftar Akaun',
-                      style: TextStyle(
+                  : Text(tHub('register_btn', lang),
+                      style: const TextStyle(
                           fontSize: 15, fontWeight: FontWeight.w600)),
             ),
           ),
