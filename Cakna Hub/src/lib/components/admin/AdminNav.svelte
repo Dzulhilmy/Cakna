@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { ExternalLink } from 'lucide-svelte';
 
 	let { role }: { role: string } = $props();
 
@@ -32,6 +31,7 @@
 	});
 
 	const pathname = $derived(page.url.pathname);
+	const mathuratActive = $derived(pathname === '/hub/admin/mathurat');
 </script>
 
 <nav class="flex flex-col gap-0.5 pt-1">
@@ -54,12 +54,13 @@
 	<div class="my-2 border-t border-zinc-200/60"></div>
 
 	<a
-		href="https://cakna.org/admin"
-		target="_blank"
-		rel="noopener noreferrer"
-		class="inline-flex items-center justify-between gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-zinc-500 transition-colors hover:bg-rose-50 hover:text-rose-700"
+		href="/hub/admin/mathurat"
+		aria-current={mathuratActive ? 'page' : undefined}
+		class="relative inline-flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors {mathuratActive ? 'bg-rose-50 text-rose-700' : 'text-zinc-600 hover:bg-zinc-100/80 hover:text-zinc-900'}"
 	>
-		<span>Mathurat Dashboard</span>
-		<ExternalLink size={13} class="shrink-0 opacity-50" />
+		{#if mathuratActive}
+			<span class="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-full bg-rose-500"></span>
+		{/if}
+		Mathurat Dashboard
 	</a>
 </nav>

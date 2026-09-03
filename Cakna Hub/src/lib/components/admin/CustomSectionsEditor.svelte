@@ -99,6 +99,9 @@
 	}
 	function blockDragEnd() { blockDraggingId = null; blockDragOverId = null; blockDragSectionId = null; }
 
+	// ── Bullet description expand state ───────────────────────────────────────
+	let expandedDesc = $state<Record<string, boolean>>({});
+
 	// ── Media picker ──────────────────────────────────────────────────────────
 	let pickerOpen = $state(false);
 	let pickerFn = $state<((url: string) => void) | null>(null);
@@ -317,12 +320,50 @@
 												{:else if block.type === 'bulletList'}
 													<div class="space-y-2">
 														{#each (block.items ?? []) as _, bi (bi)}
-															<div class="flex items-center gap-2">
-																<input class={inp} value={block.items![bi]} oninput={(e) => { if (!block.items) block.items = []; block.items[bi] = e.currentTarget.value; }} placeholder="Bullet item…" />
-																<button type="button" onclick={() => { block.items = (block.items ?? []).filter((_, i) => i !== bi); }} class="shrink-0 rounded-lg border border-red-200 p-2 text-red-500 hover:bg-red-50"><Trash2 size={13} /></button>
+															{@const descKey = `${block.id}-${bi}`}
+															{@const isExpanded = expandedDesc[descKey] ?? false}
+															<div class="rounded-lg border border-zinc-200 bg-white overflow-hidden">
+																<div class="flex items-center gap-2 p-2">
+																	<button
+																		type="button"
+																		onclick={() => { expandedDesc[descKey] = !isExpanded; }}
+																		class="shrink-0 rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600"
+																		title={isExpanded ? 'Hide description' : 'Add description'}
+																	>
+																		{#if isExpanded}<ChevronUp size={13} />{:else}<ChevronDown size={13} />{/if}
+																	</button>
+																	<input
+																		class="{inp} flex-1"
+																		value={block.items![bi]}
+																		oninput={(e) => { if (!block.items) block.items = []; block.items[bi] = e.currentTarget.value; }}
+																		placeholder="Bullet item…"
+																	/>
+																	<button type="button" onclick={() => {
+																		block.items = (block.items ?? []).filter((_, i) => i !== bi);
+																		if (block.itemDescriptions) block.itemDescriptions = block.itemDescriptions.filter((_, i) => i !== bi);
+																		delete expandedDesc[descKey];
+																	}} class="shrink-0 rounded-lg border border-red-200 p-2 text-red-500 hover:bg-red-50"><Trash2 size={13} /></button>
+																</div>
+																{#if isExpanded}
+																	<div class="border-t border-zinc-100 px-2 pb-2">
+																		<textarea
+																			class="{ta} mt-2 text-xs"
+																			rows="2"
+																			placeholder="Description shown on expand…"
+																			oninput={(e) => {
+																				if (!block.itemDescriptions) block.itemDescriptions = Array((block.items ?? []).length).fill('');
+																				block.itemDescriptions[bi] = e.currentTarget.value;
+																			}}
+																		>{block.itemDescriptions?.[bi] ?? ''}</textarea>
+																	</div>
+																{/if}
 															</div>
 														{/each}
-														<button type="button" onclick={() => { block.items = [...(block.items ?? []), '']; }} class="inline-flex items-center gap-1 text-xs text-rose-600 hover:text-rose-700">
+														<button type="button" onclick={() => {
+															const len = (block.items ?? []).length;
+															block.items = [...(block.items ?? []), ''];
+															block.itemDescriptions = [...(block.itemDescriptions ?? Array(len).fill('') as string[]), ''];
+														}} class="inline-flex items-center gap-1 text-xs text-rose-600 hover:text-rose-700">
 															<Plus size={12} /> Add bullet
 														</button>
 													</div>

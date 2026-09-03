@@ -41,14 +41,8 @@
 		<PartitionTile href="/core" label="7 Core" description="Assist, Biz, Circle, Digital, Edu, Future & Green." icon={LayoutGrid} />
 		<PartitionTile href="/society" label="Society & Others" description="Community programs and everything else." icon={Users} />
 		<PartitionTile href="https://cakna.org/menu" label="Mushaf Digital" description="Quran, solat times, mathurat, zikir & more." icon={BookOpen} external />
+		{#if isStaff}
+			<PartitionTile href="/hub/admin/dashboard" label="Admin" description="Manage programs, funding, site content & users." icon={ShieldCheck} />
+		{/if}
 	</div>
-
-	{#if isStaff}
-		<div class="mt-10 text-center">
-			<a href="/hub/admin/dashboard" class="inline-flex items-center gap-1.5 text-sm text-zinc-400 transition-colors hover:text-rose-600">
-				<ShieldCheck size={15} strokeWidth={1.75} />
-				Admin
-			</a>
-		</div>
-	{/if}
 </main>
