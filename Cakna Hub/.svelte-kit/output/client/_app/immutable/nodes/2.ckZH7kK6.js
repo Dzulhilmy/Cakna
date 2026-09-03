@@ -1,1 +1,0 @@
-import"../chunks/Bzak7iHL.js";import{p as s,b as n,v as m,f as i,a as p}from"../chunks/CLcWUy81.js";import{s as l}from"../chunks/C3SDPPCV.js";import{A as u}from"../chunks/63cSm35d.js";function _(a,t){s(t,!0),u(a,{get user(){return t.data.user},children:(e,d)=>{var r=m(),o=i(r);l(o,()=>t.children),p(e,r)},$$slots:{default:!0}}),n()}export{_ as component};

@@ -4,8 +4,19 @@ target/
 web/build/
 web/.svelte-kit/
 .env
+.env.*
+!.env.example
 *.pem
 Tilawah/
+
+# Large binary/archive files
+big-quran.pdf
+big-quran.zip
+*.zip
+*.bak
+
+# IDE
+.idea/
 
 # Android signing secrets — never commit
 app/android/key.properties

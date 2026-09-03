@@ -1,0 +1,23 @@
+# SvelteKit generated
+.svelte-kit/
+
+# Build output
+build/
+
+# Dependencies
+node_modules/
+
+# TypeScript incremental build
+tsconfig.tsbuildinfo
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Editor
+.idea/
+.vscode/
+
+# OS
+.DS_Store
