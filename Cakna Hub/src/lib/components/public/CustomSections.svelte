@@ -3,6 +3,11 @@
 	import SectionBg from './SectionBg.svelte';
 	import { hasBg } from '$lib/bg-utils';
 	let { sections }: { sections?: CustomSection[] } = $props();
+
+	let openAccordion = $state<Record<string, number | null>>({});
+	function toggleAccordion(blockId: string, i: number) {
+		openAccordion[blockId] = openAccordion[blockId] === i ? null : i;
+	}
 </script>
 
 {#if sections && sections.length > 0}
@@ -59,16 +64,40 @@
 							{/if}
 
 						{:else if block.type === 'bulletList'}
-							{@const items = (block.items ?? []).filter((i) => i.trim())}
+							{@const rawItems = block.items ?? []}
+							{@const descs = block.itemDescriptions ?? []}
+							{@const hasDescs = descs.some((d) => d?.trim())}
+							{@const items = rawItems.map((label, i) => ({ label, desc: descs[i] ?? '' })).filter((it) => it.label.trim())}
 							{#if items.length > 0}
-								<ul class="space-y-2">
-									{#each items as item}
-										<li class="flex items-start gap-2.5">
-											<span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-500"></span>
-											<span class="leading-relaxed text-zinc-600">{item}</span>
-										</li>
-									{/each}
-								</ul>
+								{#if hasDescs}
+									<div class="space-y-2">
+										{#each items as item, i}
+											{@const isOpen = openAccordion[block.id] === i}
+											<div class="rounded-xl border border-zinc-200 overflow-hidden {isOpen ? 'bg-white' : 'bg-zinc-100'}">
+												<button
+													type="button"
+													onclick={() => toggleAccordion(block.id, i)}
+													class="flex w-full items-center justify-between px-5 py-4 text-left"
+												>
+													<span class="font-semibold text-rose-600">{item.label}</span>
+													<span class="ml-4 shrink-0 text-xl font-light text-zinc-700 leading-none">{isOpen ? '−' : '+'}</span>
+												</button>
+												{#if isOpen && item.desc.trim()}
+													<p class="px-5 pb-4 text-sm leading-relaxed text-zinc-500">{item.desc}</p>
+												{/if}
+											</div>
+										{/each}
+									</div>
+								{:else}
+									<ul class="space-y-2">
+										{#each items as item}
+											<li class="flex items-start gap-2.5">
+												<span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-500"></span>
+												<span class="leading-relaxed text-zinc-600">{item.label}</span>
+											</li>
+										{/each}
+									</ul>
+								{/if}
 							{/if}
 						{/if}
 					{/each}

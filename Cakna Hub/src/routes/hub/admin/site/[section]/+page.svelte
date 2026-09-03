@@ -549,15 +549,31 @@
 										{:else if block.type === 'bulletList'}
 											<div class="space-y-2">
 												{#each (block.items ?? []) as _item, bi (bi)}
-													<div class="flex items-center gap-2">
-														<input class={inp} value={block.items![bi]} placeholder="Bullet item…"
-															oninput={(e) => { if (!block.items) block.items = []; block.items[bi] = e.currentTarget.value; }} />
-														<button type="button" onclick={() => { block.items = (block.items ?? []).filter((_, i) => i !== bi); }}
-															class="shrink-0 rounded-lg border border-red-200 p-2 text-red-400 hover:bg-red-50"><Trash2 size={13} /></button>
+													<div class="rounded-lg border border-zinc-200 bg-white overflow-hidden">
+														<div class="flex items-center gap-2 p-2">
+															<input class={inp} value={block.items![bi]} placeholder="Bullet item…"
+																oninput={(e) => { if (!block.items) block.items = []; block.items[bi] = e.currentTarget.value; }} />
+															<button type="button" onclick={() => {
+																block.items = (block.items ?? []).filter((_, i) => i !== bi);
+																if (block.itemDescriptions) block.itemDescriptions = block.itemDescriptions.filter((_, i) => i !== bi);
+															}} class="shrink-0 rounded-lg border border-red-200 p-2 text-red-400 hover:bg-red-50"><Trash2 size={13} /></button>
+														</div>
+														<div class="border-t border-zinc-100 px-2 pb-2">
+															<textarea class="{ta} mt-2 text-xs" rows="2"
+																placeholder="Description shown on expand…"
+																oninput={(e) => {
+																	if (!block.itemDescriptions) block.itemDescriptions = Array((block.items ?? []).length).fill('');
+																	block.itemDescriptions[bi] = e.currentTarget.value;
+																}}>{block.itemDescriptions?.[bi] ?? ''}</textarea>
+														</div>
 													</div>
 												{/each}
 												<button type="button"
-													onclick={() => { block.items = [...(block.items ?? []), '']; }}
+													onclick={() => {
+														const len = (block.items ?? []).length;
+														block.items = [...(block.items ?? []), ''];
+														block.itemDescriptions = [...(block.itemDescriptions ?? Array(len).fill('') as string[]), ''];
+													}}
 													class="inline-flex items-center gap-1 text-xs text-rose-600 hover:text-rose-700"><Plus size={12} /> Add bullet</button>
 											</div>
 										{/if}
