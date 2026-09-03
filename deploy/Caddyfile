@@ -38,6 +38,10 @@
 		path /setem
 		path /docs
 		path /docs/*
+		path /mushaf
+		path /mushaf/*
+		path /proxy/*
+		path /qdata/*
 	}
 	handle @hub {
 		reverse_proxy hub-svelte:3000

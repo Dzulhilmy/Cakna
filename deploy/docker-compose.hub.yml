@@ -39,6 +39,7 @@ services:
       HUB_API_URL: http://hub-server:3002
       HUB_INTERNAL_SECRET: ${HUB_INTERNAL_SECRET}
       CAKNA_API_URL: https://cakna.org
+      CAKNA_API_INTERNAL_URL: http://api:8080
       CAKNA_LOGIN_URL: /login
       NODE_ENV: production
       PORT: "3000"
