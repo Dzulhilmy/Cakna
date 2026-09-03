@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
+	import { untrack } from 'svelte';
 	import AudioVisualizer from '$lib/components/modules/AudioVisualizer.svelte';
 	import MushafPage from '$lib/components/mushaf/MushafPage.svelte';
 	import MathuratView from '$lib/components/modules/MathuratView.svelte';
@@ -153,7 +154,10 @@
 	const step = (d: number) => session.setPage(session.viewPage + d);
 
 	$effect(() => {
-		void join();
+		// untrack prevents Svelte from subscribing to halaqah.session here.
+		// Without it, halaqah.join() reads session synchronously, so the effect
+		// re-fires when leave() clears the session — immediately re-joining the room.
+		untrack(() => void join());
 		// NO teardown here on purpose. Disconnecting on unmount is what made the
 		// back button (and every other navigation) end the call. The session is
 		// owned by the store now and ends only when the user says so — "Keluar",

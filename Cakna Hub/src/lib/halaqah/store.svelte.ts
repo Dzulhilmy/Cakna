@@ -25,8 +25,23 @@ class HalaqahStore {
 	 */
 	private pending: { slug: string; promise: Promise<HalaqahSession> } | null = null;
 
+	/** Slugs the user has explicitly left — not auto-rejoined on room page visit. */
+	private _leftSlugs = new Set<string>();
+	/** Incremented by leave() to invalidate any in-flight join. */
+	private generation = 0;
+
 	get active() {
 		return this.session?.connected === true;
+	}
+
+	/** Returns true if the user explicitly left this room (via the X button). */
+	hasLeft(slug: string) {
+		return this._leftSlugs.has(slug);
+	}
+
+	/** Clears the explicit-left flag so the user can rejoin. */
+	clearLeft(slug: string) {
+		this._leftSlugs.delete(slug);
 	}
 
 	/**
@@ -40,6 +55,7 @@ class HalaqahStore {
 		// Already connecting to this room — hand back the SAME promise.
 		if (this.pending?.slug === slug) return this.pending.promise;
 
+		const gen = ++this.generation;
 		const promise = (async () => {
 			// Switching rooms: close the old one first.
 			if (this.session && this.session.slug !== slug) await this.leave();
@@ -60,6 +76,11 @@ class HalaqahStore {
 			}
 			const s = new HalaqahSession();
 			await s.connect((await r.json()) as JoinInfo);
+			// If leave() was called while this was in flight, discard the connection.
+			if (gen !== this.generation) {
+				await s.disconnect();
+				return s;
+			}
 			this.session = s;
 			return s;
 		})();
@@ -73,10 +94,21 @@ class HalaqahStore {
 
 	/** Leave the room (others carry on). */
 	async leave() {
+		this.generation++; // invalidate any in-flight join promise
 		const s = this.session;
 		this.session = null;
 		this.pending = null;
 		await s?.disconnect();
+	}
+
+	/**
+	 * Explicitly leave and mark the slug so the room page won't auto-rejoin.
+	 * Used by the X button on the engagement panel.
+	 */
+	async leaveExplicit() {
+		const slug = this.session?.slug;
+		if (slug) this._leftSlugs.add(slug);
+		await this.leave();
 	}
 
 	/** Host only: end the session for everyone, then leave. */

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import AudioVisualizer from '$lib/components/modules/AudioVisualizer.svelte';
 	import { halaqah } from '$lib/halaqah/store.svelte';
@@ -19,6 +18,8 @@
 	$effect(() => {
 		const s = slug;
 		if (session?.slug === s && session?.connected) return;
+		// User explicitly left via the X button — don't auto-rejoin.
+		if (halaqah.hasLeft(s)) return;
 		joining = true;
 		joinError = null;
 		halaqah.join(s)
@@ -28,7 +29,18 @@
 			.finally(() => { joining = false; });
 	});
 
-	async function leave() { await halaqah.leave(); }
+	function rejoin() {
+		halaqah.clearLeft(slug);
+		joining = true;
+		joinError = null;
+		halaqah.join(slug)
+			.catch((e: unknown) => {
+				joinError = e instanceof Error ? e.message : 'Gagal menyertai sesi.';
+			})
+			.finally(() => { joining = false; });
+	}
+
+	async function leave() { await halaqah.leaveExplicit(); }
 	async function close() { await halaqah.close(); }
 
 	function toggleMic() { session?.setMic(!session.micOn); }
@@ -49,21 +61,14 @@
 		return new Date(ms).toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 	}
 
-	// Redirect listeners to the speaker's shared page when following.
+	// Auto-clear session error after 3 s so the banner doesn't linger.
 	$effect(() => {
-		if (!session?.connected || session.canSpeak || !session.following) return;
-		const sh = session.share;
-		if (!sh) return;
-		const cur = page.url.pathname + page.url.search;
-		if (sh.kind === 'route' && page.url.pathname !== sh.path) {
-			void goto(sh.path);
-		} else if (sh.kind === 'page') {
-			const dest = `/read/${sh.page}`;
-			if (cur !== dest) void goto(dest);
-		} else if (sh.kind === 'mathurat') {
-			if (page.url.pathname !== '/mathurat/baca') void goto('/mathurat/baca');
-		}
+		if (!session?.error) return;
+		const t = setTimeout(() => { if (session) session.error = null; }, 3000);
+		return () => clearTimeout(t);
 	});
+
+
 </script>
 
 <svelte:head><title>{roomTitle} — Halaqah Cakna</title></svelte:head>
@@ -98,6 +103,12 @@
 			<div class="state-view">
 				<div class="spinner"></div>
 				<p class="state-msg">Menyambung ke sesi…</p>
+			</div>
+		{:else if halaqah.hasLeft(slug)}
+			<div class="state-view">
+				<p class="state-msg">Anda telah meninggalkan sesi.</p>
+				<button class="rejoin-btn" onclick={rejoin}>Sertai Semula</button>
+				<a href="/halaqah" class="state-back">Kembali ke Halaqah</a>
 			</div>
 		{:else if joinError}
 			<div class="state-view">
@@ -197,9 +208,22 @@
 					</section>
 				{/if}
 
+				<!-- Session-level error banner (e.g. mic denied for listener) -->
+				{#if session.error}
+					<div class="sess-error">
+						{session.error}
+					</div>
+				{/if}
+
 				<!-- Controls -->
 				<div class="controls" class:controls-4={session.canSpeak}>
-					<button class="ctrl-btn" class:ctrl-active={session.micOn} onclick={toggleMic}>
+					<button
+						class="ctrl-btn"
+						class:ctrl-active={session.micOn}
+						class:ctrl-listener={!session.canSpeak}
+						onclick={toggleMic}
+						title={!session.canSpeak ? 'Hanya penceramah boleh menggunakan mikrofon' : session.micOn ? 'Matikan mikrofon' : 'Hidupkan mikrofon'}
+					>
 						{#if session.micOn}
 							<Mic size={22} />
 							<span>Mik Hidup</span>
@@ -221,13 +245,13 @@
 						</button>
 					{/if}
 
-{#if session.role === 'host'}
+					{#if session.role === 'host'}
 						<button class="ctrl-btn ctrl-danger" onclick={close}>
 							<X size={22} />
 							<span>Tutup</span>
 						</button>
 					{:else}
-						<button class="ctrl-btn ctrl-danger" onclick={leave}>
+						<button class="ctrl-btn ctrl-leave" onclick={leave}>
 							<LogOut size={22} />
 							<span>Keluar</span>
 						</button>
@@ -236,11 +260,11 @@
 
 				<!-- Share content preview -->
 				{#if session.share}
-					{@const shareUrl = session.share.kind === 'page' ? `/read/${session.share.page}` : session.share.kind === 'mathurat' ? '/mathurat/baca' : session.share.path}
+					{@const shareUrl = session.share.kind === 'page' ? `/mushaf?page=${session.share.page}` : session.share.kind === 'mathurat' ? `/mathurat/embed?v=${session.share.version}&m=${session.share.mode}&i=${session.share.idx}` : session.share.path}
 					<div class="content-preview">
 						<div class="preview-hdr">
 							{#if session.share.kind === 'page'}
-								<a class="preview-lbl" href="/read/{session.share.page}"><BookOpen size={13} /> Halaman {session.share.page}</a>
+								<a class="preview-lbl" href="/mushaf?page={session.share.page}"><BookOpen size={13} /> Halaman {session.share.page}</a>
 							{:else if session.share.kind === 'mathurat'}
 								<a class="preview-lbl" href="/mathurat"><ScrollText size={13} /> Al-Ma'thurat</a>
 							{:else if session.share.kind === 'route'}
@@ -350,6 +374,16 @@
 		color: rgba(74,222,128,0.9);
 		font-size: 13px; text-decoration: none;
 	}
+	.rejoin-btn {
+		padding: 10px 24px;
+		border-radius: 12px;
+		background: rgba(34,197,94,0.15);
+		border: 1px solid rgba(34,197,94,0.3);
+		color: rgba(74,222,128,0.95);
+		font-size: 14px; font-weight: 600; cursor: pointer;
+		transition: background 0.15s;
+	}
+	.rejoin-btn:hover { background: rgba(34,197,94,0.25); }
 
 	/* Session view */
 	.session-view { padding: 16px 16px 40px; display: flex; flex-direction: column; gap: 14px; }
@@ -371,7 +405,7 @@
 		font-size: 13px;
 	}
 	.speaker-label { color: rgba(74,222,128,0.7); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
-	.speaker-name { flex: 1; color: var(--pg-text-85); }
+	.speaker-name { flex: 1; color: var(--pg-text); font-weight: 500; }
 
 	/* Section */
 	.sec-label {
@@ -465,6 +499,27 @@
 	.ctrl-active { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.3); color: rgba(74,222,128,0.9); }
 	.ctrl-danger { color: rgba(248,113,113,0.7); }
 	.ctrl-danger:hover { background: rgba(248,113,113,0.12); border-color: rgba(248,113,113,0.2); }
+
+	/* Leave button — distinct red so it reads as "exit" not "danger close" */
+	.ctrl-leave {
+		color: rgba(248,113,113,0.9);
+		border-color: rgba(248,113,113,0.2);
+	}
+	.ctrl-leave:hover { background: rgba(248,113,113,0.14); border-color: rgba(248,113,113,0.35); color: #f87171; }
+
+	/* Mic button in listener mode — indicates mic is unavailable, still clickable */
+	.ctrl-listener { opacity: 0.55; }
+	.ctrl-listener:hover { opacity: 0.75; }
+
+	/* Session-level error banner */
+	.sess-error {
+		padding: 10px 14px;
+		border-radius: 12px;
+		background: rgba(248,113,113,0.1);
+		border: 1px solid rgba(248,113,113,0.2);
+		color: rgba(248,113,113,0.9);
+		font-size: 12px; text-align: center;
+	}
 
 	/* Content preview (shared content iframe) */
 	.content-preview {

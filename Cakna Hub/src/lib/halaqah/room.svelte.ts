@@ -14,12 +14,19 @@ import {
 	Room,
 	RoomEvent,
 	Track,
+	type LocalTrackPublication,
 	type RemoteParticipant,
 	type RemoteTrack,
 	type RemoteTrackPublication
 } from 'livekit-client';
 
 export type Role = 'host' | 'speaker' | 'listener';
+
+export interface LogEntry {
+	kind: 'started' | 'joined' | 'left';
+	name: string;
+	at: number;
+}
 
 export interface Member {
 	identity: string;
@@ -28,6 +35,8 @@ export interface Member {
 	/** Publishing audio right now (i.e. holds the floor). */
 	canPublish: boolean;
 	speaking: boolean;
+	/** Mic track is live and un-muted. */
+	micEnabled: boolean;
 }
 
 export interface JoinInfo {
@@ -35,6 +44,7 @@ export interface JoinInfo {
 	token: string;
 	identity: string;
 	name: string;
+	host_name: string;
 	role: Role;
 	speaker_id: string | null;
 	page: number;
@@ -112,6 +122,8 @@ export class HalaqahSession {
 	/** The track we visualise: whoever currently holds the floor. */
 	floorTrack = $state<MediaStreamTrack | null>(null);
 	micOn = $state(false);
+	screenShareTrack = $state<MediaStreamTrack | null>(null);
+	screenSharing = $state(false);
 	connected = $state(false);
 	error = $state<string | null>(null);
 	title = $state('');
@@ -123,6 +135,13 @@ export class HalaqahSession {
 	 * reads this to see who is following along. See sendHeartbeat / receiveHeartbeat.
 	 */
 	engagement = $state<Record<string, Engagement>>({});
+
+	/** Chronological room activity — joins, leaves, session start. Capped at 100 entries. */
+	logs = $state<LogEntry[]>([]);
+
+	private pushLog(entry: LogEntry) {
+		this.logs = [...this.logs.slice(-99), entry];
+	}
 	private hbTimer: ReturnType<typeof setInterval> | null = null;
 	private lastSampleAt = 0;
 	private myAttentiveMs = 0;
@@ -148,8 +167,12 @@ export class HalaqahSession {
 		this.room = room;
 
 		room
-			.on(RoomEvent.ParticipantConnected, () => this.sync())
+			.on(RoomEvent.ParticipantConnected, (p: RemoteParticipant) => {
+				this.pushLog({ kind: 'joined', name: p.name || p.identity, at: Date.now() });
+				this.sync();
+			})
 			.on(RoomEvent.ParticipantDisconnected, (p: RemoteParticipant) => {
+				this.pushLog({ kind: 'left', name: p.name || p.identity, at: Date.now() });
 				delete this.engagement[p.identity];
 				this.sync();
 			})
@@ -158,19 +181,31 @@ export class HalaqahSession {
 					this.playRemote(t);
 					this.pickFloorTrack();
 				}
+				if (t.source === Track.Source.ScreenShare && t.kind === Track.Kind.Video && t.mediaStreamTrack) {
+					this.screenShareTrack = t.mediaStreamTrack;
+				}
 				this.sync();
 			})
 			.on(RoomEvent.TrackUnsubscribed, (t: RemoteTrack) => {
 				if (t.kind === Track.Kind.Audio) this.stopRemote(t);
+				if (t.source === Track.Source.ScreenShare) this.screenShareTrack = null;
 				this.pickFloorTrack();
 				this.sync();
 			})
 			.on(RoomEvent.ActiveSpeakersChanged, () => this.sync())
-			.on(RoomEvent.LocalTrackPublished, () => {
+			.on(RoomEvent.LocalTrackPublished, (pub: LocalTrackPublication) => {
+				if (pub.source === Track.Source.ScreenShare) {
+					this.screenShareTrack = pub.track?.mediaStreamTrack ?? null;
+					this.screenSharing = true;
+				}
 				this.pickFloorTrack();
 				this.sync();
 			})
-			.on(RoomEvent.LocalTrackUnpublished, () => {
+			.on(RoomEvent.LocalTrackUnpublished, (pub: LocalTrackPublication) => {
+				if (pub.source === Track.Source.ScreenShare) {
+					this.screenShareTrack = null;
+					this.screenSharing = false;
+				}
 				this.pickFloorTrack();
 				this.sync();
 			})
@@ -209,6 +244,13 @@ export class HalaqahSession {
 			await room.connect(info.url, info.token);
 			this.connected = true;
 			this.error = null;
+			this.pushLog({ kind: 'started', name: info.host_name, at: Date.now() });
+			// Log the local participant's own join. ParticipantConnected never fires
+			// for yourself, so this is the only place to record it. Hosts skip it —
+			// the 'started' entry above already represents their presence.
+			if (info.role !== 'host') {
+				this.pushLog({ kind: 'joined', name: info.name, at: Date.now() });
+			}
 			// A room may already have a speaker when we arrive.
 			this.readMetadata(room.metadata);
 			this.sync();
@@ -519,6 +561,22 @@ export class HalaqahSession {
 		}
 	}
 
+	async toggleScreenShare() {
+		const room = this.room;
+		if (!room || !this.canSpeak) return;
+		try {
+			if (this.screenSharing) {
+				await room.localParticipant.setScreenShareEnabled(false);
+			} else {
+				await room.localParticipant.setScreenShareEnabled(true, {
+						video: { displaySurface: 'browser' }
+					});
+			}
+		} catch (e) {
+			this.error = e instanceof Error ? e.message : String(e);
+		}
+	}
+
 	/**
 	 * Choose which audio track feeds the visualiser: the remote participant who
 	 * may publish, else our own mic if we hold the floor.
@@ -552,22 +610,26 @@ export class HalaqahSession {
 		}
 		const speaking = new Set(room.activeSpeakers.map((p) => p.identity));
 		const lp = room.localParticipant;
+		const localMicPub = lp.getTrackPublication(Track.Source.Microphone);
 		const list: Member[] = [
 			{
 				identity: lp.identity,
 				name: lp.name || lp.identity,
 				isLocal: true,
 				canPublish: lp.permissions?.canPublish ?? false,
-				speaking: speaking.has(lp.identity)
+				speaking: speaking.has(lp.identity),
+				micEnabled: !!localMicPub && !localMicPub.isMuted
 			}
 		];
 		for (const p of room.remoteParticipants.values() as Iterable<RemoteParticipant>) {
+			const micPub = p.getTrackPublication(Track.Source.Microphone);
 			list.push({
 				identity: p.identity,
 				name: p.name || p.identity,
 				isLocal: false,
 				canPublish: p.permissions?.canPublish ?? false,
-				speaking: speaking.has(p.identity)
+				speaking: speaking.has(p.identity),
+				micEnabled: !!micPub && !micPub.isMuted
 			});
 		}
 		this.members = list;

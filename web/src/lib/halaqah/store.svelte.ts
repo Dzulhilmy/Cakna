@@ -24,6 +24,8 @@ class HalaqahStore {
 	 * leaving the room stuck on "Menyambung…" forever.
 	 */
 	private pending: { slug: string; promise: Promise<HalaqahSession> } | null = null;
+	/** Incremented by leave()/close() to invalidate any in-flight join. */
+	private generation = 0;
 
 	get active() {
 		return this.session?.connected === true;
@@ -40,6 +42,7 @@ class HalaqahStore {
 		// Already connecting to this room — hand back the SAME promise.
 		if (this.pending?.slug === slug) return this.pending.promise;
 
+		const gen = ++this.generation;
 		const promise = (async () => {
 			// Switching rooms: close the old one first.
 			if (this.session && this.session.slug !== slug) await this.leave();
@@ -54,6 +57,12 @@ class HalaqahStore {
 			}
 			const s = new HalaqahSession();
 			await s.connect((await r.json()) as JoinInfo);
+			// If leave() was called while this was in flight, discard the connection
+			// rather than letting it silently override the cleared session.
+			if (gen !== this.generation) {
+				await s.disconnect();
+				return s;
+			}
 			this.session = s;
 			return s;
 		})();
@@ -67,6 +76,7 @@ class HalaqahStore {
 
 	/** Leave the room (others carry on). */
 	async leave() {
+		this.generation++; // invalidate any in-flight join promise
 		const s = this.session;
 		this.session = null;
 		this.pending = null;
