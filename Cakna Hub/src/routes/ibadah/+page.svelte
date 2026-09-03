@@ -3,6 +3,7 @@
 	import { ChevronLeft } from 'lucide-svelte';
 	import SideNav from '$lib/components/SideNav.svelte';
 	import { settings, manasik } from '$lib/state/stores.svelte';
+	import { segmentTaj } from '$lib/quran/tajweed';
 
 	let loading = $state(true);
 	let fetchError = $state('');
@@ -150,10 +151,12 @@
 							</div>
 
 							<!-- Arabic / tajweed -->
-							{#if step.tajweed}
-								<p class="step-ar" dir="rtl">{@html step.tajweed}</p>
-							{:else if step.arabic}
-								<p class="step-ar" dir="rtl">{step.arabic}</p>
+							{#if step.arabic}
+								<p class="step-ar" dir="rtl">
+									{#each segmentTaj(step.arabic, Array.isArray(step.tajweed) ? step.tajweed : null, settings.value.tajweed) as seg}
+										{#if seg.rule !== null}<i class="tj t{seg.rule}">{seg.text}</i>{:else}{seg.text}{/if}
+									{/each}
+								</p>
 							{/if}
 
 							<!-- Description -->

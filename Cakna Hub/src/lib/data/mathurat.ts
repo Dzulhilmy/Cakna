@@ -80,3 +80,25 @@ export const pickText = (
 /** Clamp an index into a version's list — share payloads arrive from the network. */
 export const safeIdx = (version: Versi, idx: number): number =>
 	Math.min(Math.max(0, Math.floor(idx) || 0), LISTS[version].length - 1);
+
+const AR_DIGITS: Record<string, number> = {
+	'٠': 0, '١': 1, '٢': 2, '٣': 3, '٤': 4,
+	'٥': 5, '٦': 6, '٧': 7, '٨': 8, '٩': 9
+};
+
+/** Find an inline ﴿n×﴾ repeat marker and return the phrase before it + count. */
+export const findUlang = (text: string): { count: number; phrase: string } | null => {
+	const m = text.match(/([^،,\n]+)﴿([٠-٩]+)×﴾/u);
+	if (!m) return null;
+	const count = [...m[2]].reduce((n, d) => n * 10 + (AR_DIGITS[d] ?? 0), 0);
+	if (!count) return null;
+	return { count, phrase: m[1].trim() };
+};
+
+/** Arabic text with the repeated phrase wrapped in <mark class="ulang-mark">. */
+export const arWithHighlight = (text: string): string => {
+	return text.replace(
+		/([^،,\n]+)(﴿[٠-٩]+×﴾)/gu,
+		(_, phrase, marker) => `<mark class="ulang-mark">${phrase}</mark>${marker}`
+	);
+};

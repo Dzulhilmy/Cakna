@@ -27,6 +27,20 @@ body {
   color: var(--accent);
 }
 
+/* Tajweed spans */
+.tj { font-style: normal; }
+.t0  { color: var(--tj-0);  }
+.t1  { color: var(--tj-1);  }
+.t2  { color: var(--tj-2);  }
+.t3  { color: var(--tj-3);  }
+.t4  { color: var(--tj-4);  }
+.t5  { color: var(--tj-5);  }
+.t6  { color: var(--tj-6);  }
+.t7  { color: var(--tj-7);  }
+.t8  { color: var(--tj-8);  }
+.t9  { color: var(--tj-9);  }
+.t10 { color: var(--tj-10); }
+
 @media print {
   .no-print {
     display: none !important;

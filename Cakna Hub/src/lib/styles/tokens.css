@@ -59,6 +59,19 @@
   --pg-muted:      rgba(0,0,0,0.45);
   --pg-subtle:     rgba(0,0,0,0.25);
   --pg-faint:      rgba(0,0,0,0.18);
+
+  /* Tajweed colours — light mode */
+  --tj-0:  #1e8e5a;
+  --tj-1:  #8e44ad;
+  --tj-2:  #0e9aa7;
+  --tj-3:  #6c7a45;
+  --tj-4:  #2e75d1;
+  --tj-5:  #a93a8c;
+  --tj-6:  #0b7a69;
+  --tj-7:  #d35400;
+  --tj-8:  #c0392b;
+  --tj-9:  #c2185b;
+  --tj-10: #8e1600;
 }
 
 html[data-theme="dark"] {
@@ -78,4 +91,17 @@ html[data-theme="dark"] {
   --pg-muted:      rgba(255,255,255,0.45);
   --pg-subtle:     rgba(255,255,255,0.25);
   --pg-faint:      rgba(255,255,255,0.18);
+
+  /* Tajweed colours — dark mode */
+  --tj-0:  #4cc38a;
+  --tj-1:  #c39bdd;
+  --tj-2:  #5bc8d4;
+  --tj-3:  #adbe85;
+  --tj-4:  #82b3f2;
+  --tj-5:  #e091c8;
+  --tj-6:  #54bfa6;
+  --tj-7:  #f0a05a;
+  --tj-8:  #f1948a;
+  --tj-9:  #f06292;
+  --tj-10: #e57373;
 }

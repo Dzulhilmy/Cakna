@@ -8,7 +8,8 @@ const config = {
 		adapter: adapter(),
 		appDir: '_hub',
 		alias: {
-			$lib: './src/lib'
+			$lib: './src/lib',
+			$data: './data/frontend'
 		}
 	}
 };
