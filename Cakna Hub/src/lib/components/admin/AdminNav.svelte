@@ -21,7 +21,8 @@
 		{ href: '/hub/admin/programs', label: 'Programs' },
 		{ href: '/hub/admin/site', label: 'Website' },
 		{ href: '/hub/admin/media', label: 'Media' },
-		{ href: '/hub/admin/users', label: 'Users' }
+		{ href: '/hub/admin/users', label: 'Users' },
+		{ href: '/hub/admin/halaqah', label: 'Halaqah' }
 	];
 
 	const links = $derived.by(() => {

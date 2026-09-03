@@ -13,7 +13,7 @@
 	import { page } from '$app/state';
 	import { halaqah } from '$lib/halaqah/store.svelte';
 	import AudioVisualizer from '$lib/components/modules/AudioVisualizer.svelte';
-	import { Maximize2, Minimize2, X, Mic, MicOff, Copy, Users, Crown, Radio, Monitor, BookOpen, ScrollText, MapPin } from 'lucide-svelte';
+	import { Maximize2, Minimize2, X, Mic, MicOff, Copy, Users, Crown, Radio, Monitor, BookOpen, ScrollText, MapPin, LogOut } from 'lucide-svelte';
 
 	const s = $derived(halaqah.session);
 	const inRoom = $derived(page.url.pathname.startsWith('/halaqah/'));
@@ -279,14 +279,14 @@
 				{#if expanded}<Minimize2 size={14} />{:else}<Maximize2 size={14} />{/if}
 			</button>
 
-			<!-- Leave -->
+			<!-- Close (host) / Leave (listener) -->
 			<button
 				class="ic ic-leave"
 				onpointerdown={(e) => e.stopPropagation()}
-				onclick={() => halaqah.leave()}
-				title="Keluar halaqah"
+				onclick={() => s.role === 'host' ? halaqah.close() : halaqah.leave()}
+				title={s.role === 'host' ? 'Tamatkan sesi' : 'Keluar halaqah'}
 			>
-				<X size={14} />
+				{#if s.role === 'host'}<X size={14} />{:else}<LogOut size={14} />{/if}
 			</button>
 		</div>
 

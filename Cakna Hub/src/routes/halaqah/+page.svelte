@@ -1,26 +1,25 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { goto } from '$app/navigation';
 	import AudioVisualizer from '$lib/components/modules/AudioVisualizer.svelte';
 	import { halaqah } from '$lib/halaqah/store.svelte';
 	import { ChevronLeft, Mic, MicOff, Users, LogOut, Copy, X, Radio, BookOpen, ScrollText, MapPin } from 'lucide-svelte';
 	import SideNav from '$lib/components/SideNav.svelte';
 
+	let { data } = $props();
+
 	let slug = $state(page.url.searchParams.get('slug') ?? '');
 	let joining = $state(false);
 	let joinError = $state<string | null>(null);
-	let createSlug = $state('');
-	let showCreate = $state(false);
 
 	const session = $derived(halaqah.session);
 	const active = $derived(halaqah.active);
 
-	async function join() {
-		if (!slug.trim()) return;
+	async function join(s = slug) {
+		if (!s.trim()) return;
 		joining = true;
 		joinError = null;
 		try {
-			await halaqah.join(slug.trim().toLowerCase());
+			await halaqah.join(s.trim().toLowerCase());
 		} catch (e: unknown) {
 			joinError = e instanceof Error ? e.message : 'Gagal menyambung. Cuba lagi.';
 		} finally {
@@ -37,7 +36,7 @@
 	}
 
 	function copyLink() {
-		const url = `${location.origin}/halaqah?slug=${session?.slug}`;
+		const url = `${location.origin}/halaqah/${session?.slug}`;
 		navigator.clipboard.writeText(url);
 	}
 
@@ -45,8 +44,16 @@
 		session?.setMic(!session.micOn);
 	}
 
-	const memberCount = $derived(session?.members?.size ?? 0);
+	const memberCount = $derived(session?.members?.length ?? 0);
 	const roomTitle = $derived(session?.title ?? session?.slug ?? '');
+
+	function fmtAge(iso: string) {
+		const ms = Date.now() - new Date(iso).getTime();
+		const m = Math.floor(ms / 60000);
+		if (m < 1) return 'Baru sahaja';
+		if (m < 60) return `${m} min lalu`;
+		return `${Math.floor(m / 60)} jam lalu`;
+	}
 </script>
 
 <svelte:head><title>Halaqah — Cakna</title></svelte:head>
@@ -89,7 +96,7 @@
 
 				<!-- Speaker info -->
 				{#if session.speakerId}
-					{@const speaker = session.members.get(session.speakerId)}
+					{@const speaker = session.members.find((m) => m.identity === session.speakerId)}
 					<div class="speaker-card">
 						<Radio size={16} class="text-rose-400" />
 						<span class="speaker-label">Penceramah</span>
@@ -104,7 +111,7 @@
 						Ahli ({memberCount})
 					</h2>
 					<div class="members-grid">
-						{#each [...(session.members?.values() ?? [])] as m (m.identity)}
+						{#each session.members as m (m.identity)}
 							<div class="member-chip" class:member-speaking={m.identity === session.speakerId}>
 								<span class="member-avatar">{m.name?.[0]?.toUpperCase() ?? '?'}</span>
 								<span class="member-name">{m.name}</span>
@@ -149,12 +156,12 @@
 				<!-- Share state -->
 				{#if session.share}
 					<div class="share-info">
-						{#if session.share.type === 'page'}
+						{#if session.share.kind === 'page'}
 							<span class="share-label"><BookOpen size={14} /> Halaman {session.share.page}</span>
-						{:else if session.share.type === 'mathurat'}
+						{:else if session.share.kind === 'mathurat'}
 							<span class="share-label"><ScrollText size={14} /> Al-Ma'thurat</span>
 						{:else}
-							<span class="share-label"><MapPin size={14} /> {session.share.route}</span>
+							<span class="share-label"><MapPin size={14} /> {session.share.label}</span>
 						{/if}
 						{#if !session.following && session.role !== 'host'}
 							<button class="follow-btn" onclick={() => session?.followSpeaker()}>Ikut</button>
@@ -170,7 +177,7 @@
 				{/if}
 			</div>
 		{:else}
-			<!-- Join / Create -->
+			<!-- Join / Lobby -->
 			<div class="lobby">
 				<div class="lobby-hero">
 					<div class="lobby-icon">
@@ -191,7 +198,7 @@
 							bind:value={slug}
 							onkeydown={(e) => e.key === 'Enter' && join()}
 						/>
-						<button class="join-btn" onclick={join} disabled={joining || !slug.trim()}>
+						<button class="join-btn" onclick={() => join()} disabled={joining || !slug.trim()}>
 							{joining ? 'Menyambung…' : 'Sertai'}
 						</button>
 					</div>
@@ -199,6 +206,37 @@
 						<p class="join-error">{joinError}</p>
 					{/if}
 				</div>
+
+				<!-- Active rooms -->
+				{#if data.rooms.length > 0}
+					<div class="rooms-section">
+						<h2 class="card-title">Sesi Aktif</h2>
+						<div class="rooms-list">
+							{#each data.rooms as room (room.id)}
+								<div class="room-row">
+									<div class="room-info">
+										<span class="room-live-dot"></span>
+										<div>
+											<div class="room-title">{room.title}</div>
+											{#if room.host_name}
+												<div class="room-meta">Hos: {room.host_name} · {fmtAge(room.created_at)}</div>
+											{:else}
+												<div class="room-meta">{fmtAge(room.created_at)}</div>
+											{/if}
+										</div>
+									</div>
+									<button
+										class="join-btn room-join-btn"
+										onclick={() => join(room.slug)}
+										disabled={joining}
+									>
+										Sertai
+									</button>
+								</div>
+							{/each}
+						</div>
+					</div>
+				{/if}
 
 				<!-- Feature bullets -->
 				<div class="features">
@@ -224,8 +262,6 @@
 						</div>
 					</div>
 				</div>
-
-				<p class="lobby-note">Untuk mencipta sesi, hubungi penganjur atau gunakan apl Cakna.</p>
 			</div>
 		{/if}
 	</main>
@@ -370,6 +406,7 @@
 		color: rgba(74,222,128,0.9);
 		font-size: 11px; cursor: pointer;
 	}
+	.share-label { display: flex; align-items: center; gap: 6px; }
 
 	.unlock-btn {
 		width: 100%;
@@ -406,9 +443,9 @@
 		border: 1px solid var(--pg-btn-border);
 		border-radius: 16px;
 		padding: 18px;
-		margin-bottom: 24px;
+		margin-bottom: 16px;
 	}
-	.card-title { font-size: 13px; font-weight: 700; color: var(--pg-btn-color); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.08em; }
+	.card-title { font-size: 11px; font-weight: 700; color: var(--pg-btn-color); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.08em; }
 	.join-row { display: flex; gap: 8px; }
 	.join-input {
 		flex: 1;
@@ -436,6 +473,34 @@
 	.join-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 	.join-error { font-size: 12px; color: #f87171; margin-top: 8px; }
 
+	/* Active rooms */
+	.rooms-section {
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-btn-border);
+		border-radius: 16px;
+		padding: 18px;
+		margin-bottom: 16px;
+	}
+	.rooms-list { display: flex; flex-direction: column; gap: 8px; }
+	.room-row {
+		display: flex; align-items: center; justify-content: space-between; gap: 12px;
+		padding: 10px 12px;
+		border-radius: 12px;
+		background: var(--pg-btn);
+		border: 1px solid var(--pg-btn-border);
+	}
+	.room-info { display: flex; align-items: center; gap: 10px; min-width: 0; }
+	.room-live-dot {
+		width: 8px; height: 8px; flex-shrink: 0;
+		border-radius: 50%;
+		background: rgba(74,222,128,0.8);
+		box-shadow: 0 0 6px rgba(74,222,128,0.5);
+		animation: pulse 1.5s ease-in-out infinite;
+	}
+	.room-title { font-size: 13px; font-weight: 600; color: var(--pg-fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+	.room-meta { font-size: 11px; color: var(--pg-subtle); margin-top: 1px; }
+	.room-join-btn { padding: 7px 14px; font-size: 12px; flex-shrink: 0; }
+
 	.features { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
 	.feat {
 		display: flex; align-items: flex-start; gap: 14px;
@@ -445,10 +510,8 @@
 		border: 1px solid var(--pg-surface-b);
 	}
 	.feat-icon { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 12px; background: rgba(74,222,128,0.08); color: rgba(74,222,128,0.8); flex-shrink: 0; }
-	.share-label { display: flex; align-items: center; gap: 6px; }
 	.feat-title { font-size: 14px; font-weight: 600; color: var(--pg-text-75); margin-bottom: 2px; }
 	.feat-sub { font-size: 12px; color: var(--pg-subtle); }
 
-	.lobby-note { font-size: 12px; color: var(--pg-faint); text-align: center; }
 	.w-9 { width: 36px; }
 </style>

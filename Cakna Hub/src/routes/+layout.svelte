@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import { settings } from '$lib/state/stores.svelte';
+	import HalaqahBar from '$lib/components/chrome/HalaqahBar.svelte';
 
 	let { children } = $props();
 
@@ -10,3 +11,4 @@
 </script>
 
 {@render children()}
+<HalaqahBar />
