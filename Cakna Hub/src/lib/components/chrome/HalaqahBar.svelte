@@ -144,9 +144,7 @@
 		'/puasa': 'Rekod Puasa',
 		'/zakat': 'Kalkulator Zakat',
 		'/search': 'Cari Ayat',
-		'/menu': 'Lagi',
-		'/settings': 'Tetapan',
-		'/read': 'Mushaf',
+		'/mushaf': 'Mushaf',
 		'/': 'Utama'
 	};
 

@@ -83,7 +83,7 @@
 
 <div class="hlq-root">
 	<header class="hlq-header">
-		<a href="https://cakna.org/hub" class="hdr-btn">
+		<a href="/hub" class="hdr-btn">
 			<ChevronLeft size={20} />
 		</a>
 		<div class="hdr-center">
