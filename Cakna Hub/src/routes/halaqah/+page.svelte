@@ -264,6 +264,30 @@
 				{#if joinError}
 					<p class="join-error">{joinError}</p>
 				{/if}
+
+				<div class="features">
+					<div class="feat">
+						<span class="feat-icon"><BookOpen size={18} /></span>
+						<div>
+							<div class="feat-title">Mushaf Bersama</div>
+							<div class="feat-sub">Halaman Quran disinkron secara masa nyata</div>
+						</div>
+					</div>
+					<div class="feat">
+						<span class="feat-icon"><Mic size={18} /></span>
+						<div>
+							<div class="feat-title">Audio Langsung</div>
+							<div class="feat-sub">Dengar bacaan guru terus dalam sesi</div>
+						</div>
+					</div>
+					<div class="feat">
+						<span class="feat-icon"><ScrollText size={18} /></span>
+						<div>
+							<div class="feat-title">Al-Ma'thurat Bersama</div>
+							<div class="feat-sub">Bacaan wirid dikongsi dengan ahli sesi</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		{/if}
 	</main>
@@ -522,6 +546,23 @@
 	.room-join-label { font-size: 12px; font-weight: 600; color: rgba(74,222,128,0.85); flex-shrink: 0; }
 
 	.join-error { font-size: 12px; color: #f87171; text-align: center; }
+
+	.features { display: flex; flex-direction: column; gap: 2px; }
+	.feat {
+		display: flex; align-items: center; gap: 12px;
+		padding: 12px 14px;
+		border-radius: 12px;
+	}
+	.feat:hover { background: var(--pg-surface); }
+	.feat-icon {
+		display: grid; place-items: center;
+		width: 36px; height: 36px; flex-shrink: 0;
+		border-radius: 10px;
+		background: rgba(74,222,128,0.08);
+		color: rgba(74,222,128,0.75);
+	}
+	.feat-title { font-size: 13px; font-weight: 600; color: var(--pg-text-75); }
+	.feat-sub { font-size: 12px; color: var(--pg-subtle); margin-top: 1px; }
 
 	.w-9 { width: 36px; }
 </style>
