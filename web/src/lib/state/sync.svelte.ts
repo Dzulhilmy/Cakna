@@ -64,6 +64,17 @@ function mergeValues(key: SyncKey, local: unknown, remote: unknown): unknown {
 			recs: [...r.recs, ...l.recs.filter((x) => !seen.has(x.d + x.t))]
 		};
 	}
+	if (key === 'mathurat') {
+		// Merge rekod: union of all days; for each day union pagi/petang flags
+		// so a locally-completed session is never discarded by a stale server value.
+		const r = remote as { rekod?: Record<string, Record<string, boolean>> };
+		const l = local as { rekod?: Record<string, Record<string, boolean>> };
+		const mergedRekod = { ...(r.rekod ?? {}) };
+		for (const [date, sessions] of Object.entries(l.rekod ?? {})) {
+			mergedRekod[date] = { ...(mergedRekod[date] ?? {}), ...sessions };
+		}
+		return { ...r, rekod: mergedRekod };
+	}
 	return remote;
 }
 
@@ -113,6 +124,20 @@ export function setupPersistence() {
 		if (document.visibilityState === 'hidden') flush();
 	};
 	document.addEventListener('visibilitychange', onVisibility);
-	window.addEventListener('beforeunload', () => flush());
+	window.addEventListener('beforeunload', () => {
+		// Must use keepalive fetch here — async flush() is abandoned on page unload.
+		// keepalive requests are guaranteed to complete even through navigation/refresh.
+		if (!auth.user || pending.size === 0) return;
+		if (timer) { clearTimeout(timer); timer = null; }
+		const items = [...pending].map((key) => ({ key, value: registry.get(key)!.value }));
+		pending = new Set();
+		fetch('/api/sync', {
+			method: 'PUT',
+			credentials: 'same-origin',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify(items),
+			keepalive: true
+		}).catch(() => {});
+	});
 	return () => document.removeEventListener('visibilitychange', onVisibility);
 }

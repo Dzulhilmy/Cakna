@@ -28,7 +28,8 @@ export const MERGE_KEYS: SyncKey[] = [
 	'hls',
 	'read',
 	'readlog',
-	'puasa'
+	'puasa',
+	'mathurat'
 ];
 
 export const registry = new Map<SyncKey, Persisted<unknown>>();
