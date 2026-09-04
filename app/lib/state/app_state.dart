@@ -58,6 +58,13 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Hub UI language: 'ms' | 'en'
+  String get uiLang => prefs.getString('uiLang') ?? 'ms';
+  set uiLang(String v) {
+    prefs.setString('uiLang', v);
+    notifyListeners();
+  }
+
   /// audio reciter edition id (islamic.network), e.g. 'ar.alafasy'
   String get reciter => prefs.getString('reciter') ?? 'ar.alafasy';
   set reciter(String v) {

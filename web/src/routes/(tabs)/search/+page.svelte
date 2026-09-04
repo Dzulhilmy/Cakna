@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import { search } from '$lib/api/content';
 	import type { SearchHit, SearchResult } from '$lib/api/types';
 	import PageHeader from '$lib/components/chrome/PageHeader.svelte';
@@ -57,7 +58,7 @@
 	}
 
 	function open(hit: SearchHit) {
-		goto(`/read/${hit.page}?g=${hit.global}`);
+		goto(`${base}/read/${hit.page}?g=${hit.global}`);
 	}
 
 	function snip(s: string): string {

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import { page } from '$app/state';
 	import { ApiError } from '$lib/api/client';
 	import { auth } from '$lib/state/auth.svelte';
@@ -76,7 +77,7 @@
 				/* sync failure is non-fatal on login */
 			}
 			if (navigator.vibrate) navigator.vibrate(15);
-			goto(next ?? '/');
+			goto(next ?? `${base}/`);
 		} catch (err) {
 			fail(errMsg(err));
 		} finally {
@@ -217,10 +218,10 @@
 		<p class="register">
 			{#if isLogin}
 				{ms ? 'Belum ada akaun?' : 'No account yet?'}
-				<a href="/auth/register">{ms ? 'Daftar' : 'Register'}</a>
+				<a href="{base}/auth/register">{ms ? 'Daftar' : 'Register'}</a>
 			{:else}
 				{ms ? 'Sudah ada akaun?' : 'Already have an account?'}
-				<a href="/auth/login">{ms ? 'Log masuk' : 'Sign in'}</a>
+				<a href="{base}/auth/login">{ms ? 'Log masuk' : 'Sign in'}</a>
 			{/if}
 		</p>
 

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { base } from '$app/paths';
 	import { Button } from '$lib/components/ui/button';
 	import { Progress } from '$lib/components/ui/progress';
 	import { gToSA, juzOf, pageRange, SURAHS, TOTAL_PAGES } from '$lib/quran/meta';
@@ -67,14 +68,14 @@
 		return t('next_in', { t: (j > 0 ? `${j} ${t('jam')} ` : '') + `${m} ${t('minit')}` });
 	});
 
-	const shortcuts = [
-		{ href: '/solat', key: 'mod_panelSolat', icon: Clock },
-		{ href: '/qibla', key: 'mod_panelQiblat', icon: Compass },
-		{ href: '/zikir', key: 'mod_panelZikir', icon: HandHeart },
-		{ href: '/asma', key: 'mod_panelAsma', icon: Star },
-		{ href: '/doa', key: 'mod_panelDoa', icon: Droplet },
-		{ href: '/khatam', key: 'mod_panelSasaran', icon: Target }
-	];
+	const shortcuts = $derived([
+		{ href: `${base}/solat`, key: 'mod_panelSolat', icon: Clock },
+		{ href: `${base}/qibla`, key: 'mod_panelQiblat', icon: Compass },
+		{ href: `${base}/zikir`, key: 'mod_panelZikir', icon: HandHeart },
+		{ href: `${base}/asma`, key: 'mod_panelAsma', icon: Star },
+		{ href: `${base}/doa`, key: 'mod_panelDoa', icon: Droplet },
+		{ href: `${base}/khatam`, key: 'mod_panelSasaran', icon: Target }
+	]);
 </script>
 
 <div class="mx-auto max-w-[680px] px-4 py-4">
@@ -106,7 +107,7 @@
 
 	<!-- Sambung bacaan -->
 	<a
-		href={`/read/${pg}`}
+		href={`${base}/read/${pg}`}
 		class="mt-4 block rounded-2xl bg-primary p-4 text-primary-foreground shadow-sm transition-transform active:scale-[0.99]"
 	>
 		<div class="text-[11px] font-semibold uppercase tracking-[0.12em] opacity-80">
@@ -126,7 +127,7 @@
 
 	<!-- Solat seterusnya -->
 	<a
-		href="/solat"
+		href="{base}/solat"
 		class="mt-3 flex items-center gap-3 rounded-2xl border bg-card p-4 transition-transform active:scale-[0.99]"
 	>
 		<div class="min-w-0 flex-1">
@@ -149,7 +150,7 @@
 
 	<!-- Kemajuan khatam -->
 	<a
-		href="/khatam"
+		href="{base}/khatam"
 		class="mt-3 block rounded-2xl border bg-card p-4 transition-transform active:scale-[0.99]"
 	>
 		<div class="flex items-baseline justify-between gap-2 text-[13px]">
@@ -178,7 +179,7 @@
 	</div>
 
 	<!-- Buka mushaf -->
-	<Button href="/read" class="mt-5 h-12 w-full rounded-2xl text-[15px]">
+	<Button href="{base}/read" class="mt-5 h-12 w-full rounded-2xl text-[15px]">
 		<BookOpen size={18} />
 		{t('h_open')}
 	</Button>

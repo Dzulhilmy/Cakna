@@ -15,7 +15,8 @@
 		reverse_proxy api:8080
 	}
 
-	# Hub web app: public website, hub partition, auth login, admin, notifications
+	# Hub web app: public website, hub partition, auth login, admin, notifications,
+	# and all content pages that the Hub owns.
 	@hub {
 		path /
 		path /_hub/*
@@ -24,6 +25,7 @@
 		path /hub
 		path /hub/*
 		path /auth/login
+		path /auth/register
 		path /logout
 		path /notifications
 		path /notifications/*
@@ -42,6 +44,25 @@
 		path /mushaf/*
 		path /proxy/*
 		path /qdata/*
+		# Content pages — owned by Hub, not the web SPA catch-all
+		path /solat
+		path /mathurat
+		path /mathurat/*
+		path /halaqah
+		path /halaqah/*
+		path /zikir
+		path /selawat
+		path /asma
+		path /doa
+		path /qibla
+		path /puasa
+		path /zakat
+		path /search
+		path /surah
+		path /yasin
+		path /ibadah
+		path /mengaji
+		path /khatam
 	}
 	handle @hub {
 		reverse_proxy hub-svelte:3000
@@ -53,7 +74,17 @@
 		reverse_proxy 172.17.0.1:7880
 	}
 
-	# Everything else → prayer app SPA (/menu, /mathurat, /read/*, /halaqah/*, etc.)
+	# Web SPA — accessible at /web/* with the /web prefix stripped before forwarding.
+	# The SPA is built with paths.base=/web so its router expects this prefix.
+	handle /web {
+		redir /web/ 301
+	}
+	handle /web/* {
+		uri strip_prefix /web
+		reverse_proxy api:8080
+	}
+
+	# Everything else → prayer app SPA legacy catch-all (/menu, /read/*, etc.)
 	handle {
 		reverse_proxy api:8080
 	}

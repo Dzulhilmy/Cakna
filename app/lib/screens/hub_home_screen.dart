@@ -44,9 +44,12 @@ class HubHomeScreen extends StatelessWidget {
     final hub = context.watch<HubContent>();
     final auth = context.watch<Auth>();
     final appState = context.watch<HubApplicationState>();
+    final api = context.read<Auth>().api;
     return Scaffold(
       backgroundColor: const Color(0xFFF7F6F2),
-      body: ListView(
+      body: RefreshIndicator(
+        onRefresh: () => hub.refresh(api),
+        child: ListView(
         padding: EdgeInsets.zero,
         children: [
           _buildHeader(context, hub, auth),
@@ -95,6 +98,7 @@ class HubHomeScreen extends StatelessWidget {
             ),
           ),
         ],
+        ),
       ),
     );
   }

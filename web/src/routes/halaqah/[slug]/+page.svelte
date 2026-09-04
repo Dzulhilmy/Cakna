@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import { untrack } from 'svelte';
 	import AudioVisualizer from '$lib/components/modules/AudioVisualizer.svelte';
 	import MushafPage from '$lib/components/mushaf/MushafPage.svelte';
@@ -70,7 +71,7 @@
 			joinError = s.error;
 		} catch (e) {
 			if ((e as { cause?: number })?.cause === 401) {
-				await goto(`/auth/login?next=/halaqah/${slug}`);
+				await goto(`${base}/auth/login?next=${base}/halaqah/${slug}`);
 				return;
 			}
 			joinError = e instanceof Error ? e.message : String(e);
@@ -101,7 +102,7 @@
 	async function endSession() {
 		if (!confirm('Tutup halaqah ini untuk semua peserta?')) return;
 		await halaqah.close();
-		await goto('/halaqah');
+		await goto(`${base}/halaqah`);
 	}
 
 	/**
@@ -114,7 +115,7 @@
 	async function leave() {
 		if (session.connected && !confirm('Keluar dari halaqah ini? Panggilan anda akan tamat.')) return;
 		await halaqah.leave();
-		await goto('/halaqah');
+		await goto(`${base}/halaqah`);
 	}
 
 	/**
@@ -123,7 +124,7 @@
 	 * halaqah keeps running.
 	 */
 	async function minimise() {
-		await goto('/menu');
+		await goto(`${base}/menu`);
 	}
 
 	/* ---- shared mushaf page --------------------------------------------------
@@ -207,11 +208,11 @@
 		<nav class="jump" aria-label="Buka ciri lain sambil terus dalam panggilan">
 			<span class="jlab">Buka sambil terus mendengar</span>
 			<div class="jrow">
-				<a href="/read/{session.page}">Mushaf</a>
-				<a href="/mathurat">Al-Ma'thurat</a>
-				<a href="/surah">Surah</a>
-				<a href="/zikir">Zikir</a>
-				<a href="/menu">Lagi…</a>
+				<a href="{base}/read/{session.page}">Mushaf</a>
+				<a href="{base}/mathurat">Al-Ma'thurat</a>
+				<a href="{base}/surah">Surah</a>
+				<a href="{base}/zikir">Zikir</a>
+				<a href="{base}/menu">Lagi…</a>
 			</div>
 		</nav>
 	{/if}

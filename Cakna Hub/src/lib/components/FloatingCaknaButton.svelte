@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Floating button that opens the Cakna app menu — always visible, top of the
 	// z-stack. Kept deliberately small so it doesn't obstruct page content.
-	const CAKNA_MENU_URL = 'https://cakna.org/menu';
+	const CAKNA_MENU_URL = 'https://cakna.org/web/menu';
 </script>
 
 <a

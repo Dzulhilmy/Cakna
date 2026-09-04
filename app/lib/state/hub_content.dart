@@ -14,20 +14,34 @@ class HubContent extends ChangeNotifier {
 
   Future<void> load(CaknaApi api) async {
     if (_loaded) return;
+    await _fetch(api);
+  }
+
+  Future<void> refresh(CaknaApi api) async {
+    _loaded = false;
+    await _fetch(api);
+  }
+
+  Future<void> _fetch(CaknaApi api) async {
+    // Public calls always run first — failure here is a real network problem.
+    try {
+      final results = await Future.wait([api.hubSite(), api.hubPrograms()]);
+      site = results[0] as Map<String, dynamic>;
+      programs = results[1] as List<dynamic>;
+    } catch (_) {}
+
+    // Auth-gated calls are best-effort; failure just means the user isn't signed in.
     try {
       final results = await Future.wait([
-        api.hubSite(),
-        api.hubPrograms(),
         api.hubNotifications(),
         api.hubEvents(),
         api.hubNotices(),
       ]);
-      site = results[0] as Map<String, dynamic>;
-      programs = results[1] as List<dynamic>;
-      notifications = results[2] as List<dynamic>;
-      events = results[3] as List<dynamic>;
-      notices = results[4] as List<dynamic>;
+      notifications = results[0];
+      events = results[1];
+      notices = results[2];
     } catch (_) {}
+
     _loaded = true;
     notifyListeners();
   }
@@ -83,5 +97,21 @@ class HubContent extends ChangeNotifier {
     }
     if (v is! List) return [];
     return v.whereType<String>().toList();
+  }
+
+  /// Section display order for the Setem page. Falls back to the canonical default.
+  List<String> setemSectionOrder() {
+    final raw = strList(['sectionOrder', 'setemPage']);
+    return raw.isNotEmpty
+        ? raw
+        : const ['hero', 'gap', 'whatIsSetem', 'whatToExpect', 'whoIsItFor', 'ourProcess', 'cta', 'customSections'];
+  }
+
+  /// Section display order for the About page. Falls back to the canonical default.
+  List<String> aboutSectionOrder() {
+    final raw = strList(['sectionOrder', 'aboutPage']);
+    return raw.isNotEmpty
+        ? raw
+        : const ['hero', 'whoWeAre', 'purpose', 'collabStats', 'testimonial', 'cta', 'customSections'];
   }
 }

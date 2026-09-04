@@ -7,12 +7,13 @@
 	 * reciting, which page they are on, and gets you back in one tap.
 	 */
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import { page } from '$app/state';
 	import { halaqah } from '$lib/halaqah/store.svelte';
 	import AudioVisualizer from '$lib/components/modules/AudioVisualizer.svelte';
 
 	const s = $derived(halaqah.session);
-	const inRoom = $derived(page.url.pathname.startsWith('/halaqah/'));
+	const inRoom = $derived(page.url.pathname.startsWith(`${base}/halaqah/`));
 	const visible = $derived(!!s?.connected && !inRoom);
 
 	const speaking = $derived(s?.members.find((m) => m.speaking)?.name ?? null);
@@ -50,12 +51,12 @@
 		const path = page.url.pathname;
 		if (!sess?.connected || !sess.canSpeak || !sess.sharing) return;
 		// The room view is the room itself — nothing to share from there.
-		if (path.startsWith('/halaqah')) return;
+		if (path.startsWith(`${base}/halaqah`)) return;
 		// The Ma'thurat page publishes its own richer share (which wirid item), so
 		// leave it alone — a generic route share here would immediately clobber it.
-		if (path === '/mathurat') return;
+		if (path === `${base}/mathurat`) return;
 
-		const m = path.match(/^\/read\/(\d+)$/);
+		const m = path.match(new RegExp(`^${base}/read/(\\d+)$`));
 		if (m) {
 			void sess.setShare({ kind: 'page', page: Number(m[1]) });
 		} else {
@@ -68,7 +69,7 @@
 	});
 
 	// The reader is a different route, so jumping there keeps the call alive.
-	const readerHref = $derived(`/read/${s?.page ?? 1}`);
+	const readerHref = $derived(`${base}/read/${s?.page ?? 1}`);
 	const onReaderPage = $derived(page.url.pathname === readerHref);
 
 	/** What is actually on show — the bar used to always claim "halaman N", which
@@ -101,7 +102,7 @@
 {#if visible && s}
 	<div class="wrap" style="bottom: calc(64px + var(--safe-b));">
 		<div class="bar" bind:clientHeight={barH}>
-			<button class="main" onclick={() => goto(`/halaqah/${s.slug}`)}>
+			<button class="main" onclick={() => goto(`${base}/halaqah/${s.slug}`)}>
 				<span class="viz" aria-hidden="true">
 					<AudioVisualizer track={s.floorTrack} live={!!speaking} height={26} bars={10} />
 				</span>

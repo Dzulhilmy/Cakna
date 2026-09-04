@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { base } from '$app/paths';
 	import { settings } from '$lib/state/stores.svelte';
 	import { BookOpen, Clock, House, LayoutGrid, HandHeart } from '@lucide/svelte';
 
@@ -10,16 +11,16 @@
 	);
 
 	const tabs = $derived([
-		{ href: '/', label: labels.home, icon: House },
-		{ href: '/read', label: labels.read, icon: BookOpen },
-		{ href: '/solat', label: labels.solat, icon: Clock },
-		{ href: '/zikir', label: labels.zikir, icon: HandHeart },
-		{ href: '/menu', label: labels.more, icon: LayoutGrid }
+		{ href: `${base}/`, label: labels.home, icon: House },
+		{ href: `${base}/read`, label: labels.read, icon: BookOpen },
+		{ href: `${base}/solat`, label: labels.solat, icon: Clock },
+		{ href: `${base}/zikir`, label: labels.zikir, icon: HandHeart },
+		{ href: `${base}/menu`, label: labels.more, icon: LayoutGrid }
 	]);
 
 	function isActive(href: string): boolean {
 		const p = page.url.pathname;
-		return href === '/' ? p === '/' : p.startsWith(href);
+		return href === `${base}/` ? p === `${base}/` : p.startsWith(href);
 	}
 </script>
 

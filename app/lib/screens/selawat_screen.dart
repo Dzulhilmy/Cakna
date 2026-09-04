@@ -10,7 +10,7 @@ class SelawatScreen extends StatefulWidget {
 }
 
 class _SelawatScreenState extends State<SelawatScreen> {
-  List<dynamic>? _stanzas;
+  List<dynamic> _displayItems = [];
   bool _showMs = true;
 
   @override
@@ -21,7 +21,23 @@ class _SelawatScreenState extends State<SelawatScreen> {
 
   Future<void> _load() async {
     final raw = await rootBundle.loadString('assets/data/selawat.json');
-    setState(() => _stanzas = jsonDecode(raw) as List<dynamic>);
+    final all = jsonDecode(raw) as List<dynamic>;
+
+    // First two ulang stanzas are the repeating refrain
+    final refrain = all.where((s) => s['jenis'] == 'ulang').take(2).toList();
+    final baits = all.where((s) => s['jenis'] == 'bait').toList();
+    final penutup = all.where((s) => s['jenis'] == 'penutup').toList();
+
+    final display = <dynamic>[...refrain];
+    for (int i = 0; i < baits.length; i++) {
+      display.add(baits[i]);
+      if ((i + 1) % 2 == 0) display.addAll(refrain);
+    }
+    // If odd number of baits, still close with refrain
+    if (baits.length % 2 != 0) display.addAll(refrain);
+    display.addAll(penutup);
+
+    setState(() => _displayItems = display);
   }
 
   @override
@@ -40,14 +56,14 @@ class _SelawatScreenState extends State<SelawatScreen> {
           ),
         ],
       ),
-      body: _stanzas == null
+      body: _displayItems.isEmpty
           ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
           : ListView.builder(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
-              itemCount: _stanzas!.length + 1,
+              itemCount: _displayItems.length + 1,
               itemBuilder: (_, i) {
                 if (i == 0) return _header(dark);
-                final s = _stanzas![i - 1];
+                final s = _displayItems[i - 1];
                 final jenis = s['jenis'] as String;
                 return _StanzaCard(stanza: s, jenis: jenis, showMs: _showMs, dark: dark);
               },

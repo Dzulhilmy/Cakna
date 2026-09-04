@@ -18,12 +18,12 @@
 		{ label: 'Waktu Solat', sublabel: 'Jadual solat hari ini', href: '/solat', icon: Clock },
 		{ label: "Al-Ma'thurat", sublabel: 'Wirid pagi & petang', href: '/mathurat', icon: BookMarked },
 		{ label: 'Halaqah', sublabel: 'Sesi pembelajaran', href: '/halaqah', icon: Radio },
-		{ label: 'Zikir & Tasbih', sublabel: 'Zikir harian', href: 'https://cakna.org/zikir', icon: HandHeart },
-		{ label: 'Kiblat', sublabel: 'Arah kiblat', href: 'https://cakna.org/qibla', icon: Compass },
-		{ label: 'Selawat Nabi', sublabel: 'Selawat & salutasi', href: 'https://cakna.org/selawat', icon: Heart },
-		{ label: 'Asmaul Husna', sublabel: '99 nama Allah', href: 'https://cakna.org/asma', icon: Star },
-		{ label: 'Cari Ayat', sublabel: 'Carian dalam Al-Quran', href: 'https://cakna.org/search', icon: Search },
-		{ label: 'Rekod Puasa', sublabel: 'Jejaki puasa sunat', href: 'https://cakna.org/puasa', icon: Moon }
+		{ label: 'Zikir & Tasbih', sublabel: 'Zikir harian', href: 'https://cakna.org/web/zikir', icon: HandHeart },
+		{ label: 'Kiblat', sublabel: 'Arah kiblat', href: 'https://cakna.org/web/qibla', icon: Compass },
+		{ label: 'Selawat Nabi', sublabel: 'Selawat & salutasi', href: 'https://cakna.org/web/selawat', icon: Heart },
+		{ label: 'Asmaul Husna', sublabel: '99 nama Allah', href: 'https://cakna.org/web/asma', icon: Star },
+		{ label: 'Cari Ayat', sublabel: 'Carian dalam Al-Quran', href: 'https://cakna.org/web/search', icon: Search },
+		{ label: 'Rekod Puasa', sublabel: 'Jejaki puasa sunat', href: 'https://cakna.org/web/puasa', icon: Moon }
 	];
 </script>
 

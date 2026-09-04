@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import PageHeader from '$lib/components/chrome/PageHeader.svelte';
 	import { auth } from '$lib/state/auth.svelte';
 
@@ -53,7 +54,7 @@
 			});
 			if (!r.ok) throw new Error((await r.json())?.error ?? `HTTP ${r.status}`);
 			const room = await r.json();
-			await goto(`/halaqah/${room.slug}`);
+			await goto(`${base}/halaqah/${room.slug}`);
 		} catch (e) {
 			error = e instanceof Error ? e.message : String(e);
 		} finally {
@@ -80,7 +81,7 @@
 	{#if error === 'unauth'}
 		<div class="card note">
 			<p>Log masuk untuk menyertai halaqah.</p>
-			<a class="btn" href="/auth/login?next=/halaqah">Log masuk</a>
+			<a class="btn" href="{base}/auth/login?next={base}/halaqah">Log masuk</a>
 		</div>
 	{:else}
 		{#if !configured}
@@ -120,7 +121,7 @@
 			<ul class="list">
 				{#each rooms as r (r.id)}
 					<li>
-						<a class="room" href="/halaqah/{r.slug}">
+						<a class="room" href="{base}/halaqah/{r.slug}">
 							<div>
 								<div class="t">{r.title}</div>
 								<div class="m">

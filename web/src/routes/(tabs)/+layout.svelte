@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { base } from '$app/paths';
 	import TabBar from '$lib/components/chrome/TabBar.svelte';
 
 	let { children } = $props();
 
 	// Auth pages render as a full-screen branded card (like the pre-deployment
 	// login), so they suppress the tab bar and its reserved padding.
-	const bare = $derived(page.url.pathname.startsWith('/auth/'));
+	const bare = $derived(page.url.pathname.startsWith(`${base}/auth/`));
 </script>
 
 {#if bare}

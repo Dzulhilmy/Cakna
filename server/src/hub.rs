@@ -11,7 +11,15 @@ use crate::state::AppState;
 // ── Public (secret-only) proxies ─────────────────────────────────────────────
 
 pub async fn site(State(st): State<AppState>) -> Json<Value> {
-    Json(proxy_public(&st, "/api/site", serde_json::json!({})).await)
+    let raw = proxy_public(&st, "/api/site", serde_json::json!({})).await;
+    // Hub API wraps the content as { content: {...} }; mobile consumers expect the
+    // inner object directly so they can access fields like csrPage, sectionOrder, etc.
+    let content = raw
+        .get("content")
+        .and_then(|v| v.as_object())
+        .map(|o| Value::Object(o.clone()))
+        .unwrap_or(raw);
+    Json(content)
 }
 
 pub async fn programs(State(st): State<AppState>) -> Json<Value> {

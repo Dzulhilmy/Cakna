@@ -157,41 +157,79 @@ class HubCsrScreen extends StatelessWidget {
     final heading = hub.s(['csrPage', 'heading'], 'Berita CSR');
     final subtext =
         hub.s(['csrPage', 'subtext'], 'Kisah-kisah impak komuniti HOME Cakna');
-    return Container(
-      padding: EdgeInsets.fromLTRB(
-          20, MediaQuery.of(context).padding.top + 20, 20, 48),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF9E2A42), Color(0xFF6B1830)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(28),
-          bottomRight: Radius.circular(28),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (eyebrow.isNotEmpty) ...[
-            Text(eyebrow,
-                style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white60,
-                    letterSpacing: 0.8)),
-            const SizedBox(height: 6),
-          ],
-          Text(heading,
+    final bgImages = hub.strList(['csrPage', 'heroBgImages']);
+    final overlayVal = hub.s(['csrPage', 'heroOverlay'], 'medium');
+    final overlayAlpha = overlayVal == 'light' ? 0.3 : overlayVal == 'dark' ? 0.65 : 0.45;
+
+    const borderRadius = BorderRadius.only(
+      bottomLeft: Radius.circular(28),
+      bottomRight: Radius.circular(28),
+    );
+    final padding = EdgeInsets.fromLTRB(
+        20, MediaQuery.of(context).padding.top + 20, 20, 48);
+
+    final content = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (eyebrow.isNotEmpty) ...[
+          Text(eyebrow,
               style: const TextStyle(
-                  fontFamily: 'Lora',
-                  fontSize: 28,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white)),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white60,
+                  letterSpacing: 0.8)),
           const SizedBox(height: 6),
-          Text(subtext,
-              style: const TextStyle(fontSize: 13.5, color: Colors.white70)),
+        ],
+        Text(heading,
+            style: const TextStyle(
+                fontFamily: 'Lora',
+                fontSize: 28,
+                fontWeight: FontWeight.w700,
+                color: Colors.white)),
+        const SizedBox(height: 6),
+        Text(subtext,
+            style: const TextStyle(fontSize: 13.5, color: Colors.white70)),
+      ],
+    );
+
+    if (bgImages.isEmpty) {
+      return Container(
+        padding: padding,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF9E2A42), Color(0xFF6B1830)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: borderRadius,
+        ),
+        child: content,
+      );
+    }
+
+    return ClipRRect(
+      borderRadius: borderRadius,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.network(
+              CaknaApi.resolveHubUrl(bgImages[0]),
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFF9E2A42), Color(0xFF6B1830)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: Container(color: Color.fromRGBO(0, 0, 0, overlayAlpha)),
+          ),
+          Padding(padding: padding, child: content),
         ],
       ),
     );

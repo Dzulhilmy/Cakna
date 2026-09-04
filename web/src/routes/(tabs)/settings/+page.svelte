@@ -1,5 +1,6 @@
 <script lang="ts">
 	import PageHeader from '$lib/components/chrome/PageHeader.svelte';
+	import { base } from '$app/paths';
 	import SettingsPanel from '$lib/components/mushaf/SettingsPanel.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
@@ -102,11 +103,11 @@
 				</div>
 			{:else}
 				<div class="flex gap-2">
-					<Button variant="outline" class="flex-1" href="/auth/login">
+					<Button variant="outline" class="flex-1" href="{base}/auth/login">
 						<LogIn size={16} />
 						{ms ? 'Log masuk' : 'Sign in'}
 					</Button>
-					<Button variant="outline" class="flex-1" href="/auth/register">
+					<Button variant="outline" class="flex-1" href="{base}/auth/register">
 						<UserPlus size={16} />
 						{ms ? 'Daftar' : 'Register'}
 					</Button>

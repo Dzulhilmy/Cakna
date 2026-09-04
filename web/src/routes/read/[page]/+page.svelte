@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import { Button } from '$lib/components/ui/button';
 	import * as Drawer from '$lib/components/ui/drawer';
 	import AyahActionsDrawer from '$lib/components/mushaf/AyahActionsDrawer.svelte';
@@ -67,7 +68,7 @@
 	}
 
 	function go(page: number) {
-		if (page >= 1 && page <= 604) goto(`/read/${page}`);
+		if (page >= 1 && page <= 604) goto(`${base}/read/${page}`);
 	}
 
 	// swipe: left = next page, like the sample
@@ -142,7 +143,7 @@
 	{#if !focusMode}
 		<header class="fixed inset-x-0 top-0 z-30 border-b bg-card">
 			<div class="mx-auto flex h-14 max-w-[680px] items-center gap-1 px-2">
-				<a href="/" class="grid h-10 w-10 place-items-center rounded-xl text-muted-foreground">
+				<a href="{base}/" class="grid h-10 w-10 place-items-center rounded-xl text-muted-foreground">
 					<ArrowLeft size={20} />
 				</a>
 				<div class="min-w-0 flex-1 text-center">
@@ -153,7 +154,7 @@
 						{data.bundle.juz}
 					</p>
 				</div>
-				<a href="/search" class="grid h-10 w-10 place-items-center rounded-xl text-muted-foreground">
+				<a href="{base}/search" class="grid h-10 w-10 place-items-center rounded-xl text-muted-foreground">
 					<Search size={19} />
 				</a>
 				<button

@@ -22,6 +22,8 @@
 
 	function addStat() { p.gapStats = [...p.gapStats, { value: '', label: '' }]; }
 	function removeStat(i: number) { p.gapStats = p.gapStats.filter((_, idx) => idx !== i); }
+	function addBgImage() { p.heroBgImages = [...p.heroBgImages, '']; }
+	function removeBgImage(i: number) { p.heroBgImages = p.heroBgImages.filter((_, idx) => idx !== i); }
 	function addExpect() { p.expect = [...p.expect, '']; }
 	function removeExpect(i: number) { p.expect = p.expect.filter((_, idx) => idx !== i); }
 	function addAudience() { p.audience = [...p.audience, { title: '', desc: '' }]; }
@@ -71,6 +73,21 @@
 						<span class="text-sm font-medium text-zinc-700">Subtext</span>
 						<textarea class="field" rows="3" bind:value={p.subtext}></textarea>
 					</label>
+					<div>
+						<div class="flex items-center justify-between mb-2">
+							<span class="text-sm font-medium text-zinc-700">Background Images</span>
+							<button type="button" onclick={addBgImage} class="add-btn"><Plus size={13} /> Add URL</button>
+						</div>
+						<p class="text-xs text-zinc-400 mb-2">Paste full image URLs. First image is used as the hero background.</p>
+						<div class="space-y-2">
+							{#each p.heroBgImages as _, i}
+								<div class="flex gap-2 items-center">
+									<input class="field flex-1" bind:value={p.heroBgImages[i]} placeholder="https://..." />
+									<button type="button" onclick={() => removeBgImage(i)} class="del-btn"><Trash2 size={15} /></button>
+								</div>
+							{/each}
+						</div>
+					</div>
 					<label class="flex flex-col gap-1.5">
 						<span class="text-sm font-medium text-zinc-700">Overlay Strength</span>
 						<select class="field" bind:value={p.heroOverlay}>

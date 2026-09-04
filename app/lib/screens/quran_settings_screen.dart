@@ -118,7 +118,7 @@ class QuranSettingsScreen extends StatelessWidget {
                 const Divider(height: 1, indent: 56),
                 ListTile(
                   leading: const Icon(Icons.translate, color: CaknaColors.olive),
-                  title: const Text('Terjemahan / Tafsir'),
+                  title: const Text('Terjemahan'),
                   subtitle: Text(_langName(app.transLang)),
                   trailing: const Icon(Icons.chevron_right, color: CaknaColors.inkSoft),
                   onTap: () => _pickLang(context, app),

@@ -40,7 +40,7 @@
 	<div class="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
 		<PartitionTile href="/core" label="7 Core" description="Assist, Biz, Circle, Digital, Edu, Future & Green." icon={LayoutGrid} />
 		<PartitionTile href="/society" label="Society & Others" description="Community programs and everything else." icon={Users} />
-		<PartitionTile href="https://cakna.org/menu" label="Mushaf Digital" description="Quran, solat times, mathurat, zikir & more." icon={BookOpen} external />
+		<PartitionTile href="https://cakna.org/web/menu" label="Mushaf Digital" description="Quran, solat times, mathurat, zikir & more." icon={BookOpen} external />
 		{#if isStaff}
 			<PartitionTile href="/hub/admin/dashboard" label="Admin" description="Manage programs, funding, site content & users." icon={ShieldCheck} />
 		{/if}

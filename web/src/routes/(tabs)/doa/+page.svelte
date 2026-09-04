@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { DuaItem, QuranRef } from '$lib/api/types';
+	import { base } from '$app/paths';
 	import PageHeader from '$lib/components/chrome/PageHeader.svelte';
 	import ArabicText from '$lib/components/ArabicText.svelte';
 	import DoaAyatRange from '$lib/components/modules/DoaAyatRange.svelte';
@@ -31,7 +32,7 @@
 
 	function mushafHref(r: QuranRef): string {
 		const g = saToG(r.surah, r.ayah_from);
-		return `/read/${pageOf(g)}?g=${g}`;
+		return `${base}/read/${pageOf(g)}?g=${g}`;
 	}
 </script>
 

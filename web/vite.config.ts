@@ -14,6 +14,9 @@ export default defineConfig({
 			},
 			// SPA: static build served by the Rust API (prod) / Vite proxy (dev)
 			adapter: adapter({ fallback: 'index.html' }),
+			paths: {
+				base: '/web'
+			},
 			alias: {
 				$data: '../data/frontend'
 			}

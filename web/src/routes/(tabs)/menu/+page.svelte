@@ -6,6 +6,7 @@
 	import { settings, mathuratState, todayKey } from '$lib/state/stores.svelte';
 	import type { MathuratState } from '$lib/state/stores.svelte';
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import {
 		BookHeart,
 		ChevronRight,
@@ -66,7 +67,7 @@
 
 	function launchMathurat() {
 		showMathuratSheet = false;
-		goto(`/mathurat?v=${mtVersion}&m=${mtMode}`);
+		goto(`${base}/mathurat?v=${mtVersion}&m=${mtMode}`);
 	}
 
 	interface Mod {
@@ -78,32 +79,32 @@
 		{
 			title: t('modg_g1'),
 			mods: [
-				{ href: '/solat', label: t('mod_panelSolat'), icon: Clock },
-				{ href: '/qibla', label: t('mod_panelQiblat'), icon: Compass },
-				{ href: '/zikir', label: t('mod_panelZikir'), icon: HandHeart },
-				{ href: '/mathurat', label: t('mathurat'), icon: Sunrise },
-				{ href: '/yasin', label: t('p_yasin'), icon: BookHeart },
-				{ href: '/halaqah', label: en ? 'Halaqah' : 'Halaqah', icon: Radio },
-				{ href: '/selawat', label: t('p_selawat'), icon: Heart }
+				{ href: `${base}/solat`, label: t('mod_panelSolat'), icon: Clock },
+				{ href: `${base}/qibla`, label: t('mod_panelQiblat'), icon: Compass },
+				{ href: `${base}/zikir`, label: t('mod_panelZikir'), icon: HandHeart },
+				{ href: `${base}/mathurat`, label: t('mathurat'), icon: Sunrise },
+				{ href: `${base}/yasin`, label: t('p_yasin'), icon: BookHeart },
+				{ href: `${base}/halaqah`, label: en ? 'Halaqah' : 'Halaqah', icon: Radio },
+				{ href: `${base}/selawat`, label: t('p_selawat'), icon: Heart }
 			]
 		},
 		{
 			title: en ? 'Reference' : 'Rujukan',
 			mods: [
-				{ href: '/asma', label: t('mod_panelAsma'), icon: Star },
-				{ href: '/doa', label: t('mod_panelDoa'), icon: Droplet },
-				{ href: '/ibadah', label: t('p_ibadah'), icon: ListChecks },
-				{ href: '/mengaji', label: t('p_mengaji'), icon: GraduationCap }
+				{ href: `${base}/asma`, label: t('mod_panelAsma'), icon: Star },
+				{ href: `${base}/doa`, label: t('mod_panelDoa'), icon: Droplet },
+				{ href: `${base}/ibadah`, label: t('p_ibadah'), icon: ListChecks },
+				{ href: `${base}/mengaji`, label: t('p_mengaji'), icon: GraduationCap }
 			]
 		},
 		{
 			title: en ? 'Tools' : 'Alat',
 			mods: [
-				{ href: '/khatam', label: t('mod_panelSasaran'), icon: Target },
-				{ href: '/puasa', label: t('p_puasa'), icon: Moon },
-				{ href: '/zakat', label: t('p_zakat'), icon: Percent },
-				{ href: '/search', label: t('srch_title'), icon: Search },
-				{ href: '/surah', label: t('tab_surah'), icon: ListOrdered }
+				{ href: `${base}/khatam`, label: t('mod_panelSasaran'), icon: Target },
+				{ href: `${base}/puasa`, label: t('p_puasa'), icon: Moon },
+				{ href: `${base}/zakat`, label: t('p_zakat'), icon: Percent },
+				{ href: `${base}/search`, label: t('srch_title'), icon: Search },
+				{ href: `${base}/surah`, label: t('tab_surah'), icon: ListOrdered }
 			]
 		}
 	]);
@@ -132,7 +133,7 @@
 			</h2>
 			<div class="grid grid-cols-2 gap-2">
 				{#each g.mods as m (m.href)}
-					{#if m.href === '/mathurat'}
+					{#if m.href === `${base}/mathurat`}
 						<button
 							onclick={openMathurat}
 							class="flex items-center gap-2.5 rounded-2xl border bg-card px-3.5 py-3 text-[13.5px] font-medium transition-colors hover:bg-accent text-left"
@@ -185,7 +186,7 @@
 		{/if}
 
 		<a
-			href="/settings"
+			href="{base}/settings"
 			class="flex items-center gap-3 rounded-2xl border bg-card px-4 py-3.5 transition-colors hover:bg-accent"
 		>
 			<Settings size={19} class="shrink-0 text-primary" />
@@ -209,7 +210,7 @@
 			</div>
 		{:else}
 			<a
-				href="/auth/login"
+				href="{base}/auth/login"
 				class="mt-2 flex items-center gap-3 rounded-2xl border bg-card px-4 py-3.5 transition-colors hover:bg-accent"
 			>
 				<LogIn size={19} class="shrink-0 text-primary" />

@@ -2,6 +2,7 @@
 // adapted to 1-BASED globals (CDN url needs no +1 here).
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
+import { base } from '$app/paths';
 import { audioUrl, gToSA, pageOf, pageRange, SURAHS, TOTAL_AYAHS } from '$lib/quran/meta';
 import { loadChapterTimings, segmentsFor, wordAt, type WordSeg } from '$lib/quran/wordtiming';
 import { settings } from './stores.svelte';
@@ -210,7 +211,7 @@ class Player {
 		const p = pageOf(g);
 		if (p !== pageOf(this.playingG >= 1 ? this.playingG : g) || p !== settings.value.page) {
 			this.navigating = true;
-			goto(`/read/${p}`).finally(() => (this.navigating = false));
+			goto(`${base}/read/${p}`).finally(() => (this.navigating = false));
 		}
 	}
 
@@ -257,7 +258,7 @@ class Player {
 		//    gated on the auto-flip setting; continuous playback is now the default.)
 		if (page < 604) {
 			this.navigating = true;
-			goto(`/read/${page + 1}`).finally(() => (this.navigating = false));
+			goto(`${base}/read/${page + 1}`).finally(() => (this.navigating = false));
 			this.playFrom(g + 1);
 			return;
 		}

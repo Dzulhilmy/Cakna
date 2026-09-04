@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import { mathuratState, todayKey } from '$lib/state/stores.svelte';
 	import type { MathuratState } from '$lib/state/stores.svelte';
 
@@ -78,7 +79,7 @@
 			st()!.version = pilihV;
 			st()!.mode = pilihM;
 		}
-		goto(`/mathurat?v=${pilihV}&m=${pilihM}`);
+		goto(`${base}/mathurat?v=${pilihV}&m=${pilihM}`);
 	}
 </script>
 

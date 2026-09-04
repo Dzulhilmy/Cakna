@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import { page } from '$app/state';
 	import { player } from '$lib/state/player.svelte';
 	import { gToSA, pageOf, SURAHS } from '$lib/quran/meta';
 	import { Square } from '@lucide/svelte';
 
-	const visible = $derived(player.playingG >= 1 && !page.url.pathname.startsWith('/read'));
+	const visible = $derived(player.playingG >= 1 && !page.url.pathname.startsWith(`${base}/read`));
 	const label = $derived.by(() => {
 		if (player.playingG < 1) return '';
 		const { s, a } = gToSA(player.playingG);
@@ -20,7 +21,7 @@
 	>
 		<button
 			class="flex w-full max-w-[420px] items-center gap-3 rounded-2xl border border-gold-soft bg-card px-4 py-2.5 shadow-lg"
-			onclick={() => goto(`/read/${pageOf(player.playingG)}`)}
+			onclick={() => goto(`${base}/read/${pageOf(player.playingG)}`)}
 		>
 			<span class="relative flex h-2.5 w-2.5">
 				<span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60"></span>

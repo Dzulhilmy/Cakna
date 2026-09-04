@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import PageHeader from '$lib/components/chrome/PageHeader.svelte';
 	import { Input } from '$lib/components/ui/input';
 	import * as Tabs from '$lib/components/ui/tabs';
@@ -120,7 +121,7 @@
 						class="flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left active:bg-accent/40 {active
 							? 'bg-accent'
 							: ''}"
-						onclick={() => goto(`/read/${surahPage(s.number)}`)}
+						onclick={() => goto(`${base}/read/${surahPage(s.number)}`)}
 					>
 						{@render medallion(String(s.number))}
 						<span class="min-w-0 flex-1">
@@ -149,7 +150,7 @@
 					{@const p = pageOf(g)}
 					<button
 						class="flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left active:bg-accent/40"
-						onclick={() => goto(`/read/${p}`)}
+						onclick={() => goto(`${base}/read/${p}`)}
 					>
 						{@render medallion(String(i + 1))}
 						<span class="min-w-0 flex-1">
@@ -175,7 +176,7 @@
 					<div class="flex w-full items-center gap-1 rounded-xl">
 						<button
 							class="flex min-w-0 flex-1 items-center gap-3 rounded-xl px-2 py-2.5 text-left active:bg-accent/40"
-							onclick={() => goto(`/read/${p}`)}
+							onclick={() => goto(`${base}/read/${p}`)}
 						>
 							{@render medallion(String(p))}
 							<span class="min-w-0 flex-1">
@@ -212,7 +213,7 @@
 					<div class="flex w-full items-center gap-1 rounded-xl">
 						<button
 							class="flex min-w-0 flex-1 items-center gap-3 rounded-xl px-2 py-2.5 text-left active:bg-accent/40"
-							onclick={() => goto(`/read/${pageOf(g)}?g=${g}`)}
+							onclick={() => goto(`${base}/read/${pageOf(g)}?g=${g}`)}
 						>
 							{@render medallion('✎')}
 							<span class="min-w-0 flex-1">
