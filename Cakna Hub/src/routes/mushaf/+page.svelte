@@ -5,6 +5,7 @@
 	import MushafPage from '$lib/components/mushaf/MushafPage.svelte';
 	import TranslationBar from '$lib/components/mushaf/TranslationBar.svelte';
 	import MiniPlayer from '$lib/components/chrome/MiniPlayer.svelte';
+	import AudioPlayer from '$lib/components/mushaf/AudioPlayer.svelte';
 	import { getPage, prefetchPage } from '$lib/api/content';
 	import type { PageBundle } from '$lib/api/types';
 	import { QARIS } from '$lib/quran/tajweed';
@@ -128,7 +129,10 @@
 
 	<SideNav active="mushaf" />
 
-	<!-- Mini player (persists across pages) -->
+	<!-- Audio player — fixed above page-nav, mushaf-only -->
+	<AudioPlayer {currentPage} />
+
+	<!-- Mini player (visible outside /mushaf only) -->
 	<MiniPlayer />
 
 	<!-- Ayah Actions Sheet -->
@@ -262,7 +266,7 @@
 
 	.mushaf-main {
 		flex: 1;
-		padding: 20px 16px 140px;
+		padding: 20px 16px 200px;
 		overflow-y: auto;
 	}
 
