@@ -7,16 +7,25 @@ function caknaBase() {
 
 export const load: PageServerLoad = async ({ request }) => {
 	const cookie = request.headers.get('cookie') ?? '';
-	try {
-		const res = await fetch(`${caknaBase()}/api/halaqah/rooms`, {
-			headers: { cookie },
-			signal: AbortSignal.timeout(5000)
-		});
-		if (!res.ok) return { rooms: [] };
-		return { rooms: (await res.json()) as ActiveRoom[] };
-	} catch {
-		return { rooms: [] };
+	const base = caknaBase();
+	const [roomsRes, meRes] = await Promise.allSettled([
+		fetch(`${base}/api/halaqah/rooms`, { headers: { cookie }, signal: AbortSignal.timeout(5000) }),
+		fetch(`${base}/api/auth/me`, { headers: { cookie }, signal: AbortSignal.timeout(4000) })
+	]);
+
+	let rooms: ActiveRoom[] = [];
+	if (roomsRes.status === 'fulfilled' && roomsRes.value.ok) {
+		const body = await roomsRes.value.json();
+		rooms = Array.isArray(body) ? body : (body.rooms ?? []);
 	}
+
+	let isAdmin = false;
+	if (meRes.status === 'fulfilled' && meRes.value.ok) {
+		const me = await meRes.value.json() as { is_admin?: boolean };
+		isAdmin = me.is_admin === true;
+	}
+
+	return { rooms, isAdmin };
 };
 
 export interface ActiveRoom {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 	import AudioVisualizer from '$lib/components/modules/AudioVisualizer.svelte';
 	import { halaqah } from '$lib/halaqah/store.svelte';
 	import { ChevronLeft, Mic, MicOff, Users, LogOut, Copy, X, Radio, BookOpen, ScrollText, MapPin } from 'lucide-svelte';
@@ -7,14 +7,37 @@
 
 	let { data } = $props();
 
-	let slug = $state(page.url.searchParams.get('slug') ?? '');
+	let roomTitle = $state('');
+	let creating = $state(false);
+	let createError = $state<string | null>(null);
 	let joining = $state(false);
 	let joinError = $state<string | null>(null);
 
 	const session = $derived(halaqah.session);
 	const active = $derived(halaqah.active);
 
-	async function join(s = slug) {
+	async function create() {
+		if (!roomTitle.trim() || creating) return;
+		creating = true;
+		createError = null;
+		try {
+			const r = await fetch('/api/halaqah/rooms', {
+				method: 'POST',
+				credentials: 'same-origin',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ title: roomTitle.trim() })
+			});
+			if (!r.ok) throw new Error((await r.json())?.error ?? `HTTP ${r.status}`);
+			const room = await r.json();
+			await goto(`/halaqah/${room.slug}`);
+		} catch (e: unknown) {
+			createError = e instanceof Error ? e.message : 'Gagal membuka sesi.';
+		} finally {
+			creating = false;
+		}
+	}
+
+	async function join(s: string) {
 		if (!s.trim()) return;
 		joining = true;
 		joinError = null;
@@ -45,7 +68,7 @@
 	}
 
 	const memberCount = $derived(session?.members?.length ?? 0);
-	const roomTitle = $derived(session?.title ?? session?.slug ?? '');
+	const sessionTitle = $derived(session?.title ?? session?.slug ?? '');
 
 	function fmtAge(iso: string) {
 		const ms = Date.now() - new Date(iso).getTime();
@@ -69,7 +92,7 @@
 					<span class="live-dot"></span>
 					Langsung
 				</span>
-				<span class="hdr-title">{roomTitle}</span>
+				<span class="hdr-title">{sessionTitle}</span>
 			{:else}
 				<span class="hdr-title">Halaqah</span>
 			{/if}
@@ -177,7 +200,7 @@
 				{/if}
 			</div>
 		{:else}
-			<!-- Join / Lobby -->
+			<!-- Lobby -->
 			<div class="lobby">
 				<div class="lobby-hero">
 					<div class="lobby-icon">
@@ -187,81 +210,60 @@
 					<p class="lobby-sub">Platform pembelajaran Al-Quran secara langsung bersama-sama.</p>
 				</div>
 
-				<!-- Join form -->
-				<div class="join-card">
-					<h2 class="card-title">Sertai Sesi</h2>
-					<div class="join-row">
-						<input
-							class="join-input"
-							type="text"
-							placeholder="Kod sesi (cth: cakna-123)"
-							bind:value={slug}
-							onkeydown={(e) => e.key === 'Enter' && join()}
-						/>
-						<button class="join-btn" onclick={() => join()} disabled={joining || !slug.trim()}>
-							{joining ? 'Menyambung…' : 'Sertai'}
-						</button>
-					</div>
-					{#if joinError}
-						<p class="join-error">{joinError}</p>
-					{/if}
-				</div>
-
-				<!-- Active rooms -->
-				{#if data.rooms.length > 0}
-					<div class="rooms-section">
-						<h2 class="card-title">Sesi Aktif</h2>
-						<div class="rooms-list">
-							{#each data.rooms as room (room.id)}
-								<div class="room-row">
-									<div class="room-info">
-										<span class="room-live-dot"></span>
-										<div>
-											<div class="room-title">{room.title}</div>
-											{#if room.host_name}
-												<div class="room-meta">Hos: {room.host_name} · {fmtAge(room.created_at)}</div>
-											{:else}
-												<div class="room-meta">{fmtAge(room.created_at)}</div>
-											{/if}
-										</div>
-									</div>
-									<button
-										class="join-btn room-join-btn"
-										onclick={() => join(room.slug)}
-										disabled={joining}
-									>
-										Sertai
-									</button>
-								</div>
-							{/each}
+				{#if data.isAdmin}
+					<div class="create-card">
+						<label class="create-label" for="room-title">Buka halaqah baharu</label>
+						<div class="create-row">
+							<input
+								id="room-title"
+								class="create-input"
+								type="text"
+								placeholder="cth. Tadarus Malam Khamis"
+								maxlength="80"
+								bind:value={roomTitle}
+								onkeydown={(e) => e.key === 'Enter' && create()}
+								disabled={creating}
+							/>
+							<button class="open-btn" onclick={create} disabled={creating || !roomTitle.trim()}>
+								{creating ? 'Membuka…' : 'Buka'}
+							</button>
 						</div>
+						<p class="create-hint">Anda menjadi hos. Sesi ditutup secara automatik selepas 5 jam — atau lebih awal jika anda tutup sendiri.</p>
+						{#if createError}
+							<p class="create-error">{createError}</p>
+						{/if}
 					</div>
 				{/if}
 
-				<!-- Feature bullets -->
-				<div class="features">
-					<div class="feat">
-						<span class="feat-icon"><BookOpen size={22} /></span>
-						<div>
-							<div class="feat-title">Mushaf Bersama</div>
-							<div class="feat-sub">Halaman Quran disinkron secara masa nyata</div>
-						</div>
+				{#if data.rooms.length === 0}
+					<div class="empty-card">
+						Tiada halaqah aktif buat masa ini.
+						{#if !data.isAdmin}<br />Hos akan membuka sesi apabila bersedia.{/if}
 					</div>
-					<div class="feat">
-						<span class="feat-icon"><Mic size={22} /></span>
-						<div>
-							<div class="feat-title">Audio Langsung</div>
-							<div class="feat-sub">Dengar bacaan guru terus dalam sesi</div>
-						</div>
+				{:else}
+					<div class="rooms-card">
+						{#each data.rooms as room (room.id)}
+							<button class="room-row" onclick={() => join(room.slug)} disabled={joining}>
+								<div class="room-info">
+									<span class="room-live-dot"></span>
+									<div>
+										<div class="room-title">{room.title}</div>
+										{#if room.host_name}
+											<div class="room-meta">Hos: {room.host_name} · {fmtAge(room.created_at)}</div>
+										{:else}
+											<div class="room-meta">{fmtAge(room.created_at)}</div>
+										{/if}
+									</div>
+								</div>
+								<span class="room-join-label">{joining ? '…' : 'Sertai'}</span>
+							</button>
+						{/each}
 					</div>
-					<div class="feat">
-						<span class="feat-icon"><ScrollText size={22} /></span>
-						<div>
-							<div class="feat-title">Al-Ma'thurat Bersama</div>
-							<div class="feat-sub">Bacaan wirid dikongsi dengan ahli sesi</div>
-						</div>
-					</div>
-				</div>
+				{/if}
+
+				{#if joinError}
+					<p class="join-error">{joinError}</p>
+				{/if}
 			</div>
 		{/if}
 	</main>
@@ -424,8 +426,8 @@
 	}
 
 	/* Lobby */
-	.lobby { padding: 24px 20px 40px; }
-	.lobby-hero { text-align: center; margin-bottom: 28px; }
+	.lobby { padding: 20px 20px 40px; display: flex; flex-direction: column; gap: 12px; }
+	.lobby-hero { text-align: center; margin-bottom: 8px; }
 	.lobby-icon {
 		display: inline-grid; place-items: center;
 		width: 72px; height: 72px;
@@ -438,16 +440,16 @@
 	.lobby-title { font-size: 28px; font-weight: 700; color: var(--pg-fg); margin-bottom: 6px; }
 	.lobby-sub { font-size: 14px; color: var(--pg-subtle); max-width: 320px; margin: 0 auto; }
 
-	.join-card {
+	/* Create card */
+	.create-card {
 		background: var(--pg-surface);
 		border: 1px solid var(--pg-btn-border);
 		border-radius: 16px;
 		padding: 18px;
-		margin-bottom: 16px;
 	}
-	.card-title { font-size: 11px; font-weight: 700; color: var(--pg-btn-color); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.08em; }
-	.join-row { display: flex; gap: 8px; }
-	.join-input {
+	.create-label { font-size: 14px; font-weight: 600; color: var(--pg-fg); display: block; margin-bottom: 10px; }
+	.create-row { display: flex; gap: 8px; }
+	.create-input {
 		flex: 1;
 		padding: 10px 14px;
 		border-radius: 10px;
@@ -457,38 +459,56 @@
 		font-size: 14px;
 		outline: none;
 	}
-	.join-input:focus { border-color: rgba(34,197,94,0.4); }
-	.join-input::placeholder { color: var(--pg-faint); }
-	.join-btn {
+	.create-input:focus { border-color: rgba(34,197,94,0.4); }
+	.create-input::placeholder { color: var(--pg-faint); }
+	.create-input:disabled { opacity: 0.6; }
+	.open-btn {
 		padding: 10px 18px;
 		border-radius: 10px;
-		background: rgba(34,197,94,0.2);
-		border: 1px solid rgba(34,197,94,0.3);
-		color: rgba(74,222,128,0.95);
+		background: rgba(34,197,94,0.65);
+		border: none;
+		color: #fff;
 		font-size: 14px; font-weight: 600;
 		cursor: pointer; white-space: nowrap;
 		transition: background 0.15s;
 	}
-	.join-btn:hover:not(:disabled) { background: rgba(34,197,94,0.28); }
-	.join-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-	.join-error { font-size: 12px; color: #f87171; margin-top: 8px; }
+	.open-btn:hover:not(:disabled) { background: rgba(34,197,94,0.8); }
+	.open-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+	.create-hint { font-size: 12px; color: var(--pg-subtle); margin: 8px 0 0; line-height: 1.5; }
+	.create-error { font-size: 12px; color: #f87171; margin: 6px 0 0; }
 
-	/* Active rooms */
-	.rooms-section {
+	/* Rooms / empty */
+	.empty-card {
 		background: var(--pg-surface);
 		border: 1px solid var(--pg-btn-border);
 		border-radius: 16px;
-		padding: 18px;
-		margin-bottom: 16px;
+		padding: 28px 20px;
+		text-align: center;
+		font-size: 14px;
+		color: var(--pg-subtle);
+		line-height: 1.6;
 	}
-	.rooms-list { display: flex; flex-direction: column; gap: 8px; }
+	.rooms-card {
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-btn-border);
+		border-radius: 16px;
+		overflow: hidden;
+	}
 	.room-row {
 		display: flex; align-items: center; justify-content: space-between; gap: 12px;
-		padding: 10px 12px;
-		border-radius: 12px;
-		background: var(--pg-btn);
-		border: 1px solid var(--pg-btn-border);
+		padding: 14px 16px;
+		width: 100%;
+		background: transparent;
+		border: none;
+		border-bottom: 1px solid var(--pg-btn-border);
+		color: inherit;
+		cursor: pointer;
+		text-align: left;
+		transition: background 0.12s;
 	}
+	.room-row:last-child { border-bottom: none; }
+	.room-row:hover:not(:disabled) { background: var(--pg-btn); }
+	.room-row:disabled { opacity: 0.6; cursor: not-allowed; }
 	.room-info { display: flex; align-items: center; gap: 10px; min-width: 0; }
 	.room-live-dot {
 		width: 8px; height: 8px; flex-shrink: 0;
@@ -499,19 +519,9 @@
 	}
 	.room-title { font-size: 13px; font-weight: 600; color: var(--pg-fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 	.room-meta { font-size: 11px; color: var(--pg-subtle); margin-top: 1px; }
-	.room-join-btn { padding: 7px 14px; font-size: 12px; flex-shrink: 0; }
+	.room-join-label { font-size: 12px; font-weight: 600; color: rgba(74,222,128,0.85); flex-shrink: 0; }
 
-	.features { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
-	.feat {
-		display: flex; align-items: flex-start; gap: 14px;
-		padding: 14px;
-		border-radius: 14px;
-		background: var(--pg-surface);
-		border: 1px solid var(--pg-surface-b);
-	}
-	.feat-icon { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 12px; background: rgba(74,222,128,0.08); color: rgba(74,222,128,0.8); flex-shrink: 0; }
-	.feat-title { font-size: 14px; font-weight: 600; color: var(--pg-text-75); margin-bottom: 2px; }
-	.feat-sub { font-size: 12px; color: var(--pg-subtle); }
+	.join-error { font-size: 12px; color: #f87171; text-align: center; }
 
 	.w-9 { width: 36px; }
 </style>
